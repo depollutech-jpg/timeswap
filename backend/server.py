@@ -503,9 +503,10 @@ async def get_my_exchanges(current_user: dict = Depends(get_current_user)):
 
 # Fixed packages for buying hours
 PACKAGES = {
-    "small": {"hours": 5, "price": 5.0},
-    "medium": {"hours": 10, "price": 9.0},
-    "large": {"hours": 20, "price": 15.0}
+    "basic": {"hours": 1, "price": 9.99, "requiresVerification": False},
+    "standard": {"hours": 5, "price": 44.95, "pricePerHour": 8.99, "requiresVerification": False},
+    "premium": {"hours": 10, "price": 79.90, "pricePerHour": 7.99, "requiresVerification": False},
+    "vip": {"hours": 20, "price": 139.80, "pricePerHour": 6.99, "requiresVerification": True}
 }
 
 @api_router.get("/payments/packages")
