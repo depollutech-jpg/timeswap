@@ -142,60 +142,81 @@ export default function HomeScreen() {
               <Text style={styles.emptyText}>Aucun service disponible</Text>
             </View>
           ) : (
-            services.map((service: any) => (
-              <TouchableOpacity key={service._id} style={styles.serviceCard}>
-                <View style={styles.serviceHeader}>
-                  <View style={styles.userInfo}>
-                    <View style={styles.userAvatar}>
-                      <Text style={styles.avatarText}>
-                        {service.user.name.split(' ').map((n: string) => n[0]).join('')}
-                      </Text>
-                    </View>
-                    <View>
-                      <View style={styles.userNameRow}>
-                        <Text style={styles.userName}>{service.user.name}</Text>
-                        {service.user.isVerified && (
-                          <Ionicons name="checkmark-circle" size={16} color="#10B981" />
-                        )}
-                      </View>
-                      <View style={styles.ratingRow}>
-                        <Ionicons name="star" size={12} color="#F59E0B" />
-                        <Text style={styles.rating}>{service.user.rating.toFixed(1)}</Text>
-                        <Text style={styles.exchanges}>
-                          · {(service.user.rating * 5).toFixed(0)} échanges
+            services.map((service: any) => {
+              const isOffer = service.type === 'offer';
+              const cardColor = isOffer ? '#FFF1F2' : '#F3E8FF';
+              const borderColor = isOffer ? Colors.primary : Colors.secondary;
+              const buttonColor = isOffer ? Colors.primary : Colors.secondary;
+
+              return (
+                <TouchableOpacity 
+                  key={service._id} 
+                  style={[
+                    styles.serviceCard,
+                    { 
+                      backgroundColor: cardColor,
+                      borderLeftWidth: 4,
+                      borderLeftColor: borderColor,
+                    }
+                  ]}
+                >
+                  <View style={styles.serviceHeader}>
+                    <View style={styles.userInfo}>
+                      <View style={[styles.userAvatar, { backgroundColor: borderColor }]}>
+                        <Text style={styles.avatarText}>
+                          {service.user.name.split(' ').map((n: string) => n[0]).join('')}
                         </Text>
                       </View>
+                      <View>
+                        <View style={styles.userNameRow}>
+                          <Text style={styles.userName}>{service.user.name}</Text>
+                          {service.user.isVerified && (
+                            <Ionicons name="checkmark-circle" size={16} color="#10B981" />
+                          )}
+                        </View>
+                        <View style={styles.ratingRow}>
+                          <Ionicons name="star" size={12} color="#F59E0B" />
+                          <Text style={styles.rating}>{service.user.rating.toFixed(1)}</Text>
+                          <Text style={styles.exchanges}>
+                            · {(service.user.rating * 5).toFixed(0)} échanges
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+                    <View style={[styles.typeBadge, { backgroundColor: borderColor + '30' }]}>
+                      <Text style={[styles.typeText, { color: borderColor }]}>
+                        {isOffer ? 'Offre' : 'Demande'}
+                      </Text>
                     </View>
                   </View>
-                  <TouchableOpacity style={styles.searchIcon}>
-                    <Ionicons name="search" size={20} color="#6B7280" />
+
+                  <Text style={styles.serviceTitle}>{service.title}</Text>
+                  <Text style={styles.serviceDescription} numberOfLines={2}>
+                    {service.description}
+                  </Text>
+
+                  <View style={styles.serviceFooter}>
+                    <View style={styles.serviceInfo}>
+                      <Ionicons name="time-outline" size={16} color="#6B7280" />
+                      <Text style={styles.serviceInfoText}>{service.duration}h</Text>
+                    </View>
+                    <View style={styles.serviceInfo}>
+                      <Ionicons name="location-outline" size={16} color="#6B7280" />
+                      <Text style={styles.serviceInfoText}>{service.location}</Text>
+                    </View>
+                    <View style={[styles.categoryBadge]}>
+                      <Text style={styles.categoryText}>{service.category}</Text>
+                    </View>
+                  </View>
+
+                  <TouchableOpacity style={[styles.proposeButton, { backgroundColor: buttonColor }]}>
+                    <Text style={styles.proposeButtonText}>
+                      {isOffer ? 'Proposer un échange' : 'Proposer mon aide'}
+                    </Text>
                   </TouchableOpacity>
-                </View>
-
-                <Text style={styles.serviceTitle}>{service.title}</Text>
-                <Text style={styles.serviceDescription} numberOfLines={2}>
-                  {service.description}
-                </Text>
-
-                <View style={styles.serviceFooter}>
-                  <View style={styles.serviceInfo}>
-                    <Ionicons name="time-outline" size={16} color="#6B7280" />
-                    <Text style={styles.serviceInfoText}>{service.duration}h</Text>
-                  </View>
-                  <View style={styles.serviceInfo}>
-                    <Ionicons name="location-outline" size={16} color="#6B7280" />
-                    <Text style={styles.serviceInfoText}>{service.location}</Text>
-                  </View>
-                  <View style={[styles.categoryBadge]}>
-                    <Text style={styles.categoryText}>{service.category}</Text>
-                  </View>
-                </View>
-
-                <TouchableOpacity style={styles.proposeButton}>
-                  <Text style={styles.proposeButtonText}>Proposer un échange</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
-            ))
+              );
+            }))
           )}
         </View>
       </ScrollView>
