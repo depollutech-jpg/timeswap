@@ -81,7 +81,11 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <View style={styles.greetingCard}>
+          <TouchableOpacity 
+            style={styles.greetingCard}
+            onPress={() => router.push('/(tabs)/solde')}
+            activeOpacity={0.8}
+          >
             <View style={styles.greetingIcon}>
               <Ionicons name="hand-right" size={32} color="#FF6B9D" />
             </View>
@@ -91,7 +95,8 @@ export default function HomeScreen() {
                 Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
               </Text>
             </View>
-          </View>
+            <Ionicons name="chevron-forward" size={20} color="#FF6B9D" />
+          </TouchableOpacity>
         </LinearGradient>
 
         {/* Barre de recherche */}
