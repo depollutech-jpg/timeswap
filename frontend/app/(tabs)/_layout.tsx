@@ -178,7 +178,7 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   floatingButton: {
     position: 'absolute',
-    bottom: 20,
+    bottom: 30,
     left: '50%',
     marginLeft: -32,
     width: 64,
