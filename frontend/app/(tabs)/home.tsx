@@ -93,6 +93,18 @@ export default function HomeScreen() {
           </View>
         </LinearGradient>
 
+        {/* Barre de recherche */}
+        <View style={styles.searchSection}>
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color="#6B7280" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Rechercher un service, une compétence..."
+              placeholderTextColor="#9CA3AF"
+            />
+          </View>
+        </View>
+
         {/* Filtres de catégories */}
         <View style={styles.filtersSection}>
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
