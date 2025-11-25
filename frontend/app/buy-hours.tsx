@@ -151,27 +151,51 @@ export default function BuyHoursScreen() {
 
         <Text style={styles.sectionTitle}>Choisissez votre forfait</Text>
 
-        {packages && Object.entries(packages).map(([key, pkg]) => (
-          <TouchableOpacity
-            key={key}
-            style={styles.packageCard}
-            onPress={() => handlePurchase(key)}
-            disabled={purchasing}
-          >
-            <View style={styles.packageInfo}>
-              <View>
-                <Text style={styles.packageHours}>{pkg.hours} heures</Text>
-                <Text style={styles.packageDesc}>
-                  {pkg.price / pkg.hours}€ par heure
-                </Text>
+        {packages && Object.entries(packages).map(([key, pkg]: [string, any]) => {
+          const isVIP = pkg.requiresVerification;
+          const canPurchase = !isVIP || user?.verification.isVerified;
+          
+          return (
+            <TouchableOpacity
+              key={key}
+              style={[
+                styles.packageCard,
+                isVIP && styles.packageCardVIP,
+                !canPurchase && styles.packageCardDisabled,
+              ]}
+              onPress={() => handlePurchase(key)}
+              disabled={purchasing || !canPurchase}
+            >
+              <View style={styles.packageInfo}>
+                <View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    <Text style={styles.packageHours}>{pkg.hours} heure{pkg.hours > 1 ? 's' : ''}</Text>
+                    {isVIP && (
+                      <View style={styles.vipBadge}>
+                        <Ionicons name="star" size={12} color="#F59E0B" />
+                        <Text style={styles.vipText}>VIP</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.packageDesc}>
+                    {pkg.pricePerHour ? `${pkg.pricePerHour.toFixed(2)}€/h` : `${pkg.price.toFixed(2)}€/h`}
+                  </Text>
+                  {isVIP && !canPurchase && (
+                    <Text style={styles.verificationRequired}>
+                      ⚠️ Vérification requise
+                    </Text>
+                  )}
+                </View>
+                <View style={styles.packagePriceContainer}>
+                  <Text style={styles.packagePrice}>{pkg.price.toFixed(2)}€</Text>
+                  {canPurchase && (
+                    <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+                  )}
+                </View>
               </View>
-              <View style={styles.packagePriceContainer}>
-                <Text style={styles.packagePrice}>{pkg.price}€</Text>
-                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
-              </View>
-            </View>
-          </TouchableOpacity>
-        ))}
+            </TouchableOpacity>
+          );
+        })}
 
         <View style={styles.featuresCard}>
           <Text style={styles.featuresTitle}>Avantages</Text>
