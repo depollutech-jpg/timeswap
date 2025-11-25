@@ -97,12 +97,17 @@ export default function TabsLayout() {
             borderTopColor: Colors.border,
             paddingTop: 8,
             paddingBottom: insets.bottom + 8,
-            height: 60 + insets.bottom,
+            height: 65 + insets.bottom,
             backgroundColor: '#FFFFFF',
+            justifyContent: 'space-around',
           },
           tabBarLabelStyle: {
-            fontSize: 11,
+            fontSize: 10,
             fontWeight: '600',
+            marginTop: 2,
+          },
+          tabBarIconStyle: {
+            marginTop: 4,
           },
         }}
       >
@@ -111,7 +116,7 @@ export default function TabsLayout() {
           options={{
             title: 'Accueil',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="home" size={size} color={color} />
+              <Ionicons name="home" size={22} color={color} />
             ),
           }}
         />
@@ -120,7 +125,7 @@ export default function TabsLayout() {
           options={{
             title: 'Solde',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="wallet" size={size} color={color} />
+              <Ionicons name="wallet" size={22} color={color} />
             ),
           }}
         />
@@ -129,19 +134,8 @@ export default function TabsLayout() {
           options={{
             title: 'Récompenses',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="trophy" size={size} color={color} />
+              <Ionicons name="trophy" size={22} color={color} />
             ),
-          }}
-        />
-        {/* Espace vide pour le bouton flottant */}
-        <Tabs.Screen
-          name="placeholder"
-          options={{
-            title: '',
-            tabBarButton: () => <View style={{ width: 50 }} />,
-          }}
-          listeners={{
-            tabPress: (e) => e.preventDefault(),
           }}
         />
         <Tabs.Screen
@@ -149,7 +143,7 @@ export default function TabsLayout() {
           options={{
             title: 'Messages',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="chatbubbles" size={size} color={color} />
+              <Ionicons name="chatbubbles" size={22} color={color} />
             ),
           }}
         />
@@ -158,11 +152,17 @@ export default function TabsLayout() {
           options={{
             title: 'Profil',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="person" size={size} color={color} />
+              <Ionicons name="person" size={22} color={color} />
             ),
           }}
         />
         {/* Pages cachées */}
+        <Tabs.Screen
+          name="placeholder"
+          options={{
+            href: null,
+          }}
+        />
         <Tabs.Screen
           name="search"
           options={{
