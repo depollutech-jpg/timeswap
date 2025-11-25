@@ -276,6 +276,32 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.primary + '40',
   },
+  packageCardVIP: {
+    borderColor: '#F59E0B',
+    backgroundColor: '#FEF3C7',
+  },
+  packageCardDisabled: {
+    opacity: 0.5,
+  },
+  vipBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F59E0B',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    gap: 4,
+  },
+  vipText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
+  },
+  verificationRequired: {
+    fontSize: 12,
+    color: Colors.error,
+    marginTop: 4,
+  },
   packageInfo: {
     flexDirection: 'row',
     justifyContent: 'space-between',
