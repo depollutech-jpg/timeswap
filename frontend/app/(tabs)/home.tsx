@@ -56,6 +56,17 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Bouton Admin flottant (visible uniquement pour les admins) */}
+      {user?.role === 'admin' && (
+        <TouchableOpacity
+          style={styles.adminButton}
+          onPress={() => router.push('/admin')}
+          activeOpacity={0.8}
+        >
+          <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
+      )}
+
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
