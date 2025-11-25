@@ -1,0 +1,18 @@
+export const CATEGORIES = [
+  { id: 'bricolage', label: 'Bricolage', icon: '🔨' },
+  { id: 'jardinage', label: 'Jardinage', icon: '🌱' },
+  { id: 'cuisine', label: 'Cuisine', icon: '🍳' },
+  { id: 'menage', label: 'Ménage', icon: '🧹' },
+  { id: 'informatique', label: 'Informatique', icon: '💻' },
+  { id: 'cours', label: 'Cours', icon: '📚' },
+  { id: 'garde_enfants', label: 'Garde d\'enfants', icon: '👶' },
+  { id: 'transport', label: 'Transport', icon: '🚗' },
+  { id: 'soutien', label: 'Soutien scolaire', icon: '✏️' },
+  { id: 'sport', label: 'Sport & Fitness', icon: '🏋️' },
+  { id: 'art', label: 'Art & Créativité', icon: '🎨' },
+  { id: 'musique', label: 'Musique', icon: '🎵' },
+  { id: 'langues', label: 'Langues', icon: '🗣️' },
+  { id: 'administratif', label: 'Aide administrative', icon: '📄' },
+  { id: 'animaux', label: 'Soins animaux', icon: '🐕' },
+  { id: 'autre', label: 'Autre', icon: '⭐' },
+];
