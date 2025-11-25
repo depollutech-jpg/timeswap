@@ -670,6 +670,139 @@ async def get_badges():
     ]
     return badges
 
+# ============= ADMIN ROUTES =============
+
+async def check_admin(current_user: dict = Depends(get_current_user)):
+    if current_user.get("role") != "admin":
+        raise HTTPException(403, "Admin access required")
+    return current_user
+
+@api_router.get("/admin/stats")
+async def get_admin_stats(admin: dict = Depends(check_admin)):
+    # Total users
+    total_users = await db.users.count_documents({})
+    verified_users = await db.users.count_documents({"verification.isVerified": True})
+    
+    # Total services
+    total_services = await db.services.count_documents({})
+    active_services = await db.services.count_documents({"status": "active"})
+    
+    # Total exchanges
+    total_exchanges = await db.exchanges.count_documents({})
+    completed_exchanges = await db.exchanges.count_documents({"status": "completed"})
+    
+    # Total transactions
+    total_transactions = await db.payment_transactions.count_documents({})
+    paid_transactions = await db.payment_transactions.count_documents({"payment_status": "paid"})
+    
+    # Calculate total revenue
+    transactions = await db.payment_transactions.find({"payment_status": "paid"}).to_list(length=10000)
+    total_revenue = sum(t.get("amount", 0) for t in transactions)
+    
+    return {
+        "users": {"total": total_users, "verified": verified_users},
+        "services": {"total": total_services, "active": active_services},
+        "exchanges": {"total": total_exchanges, "completed": completed_exchanges},
+        "transactions": {"total": total_transactions, "paid": paid_transactions},
+        "revenue": total_revenue
+    }
+
+@api_router.get("/admin/users")
+async def get_all_users(skip: int = 0, limit: int = 50, admin: dict = Depends(check_admin)):
+    users = await db.users.find().skip(skip).limit(limit).sort("createdAt", -1).to_list(length=limit)
+    for user in users:
+        user.pop("password_hash", None)
+    return users
+
+@api_router.put("/admin/users/{user_id}/ban")
+async def ban_user(user_id: str, admin: dict = Depends(check_admin)):
+    await db.users.update_one(
+        {"_id": user_id},
+        {"$set": {"isBanned": True, "updatedAt": datetime.utcnow()}}
+    )
+    return {"message": "User banned successfully"}
+
+@api_router.put("/admin/users/{user_id}/unban")
+async def unban_user(user_id: str, admin: dict = Depends(check_admin)):
+    await db.users.update_one(
+        {"_id": user_id},
+        {"$set": {"isBanned": False, "updatedAt": datetime.utcnow()}}
+    )
+    return {"message": "User unbanned successfully"}
+
+@api_router.put("/admin/users/{user_id}/verify")
+async def verify_user(user_id: str, admin: dict = Depends(check_admin)):
+    await db.users.update_one(
+        {"_id": user_id},
+        {"$set": {
+            "verification.isVerified": True,
+            "verification.verifiedAt": datetime.utcnow(),
+            "updatedAt": datetime.utcnow()
+        }}
+    )
+    return {"message": "User verified successfully"}
+
+@api_router.get("/admin/services/stats")
+async def get_services_stats(admin: dict = Depends(check_admin)):
+    # Services by category
+    pipeline = [
+        {"$group": {"_id": "$category", "count": {"$sum": 1}}},
+        {"$sort": {"count": -1}}
+    ]
+    categories = await db.services.aggregate(pipeline).to_list(length=100)
+    
+    # Services by type
+    offers = await db.services.count_documents({"type": "offer"})
+    requests = await db.services.count_documents({"type": "request"})
+    
+    return {
+        "byCategory": categories,
+        "byType": {"offers": offers, "requests": requests}
+    }
+
+@api_router.get("/admin/exchanges/flow")
+async def get_exchanges_flow(admin: dict = Depends(check_admin)):
+    # Get all completed exchanges
+    exchanges = await db.exchanges.find({"status": "completed"}).to_list(length=10000)
+    
+    # Calculate hours given vs received
+    total_hours_exchanged = sum(e.get("duration", 0) for e in exchanges)
+    
+    # Get users balance
+    users = await db.users.find().to_list(length=10000)
+    user_balances = [
+        {
+            "userId": u["_id"],
+            "name": f"{u['profile']['firstName']} {u['profile']['lastName']}",
+            "given": u["credits"]["given"],
+            "received": u["credits"]["received"],
+            "balance": u["credits"]["available"]
+        }
+        for u in users
+    ]
+    
+    return {
+        "totalHoursExchanged": total_hours_exchanged,
+        "userBalances": sorted(user_balances, key=lambda x: x["given"], reverse=True)[:20]
+    }
+
+@api_router.get("/admin/transactions")
+async def get_all_transactions(skip: int = 0, limit: int = 50, admin: dict = Depends(check_admin)):
+    transactions = await db.payment_transactions.find().skip(skip).limit(limit).sort("createdAt", -1).to_list(length=limit)
+    
+    # Enrich with user data
+    enriched = []
+    for t in transactions:
+        user = await db.users.find_one({"_id": t["userId"]})
+        if user:
+            enriched.append({
+                **t,
+                "userName": f"{user['profile']['firstName']} {user['profile']['lastName']}",
+                "userEmail": user["email"]
+            })
+    
+    return enriched
+
 # ============= HEALTH CHECK =============
 
 @api_router.get("/")
