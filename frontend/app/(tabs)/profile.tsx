@@ -371,6 +371,21 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.menuSection}>
+              {user?.role === 'admin' && (
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  onPress={() => router.push('/admin')}
+                >
+                  <View style={styles.menuItemLeft}>
+                    <Ionicons name="shield-checkmark" size={24} color="#8B5CF6" />
+                    <Text style={[styles.menuItemText, { color: '#8B5CF6' }]}>
+                      Dashboard Admin
+                    </Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
+                </TouchableOpacity>
+              )}
+
               <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.menuItemLeft}>
                   <Ionicons name="settings-outline" size={24} color={Colors.text} />
