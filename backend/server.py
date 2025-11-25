@@ -129,10 +129,15 @@ async def register(user_data: UserRegister):
     user_id = str(uuid.uuid4())
     hashed_pwd = hash_password(user_data.password)
     
+    # Check if admin
+    ADMIN_EMAILS = ["quentinraffalli@hotmail.com", "depollutech@gmail.com"]
+    is_admin = user_data.email.lower() in [e.lower() for e in ADMIN_EMAILS]
+    
     user = {
         "_id": user_id,
         "email": user_data.email,
         "password_hash": hashed_pwd,
+        "role": "admin" if is_admin else "user",
         "profile": {
             "firstName": user_data.firstName,
             "lastName": user_data.lastName,
