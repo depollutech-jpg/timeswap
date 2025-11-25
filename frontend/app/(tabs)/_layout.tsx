@@ -101,7 +101,7 @@ export default function TabsLayout() {
             backgroundColor: '#FFFFFF',
           },
           tabBarLabelStyle: {
-            fontSize: 12,
+            fontSize: 11,
             fontWeight: '600',
           },
         }}
@@ -124,12 +124,21 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="rewards"
+          options={{
+            title: 'Récompenses',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="trophy" size={size} color={color} />
+            ),
+          }}
+        />
         {/* Espace vide pour le bouton flottant */}
         <Tabs.Screen
           name="placeholder"
           options={{
             title: '',
-            tabBarButton: () => <View style={{ width: 60 }} />,
+            tabBarButton: () => <View style={{ width: 50 }} />,
           }}
           listeners={{
             tabPress: (e) => e.preventDefault(),
@@ -156,12 +165,6 @@ export default function TabsLayout() {
         {/* Pages cachées */}
         <Tabs.Screen
           name="search"
-          options={{
-            href: null,
-          }}
-        />
-        <Tabs.Screen
-          name="rewards"
           options={{
             href: null,
           }}
