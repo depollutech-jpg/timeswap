@@ -56,17 +56,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Bouton Admin flottant (visible uniquement pour les admins) */}
-      {user?.role === 'admin' && (
-        <TouchableOpacity
-          style={styles.adminButton}
-          onPress={() => router.push('/admin')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="shield-checkmark" size={24} color="#FFFFFF" />
-        </TouchableOpacity>
-      )}
-
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -81,6 +70,15 @@ export default function HomeScreen() {
           <View style={styles.headerTop}>
             <Text style={styles.logo}>TimeSwap</Text>
             <View style={styles.headerIcons}>
+              {user?.role === 'admin' && (
+                <TouchableOpacity
+                  style={styles.adminButton}
+                  onPress={() => router.push('/admin')}
+                  activeOpacity={0.8}
+                >
+                  <Ionicons name="shield-checkmark" size={22} color="#FFFFFF" />
+                </TouchableOpacity>
+              )}
               <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="calendar-outline" size={24} color="#FFFFFF" />
               </TouchableOpacity>
