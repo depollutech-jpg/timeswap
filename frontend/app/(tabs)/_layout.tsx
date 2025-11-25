@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
-import { TouchableOpacity, View, StyleSheet, Modal, Text } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Modal, Text, ScrollView, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 function FloatingAddButton() {
@@ -97,9 +97,10 @@ export default function TabsLayout() {
             borderTopColor: Colors.border,
             paddingTop: 8,
             paddingBottom: insets.bottom + 8,
-            height: 65 + insets.bottom,
+            paddingHorizontal: 0,
+            height: 68 + insets.bottom,
             backgroundColor: '#FFFFFF',
-            justifyContent: 'space-around',
+            overflow: 'visible',
           },
           tabBarLabelStyle: {
             fontSize: 10,
@@ -108,6 +109,11 @@ export default function TabsLayout() {
           },
           tabBarIconStyle: {
             marginTop: 4,
+          },
+          tabBarScrollEnabled: true,
+          tabBarItemStyle: {
+            paddingHorizontal: 8,
+            minWidth: 75,
           },
         }}
       >
@@ -153,6 +159,15 @@ export default function TabsLayout() {
             title: 'Profil',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="person" size={22} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
+          name="rappel"
+          options={{
+            title: 'Rappel',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="notifications" size={22} color={color} />
             ),
           }}
         />
