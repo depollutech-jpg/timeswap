@@ -227,7 +227,7 @@ export default function HomeScreen() {
                   </TouchableOpacity>
                 </TouchableOpacity>
               );
-            }))
+            })
           )}
         </View>
       </ScrollView>
