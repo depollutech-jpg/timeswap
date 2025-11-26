@@ -1,57 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, TextInput, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../src/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/authStore';
-
-// Données de démonstration pour les conversations
-const demoConversations = [
-  {
-    _id: '1',
-    otherUser: {
-      name: 'Marie Dupont',
-      avatar: 'MD',
-    },
-    lastMessage: {
-      text: 'Merci pour votre aide au jardinage !',
-      timestamp: new Date(Date.now() - 3600000).toISOString(),
-      isFromMe: false,
-    },
-    unreadCount: 2,
-  },
-  {
-    _id: '2',
-    otherUser: {
-      name: 'Pierre Martin',
-      avatar: 'PM',
-    },
-    lastMessage: {
-      text: 'À quelle heure êtes-vous disponible demain ?',
-      timestamp: new Date(Date.now() - 7200000).toISOString(),
-      isFromMe: true,
-    },
-    unreadCount: 0,
-  },
-  {
-    _id: '3',
-    otherUser: {
-      name: 'Sophie Leblanc',
-      avatar: 'SL',
-    },
-    lastMessage: {
-      text: 'Parfait ! À demain alors 😊',
-      timestamp: new Date(Date.now() - 86400000).toISOString(),
-      isFromMe: false,
-    },
-    unreadCount: 0,
-  },
-];
+import { useRouter } from 'expo-router';
+import api from '../../src/utils/api';
 
 export default function MessagesScreen() {
   const { user } = useAuthStore();
-  const [conversations, setConversations] = useState(demoConversations);
+  const router = useRouter();
+  const [conversations, setConversations] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+
+  useEffect(() => {
+    loadConversations();
+  }, []);
+
+  const loadConversations = async () => {
+    try {
+      const response = await api.get('/chats');
+      setConversations(response.data);
+    } catch (error) {
+      console.error('Failed to load conversations:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadConversations();
+  };
 
   const formatTime = (timestamp: string) => {
     const now = Date.now();
@@ -66,7 +49,7 @@ export default function MessagesScreen() {
   };
 
   const filteredConversations = conversations.filter((conv) =>
-    conv.otherUser.name.toLowerCase().includes(searchQuery.toLowerCase())
+    conv.otherUser?.name?.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   return (
