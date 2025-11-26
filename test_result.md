@@ -211,20 +211,58 @@ test_plan:
         agent: "main"
         comment: "Import conditionnel de react-native-chart-kit pour éviter les crashs sur mobile. Fallback UI ajouté pour afficher les données sans graphiques si la bibliothèque ne charge pas."
 
+  - task: "Système de notifications temps réel"
+    implemented: true
+    working: true
+    file: "src/store/notificationStore.ts, src/hooks/useNotificationPolling.ts, app/notifications.tsx, src/components/CustomTabBar.tsx, app/chat.tsx, app/_layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: |
+          Système de notifications temps réel complété:
+          1. Store de notifications mis à jour avec API réelles
+          2. Hook de polling créé (fetchNotifications toutes les 10s)
+          3. Polling intégré dans _layout.tsx
+          4. Page notifications.tsx mise à jour pour utiliser vraies données
+          5. Badge avec compteur ajouté sur l'onglet Messages
+          6. Auto-marquage des notifications comme lues lors de l'ouverture d'un chat
+          7. Navigation automatique vers le chat lors du clic sur notification
+
 agent_communication:
   - agent: "main"
     message: |
-      CORRECTIONS MAJEURES EFFECTUÉES:
+      ✅ SYSTÈME DE NOTIFICATIONS TEMPS RÉEL IMPLÉMENTÉ:
       
-      1. ✅ SÉPARATION MESSAGES/NOTIFICATIONS
-         - La page Messages (app/(tabs)/messages.tsx) contient maintenant UNIQUEMENT les conversations
-         - Les notifications ont été déplacées vers app/notifications.tsx
-         - L'icône de notification dans le header redirige vers /notifications
-         - 3 conversations de démonstration dans la page Messages
+      BACKEND (déjà en place):
+      - Endpoints /api/notifications existants et fonctionnels
+      - Création automatique de notifications lors de l'envoi de messages
       
-      2. ✅ COMPATIBILITÉ MOBILE AMÉLIORÉE
-         - Import conditionnel de react-native-chart-kit pour éviter les erreurs
-         - Fallback UI ajouté pour afficher les données si les graphiques ne chargent pas
-         - L'application devrait maintenant fonctionner sur smartphone
+      FRONTEND (nouvellement implémenté):
+      1. Store de notifications (notificationStore.ts)
+         - Connexion aux API backend
+         - Gestion du state des notifications
       
-      Prêt pour les tests sur mobile et PC.
+      2. Système de polling (useNotificationPolling.ts)
+         - Récupération automatique toutes les 10 secondes
+         - Pause quand l'app est en arrière-plan
+         - Intégré dans app/_layout.tsx
+      
+      3. Page Notifications (notifications.tsx)
+         - Affichage des vraies notifications depuis l'API
+         - Pull-to-refresh
+         - Navigation vers le chat au clic
+         - Marquage automatique comme lu
+      
+      4. Badge de notification
+         - Compteur sur l'onglet Messages dans le TabBar
+         - Affiche le nombre de notifications non lues
+         - Mise à jour en temps réel
+      
+      5. Auto-marquage (chat.tsx)
+         - Les notifications liées à un chat sont marquées comme lues automatiquement
+         - Quand l'utilisateur ouvre la conversation
+      
+      Prêt pour les tests backend et frontend.
