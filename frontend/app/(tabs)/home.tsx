@@ -27,8 +27,39 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Animations
+  const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
+  const slideFiltersAnim = React.useRef(new Animated.Value(50)).current;
+  const bounceServicesAnim = React.useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     loadServices();
+
+    // Animation Bounce pour le cadre principal "Bonjour Quentin"
+    Animated.spring(bounceCardAnim, {
+      toValue: 1,
+      friction: 4,
+      tension: 40,
+      useNativeDriver: true,
+      delay: 200,
+    }).start();
+
+    // Animation Slide pour les filtres/catégories
+    Animated.timing(slideFiltersAnim, {
+      toValue: 0,
+      duration: 600,
+      useNativeDriver: true,
+      delay: 400,
+    }).start();
+
+    // Animation Bounce pour les services/posts
+    Animated.spring(bounceServicesAnim, {
+      toValue: 1,
+      friction: 5,
+      tension: 40,
+      useNativeDriver: true,
+      delay: 600,
+    }).start();
   }, []);
 
   const loadServices = async () => {
