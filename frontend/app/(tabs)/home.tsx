@@ -67,9 +67,33 @@ export default function HomeScreen() {
     }).start();
   }, []);
 
+  const requestLocationPermission = async () => {
+    try {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === 'granted') {
+        const currentLocation = await Location.getCurrentPositionAsync({});
+        setLocation({
+          latitude: currentLocation.coords.latitude,
+          longitude: currentLocation.coords.longitude,
+        });
+        setLocationEnabled(true);
+      }
+    } catch (error) {
+      console.log('Location permission denied or error:', error);
+      setLocationEnabled(false);
+    }
+  };
+
   const loadServices = async () => {
     try {
-      const response = await api.get('/services?limit=10');
+      let url = '/services?limit=20';
+      
+      // Add location params if available
+      if (location) {
+        url += `&lat=${location.latitude}&lon=${location.longitude}`;
+      }
+      
+      const response = await api.get(url);
       setServices(response.data);
     } catch (error) {
       console.error('Failed to load services:', error);
@@ -79,10 +103,44 @@ export default function HomeScreen() {
     }
   };
 
+  const handleDeleteService = (serviceId: string) => {
+    Alert.alert(
+      'Supprimer l\'annonce',
+      'Voulez-vous vraiment supprimer cette annonce ?',
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.delete(`/services/${serviceId}`);
+              // Update UI immediately
+              setServices(services.filter((s: any) => s._id !== serviceId));
+              Alert.alert('Succès', 'Annonce supprimée avec succès');
+            } catch (error: any) {
+              Alert.alert(
+                'Erreur',
+                error.response?.data?.detail || 'Impossible de supprimer l\'annonce'
+              );
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const onRefresh = () => {
     setRefreshing(true);
     loadServices();
   };
+
+  // Reload when location changes
+  useEffect(() => {
+    if (location) {
+      loadServices();
+    }
+  }, [location]);
 
   if (loading) {
     return (
