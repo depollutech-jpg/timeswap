@@ -92,6 +92,50 @@ export default function AdminTabScreen() {
     }
   };
 
+  // Si l'utilisateur est admin connecté, afficher le dashboard
+  if (isAdminLoggedIn) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.dashboardHeader}>
+          <Text style={styles.dashboardTitle}>🛡️ Dashboard Admin</Text>
+          <Text style={styles.dashboardSubtitle}>Bienvenue {user?.profile.firstName}</Text>
+        </View>
+        <ScrollView style={styles.dashboardContent}>
+          <View style={styles.statsCard}>
+            <Ionicons name="people" size={32} color={Colors.primary} />
+            <Text style={styles.statsTitle}>Utilisateurs Actifs</Text>
+            <Text style={styles.statsValue}>---</Text>
+          </View>
+          
+          <View style={styles.statsCard}>
+            <Ionicons name="list" size={32} color={Colors.secondary} />
+            <Text style={styles.statsTitle}>Services Publiés</Text>
+            <Text style={styles.statsValue}>---</Text>
+          </View>
+
+          <View style={styles.infoCard}>
+            <Ionicons name="information-circle" size={24} color="#3B82F6" />
+            <Text style={styles.infoCardText}>
+              Le dashboard complet sera accessible via la page /admin.
+              Utilisez le bouton bouclier dans le header de l'accueil.
+            </Text>
+          </View>
+
+          <TouchableOpacity 
+            style={styles.fullDashboardButton}
+            onPress={() => router.push('/admin')}
+          >
+            <Ionicons name="stats-chart" size={20} color="#FFFFFF" />
+            <Text style={styles.fullDashboardButtonText}>
+              Accéder au Dashboard Complet
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    );
+  }
+
+  // Sinon, afficher le formulaire de connexion
   return (
     <SafeAreaView style={styles.container}>
       <KeyboardAvoidingView
