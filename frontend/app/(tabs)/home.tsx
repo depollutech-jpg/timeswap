@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
   TextInput,
   Animated,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../src/store/authStore';
@@ -18,6 +19,7 @@ import api from '../../src/utils/api';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
+import * as Location from 'expo-location';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
