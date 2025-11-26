@@ -57,6 +57,28 @@ export default function NotificationsScreen() {
     }
   };
 
+  const getNotificationTitle = (notification: any) => {
+    switch (notification.type) {
+      case 'message':
+        return '💬 Nouveau message';
+      case 'service':
+        return '🌱 Nouveau service';
+      case 'reward':
+        return '🎁 Récompense';
+      case 'system':
+        return '⭐ Système';
+      default:
+        return 'Notification';
+    }
+  };
+
+  const getNotificationMessage = (notification: any) => {
+    if (notification.type === 'message') {
+      return `${notification.senderName}: ${notification.content}`;
+    }
+    return notification.content || 'Nouvelle notification';
+  };
+
   const formatTime = (timestamp: string) => {
     const now = Date.now();
     const diff = now - new Date(timestamp).getTime();
@@ -64,12 +86,13 @@ export default function NotificationsScreen() {
     const hours = Math.floor(diff / 3600000);
     const days = Math.floor(diff / 86400000);
 
+    if (minutes < 1) return 'À l\'instant';
     if (minutes < 60) return `Il y a ${minutes}m`;
     if (hours < 24) return `Il y a ${hours}h`;
     return `Il y a ${days}j`;
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
   return (
     <SafeAreaView style={styles.container}>
