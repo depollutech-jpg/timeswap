@@ -1001,6 +1001,24 @@ async def send_message(
         }
     )
     
+    # Create notification for the other participant (not the sender)
+    other_participant_id = [p for p in chat["participants"] if p != current_user["_id"]][0]
+    notification = {
+        "_id": str(uuid.uuid4()),
+        "userId": other_participant_id,
+        "type": "message",
+        "messageId": message["_id"],
+        "chatId": chat_id,
+        "senderId": current_user["_id"],
+        "senderName": message["senderName"],
+        "content": message_data.content[:50],  # Preview
+        "timestamp": datetime.utcnow(),
+        "read": False
+    }
+    await db.notifications.insert_one(notification)
+    
+    return message
+    
 
 
 @api_router.get("/messages/unread/count")
