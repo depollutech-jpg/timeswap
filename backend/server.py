@@ -1001,6 +1001,61 @@ async def send_message(
         }
     )
     
+
+
+@api_router.get("/messages/unread/count")
+async def get_unread_count(current_user: dict = Depends(get_current_user)):
+    """Get count of unread messages for current user"""
+    # Find all messages where user is a participant but hasn't read
+    chats = await db.chats.find({
+        "participants": current_user["_id"]
+    }).to_list(length=None)
+    
+    chat_ids = [chat["_id"] for chat in chats]
+    
+    # Count messages not read by current user
+    unread_count = await db.messages.count_documents({
+        "chatId": {"$in": chat_ids},
+        "senderId": {"$ne": current_user["_id"]},  # Not sent by me
+        "readBy": {"$ne": current_user["_id"]}  # Not read by me
+    })
+    
+    # Get unread count per chat
+    unread_by_chat = {}
+    for chat_id in chat_ids:
+        count = await db.messages.count_documents({
+            "chatId": chat_id,
+            "senderId": {"$ne": current_user["_id"]},
+            "readBy": {"$ne": current_user["_id"]}
+        })
+        if count > 0:
+            unread_by_chat[chat_id] = count
+    
+    return {
+        "total": unread_count,
+        "byChat": unread_by_chat
+    }
+
+@api_router.post("/chats/{chat_id}/mark-read")
+async def mark_chat_as_read(chat_id: str, current_user: dict = Depends(get_current_user)):
+    """Mark all messages in a chat as read"""
+    chat = await db.chats.find_one({"_id": chat_id})
+    if not chat or current_user["_id"] not in chat["participants"]:
+        raise HTTPException(403, "Access denied")
+    
+    # Update all messages in this chat to add current user to readBy
+    result = await db.messages.update_many(
+        {
+            "chatId": chat_id,
+            "readBy": {"$ne": current_user["_id"]}
+        },
+        {
+            "$addToSet": {"readBy": current_user["_id"]}
+        }
+    )
+    
+    return {"marked_read": result.modified_count}
+
     return message
 
 # ============= ADMIN ROUTES =============
