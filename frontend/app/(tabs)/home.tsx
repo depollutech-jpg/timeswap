@@ -129,22 +129,36 @@ export default function HomeScreen() {
             </View>
           </View>
 
-          <TouchableOpacity 
-            style={styles.greetingCard}
-            onPress={() => router.push('/(tabs)/solde')}
-            activeOpacity={0.8}
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  scale: bounceCardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.9, 1],
+                  }),
+                },
+              ],
+              opacity: bounceCardAnim,
+            }}
           >
-            <View style={styles.greetingIcon}>
-              <Ionicons name="hand-right" size={32} color="#FF6B9D" />
-            </View>
-            <View style={styles.greetingContent}>
-              <Text style={styles.greetingTitle}>Bonjour {user?.profile.firstName} ! 👋</Text>
-              <Text style={styles.greetingSubtitle}>
-                Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
-              </Text>
-            </View>
-            <Ionicons name="chevron-forward" size={20} color="#FF6B9D" />
-          </TouchableOpacity>
+            <TouchableOpacity 
+              style={styles.greetingCard}
+              onPress={() => router.push('/(tabs)/solde')}
+              activeOpacity={0.8}
+            >
+              <View style={styles.greetingIcon}>
+                <Ionicons name="hand-right" size={32} color="#FF6B9D" />
+              </View>
+              <View style={styles.greetingContent}>
+                <Text style={styles.greetingTitle}>Bonjour {user?.profile.firstName} ! 👋</Text>
+                <Text style={styles.greetingSubtitle}>
+                  Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
+                </Text>
+              </View>
+              <Ionicons name="chevron-forward" size={20} color="#FF6B9D" />
+            </TouchableOpacity>
+          </Animated.View>
         </LinearGradient>
 
         {/* Barre de recherche */}
