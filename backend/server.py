@@ -939,7 +939,7 @@ async def cancel_exchange(
     """
     Annuler un echange avec penalites selon le statut
     """
-    exchange = await db.exchanges.find_one({"_id": exchange_id}")
+    exchange = await db.exchanges.find_one({"_id": exchange_id})
     if not exchange:
         raise HTTPException(404, "Exchange not found")
     
