@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -31,16 +31,12 @@ export default function AdminTabScreen() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Si l'utilisateur est déjà admin, rediriger vers le dashboard
-  if (user?.role === 'admin') {
-    router.replace('/admin');
-    return (
-      <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color={Colors.primary} />
-        <Text style={styles.loadingText}>Chargement du dashboard...</Text>
-      </View>
-    );
-  }
+  // Vérifier le statut admin au montage
+  useEffect(() => {
+    if (user?.role === 'admin') {
+      router.push('/admin');
+    }
+  }, [user?.role]);
 
   const handleAdminLogin = async () => {
     if (!email || !password) {
