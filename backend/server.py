@@ -90,6 +90,14 @@ class RatingCreate(BaseModel):
     rating: int
     review: Optional[str] = None
 
+class ChatCreate(BaseModel):
+    serviceId: str
+    participantId: str
+
+class MessageCreate(BaseModel):
+    content: str
+
+
 class CheckoutRequest(BaseModel):
     package_id: str
     origin_url: str
