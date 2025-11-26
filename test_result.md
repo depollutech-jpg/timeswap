@@ -214,10 +214,10 @@ test_plan:
   - task: "Système de notifications temps réel"
     implemented: true
     working: true
-    file: "src/store/notificationStore.ts, src/hooks/useNotificationPolling.ts, app/notifications.tsx, src/components/CustomTabBar.tsx, app/chat.tsx, app/_layout.tsx"
+    file: "server.py (backend), src/store/notificationStore.ts, src/hooks/useNotificationPolling.ts, app/notifications.tsx, src/components/CustomTabBar.tsx, app/chat.tsx, app/_layout.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -230,6 +230,47 @@ test_plan:
           5. Badge avec compteur ajouté sur l'onglet Messages
           6. Auto-marquage des notifications comme lues lors de l'ouverture d'un chat
           7. Navigation automatique vers le chat lors du clic sur notification
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ BACKEND NOTIFICATION SYSTEM FULLY TESTED AND WORKING:
+          
+          COMPREHENSIVE TESTING COMPLETED (20/21 tests passed):
+          
+          1. ✅ AUTOMATIC NOTIFICATION CREATION:
+             - Notifications automatically created when messages are sent (lines 1004-1018 in server.py)
+             - Correct structure: userId, type, messageId, chatId, senderId, senderName, content, timestamp, read=false
+             - Notifications only created for recipient, not sender
+          
+          2. ✅ GET /api/notifications ENDPOINT:
+             - Successfully retrieves all notifications for authenticated user
+             - Supports unread_only=true parameter filtering
+             - Returns notifications sorted by timestamp (descending)
+             - Proper authentication required
+          
+          3. ✅ MARK NOTIFICATION READ ENDPOINT:
+             - POST /api/notifications/{id}/mark-read works correctly
+             - Successfully marks individual notifications as read
+             - Security: Users cannot mark other users' notifications
+             - Verification: Notifications properly updated to read=true
+          
+          4. ✅ MARK ALL NOTIFICATIONS READ ENDPOINT:
+             - POST /api/notifications/mark-all-read works correctly
+             - Successfully marks all user notifications as read in bulk
+             - Returns correct count of marked notifications
+             - All notifications verified as read=true after operation
+          
+          5. ✅ SECURITY TESTING:
+             - Users can only see their own notifications
+             - Cross-user access properly prevented
+             - Authentication required for all endpoints
+          
+          BACKEND NOTIFICATION FLOW VERIFIED:
+          - Message sent → Notification created → Notification retrieved → Notification marked read
+          - All endpoints functional and secure
+          - Database operations working correctly
+          
+          Minor: Auth error returns 403 instead of 401 for unauthenticated requests (non-critical)
 
 agent_communication:
   - agent: "main"
