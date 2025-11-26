@@ -115,8 +115,17 @@ export default function NotificationsScreen() {
         )}
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {notifications.length === 0 ? (
+      <ScrollView 
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {isLoading && notifications.length === 0 ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        ) : notifications.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="notifications-outline" size={64} color={Colors.textSecondary} />
             <Text style={styles.emptyTitle}>Aucune notification</Text>
@@ -147,9 +156,9 @@ export default function NotificationsScreen() {
                 <TouchableOpacity
                   style={[
                     styles.notificationCard,
-                    !notification.isRead && styles.notificationUnread,
+                    !notification.read && styles.notificationUnread,
                   ]}
-                  onPress={() => markAsRead(notification._id)}
+                  onPress={() => handleNotificationPress(notification)}
                   activeOpacity={0.7}
                 >
                   <View style={[styles.iconContainer, { backgroundColor: icon.color + '20' }]}>
@@ -157,14 +166,14 @@ export default function NotificationsScreen() {
                   </View>
 
                   <View style={styles.notificationContent}>
-                    <Text style={styles.notificationTitle}>{notification.title}</Text>
+                    <Text style={styles.notificationTitle}>{getNotificationTitle(notification)}</Text>
                     <Text style={styles.notificationMessage} numberOfLines={2}>
-                      {notification.message}
+                      {getNotificationMessage(notification)}
                     </Text>
-                    <Text style={styles.notificationTime}>{formatTime(notification.createdAt)}</Text>
+                    <Text style={styles.notificationTime}>{formatTime(notification.timestamp)}</Text>
                   </View>
 
-                  {!notification.isRead && <View style={styles.unreadDot} />}
+                  {!notification.read && <View style={styles.unreadDot} />}
                 </TouchableOpacity>
               </Animated.View>
             );
