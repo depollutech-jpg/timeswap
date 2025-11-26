@@ -539,6 +539,37 @@ async def get_my_services(current_user: dict = Depends(get_current_user)):
     services = await db.services.find({"userId": current_user["_id"]}).sort("createdAt", -1).to_list(length=100)
     return services
 
+
+
+@api_router.delete("/services/{service_id}")
+async def delete_service(service_id: str, current_user: dict = Depends(get_current_user)):
+    """Delete a service (only by its author)"""
+    service = await db.services.find_one({"_id": service_id})
+    
+    if not service:
+        raise HTTPException(404, "Service not found")
+    
+    # Check if current user is the author
+    if service["userId"] != current_user["_id"]:
+        raise HTTPException(403, "You can only delete your own services")
+    
+    # Check if service has pending/active exchanges
+    active_exchanges = await db.exchanges.find_one({
+        "serviceId": service_id,
+        "status": {"$in": ["pending", "accepted"]}
+    })
+    
+    if active_exchanges:
+        raise HTTPException(400, "Cannot delete service with active exchanges")
+    
+    # Soft delete (mark as deleted instead of removing)
+    await db.services.update_one(
+        {"_id": service_id},
+        {"$set": {"status": "deleted", "deletedAt": datetime.utcnow()}}
+    )
+    
+    return {"message": "Service deleted successfully"}
+
 # ============= EXCHANGES ROUTES =============
 
 @api_router.post("/exchanges")
