@@ -236,6 +236,102 @@ async def get_me(current_user: dict = Depends(get_current_user)):
         "interests": current_user.get("interests", [])
     }
 
+
+# ============= PASSWORD RESET ROUTES =============
+
+def generate_reset_code():
+    """Generate a 6-digit reset code"""
+    return ''.join(random.choices(string.digits, k=6))
+
+@api_router.post("/auth/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """Request a password reset code"""
+    user = await db.users.find_one({"email": request.email})
+    if not user:
+        # Don't reveal if email exists or not for security
+        return {"message": "If this email exists, a reset code has been sent."}
+    
+    # Generate reset code
+    reset_code = generate_reset_code()
+    reset_code_expiry = datetime.utcnow() + timedelta(minutes=15)
+    
+    # Save reset code to database
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {
+                "resetCode": reset_code,
+                "resetCodeExpiry": reset_code_expiry
+            }
+        }
+    )
+    
+    # In development: log the code (in production, send via email)
+    print(f"\n{'='*50}")
+    print(f"PASSWORD RESET CODE FOR {request.email}")
+    print(f"Code: {reset_code}")
+    print(f"Expires at: {reset_code_expiry}")
+    print(f"{'='*50}\n")
+    
+    # TODO: Send email with reset code using SendGrid/similar service
+    # For now, we just log it
+    
+    return {
+        "message": "If this email exists, a reset code has been sent.",
+        "dev_code": reset_code  # Remove this in production!
+    }
+
+@api_router.post("/auth/verify-reset-code")
+async def verify_reset_code(request: VerifyResetCodeRequest):
+    """Verify if the reset code is valid"""
+    user = await db.users.find_one({"email": request.email})
+    if not user:
+        raise HTTPException(400, "Invalid email or code")
+    
+    # Check if code exists and is not expired
+    if not user.get("resetCode") or not user.get("resetCodeExpiry"):
+        raise HTTPException(400, "No reset code requested")
+    
+    if user["resetCode"] != request.code:
+        raise HTTPException(400, "Invalid reset code")
+    
+    if datetime.utcnow() > user["resetCodeExpiry"]:
+        raise HTTPException(400, "Reset code has expired")
+    
+    return {"message": "Code verified successfully"}
+
+@api_router.post("/auth/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    """Reset password using the code"""
+    user = await db.users.find_one({"email": request.email})
+    if not user:
+        raise HTTPException(400, "Invalid email or code")
+    
+    # Verify reset code
+    if not user.get("resetCode") or not user.get("resetCodeExpiry"):
+        raise HTTPException(400, "No reset code requested")
+    
+    if user["resetCode"] != request.code:
+        raise HTTPException(400, "Invalid reset code")
+    
+    if datetime.utcnow() > user["resetCodeExpiry"]:
+        raise HTTPException(400, "Reset code has expired")
+    
+    # Hash new password
+    password_hash = hash_password(request.new_password)
+    
+    # Update password and remove reset code
+    await db.users.update_one(
+        {"_id": user["_id"]},
+        {
+            "$set": {"password_hash": password_hash},
+            "$unset": {"resetCode": "", "resetCodeExpiry": ""}
+        }
+    )
+    
+    return {"message": "Password reset successfully"}
+
+
 # ============= PROFILE ROUTES =============
 
 @api_router.put("/profile")
