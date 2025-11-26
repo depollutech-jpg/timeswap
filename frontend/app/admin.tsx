@@ -640,4 +640,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginTop: 4,
   },
+  fallbackChart: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 16,
+  },
+  fallbackChartItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  fallbackChartLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+  },
+  fallbackChartValue: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+  },
 });
