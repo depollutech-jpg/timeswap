@@ -104,10 +104,10 @@ class TimeSwapTester:
         
         # Login admin users
         for i, admin_creds in enumerate(ADMIN_CREDENTIALS):
+            admin_key = f"admin{i+1}"
             response = self.make_request("POST", "/auth/login", data=admin_creds)
             if response and response.status_code == 200:
                 result = response.json()
-                admin_key = f"admin{i+1}"
                 self.tokens[admin_key] = result["token"]
                 self.users[admin_key] = result["user"]
                 print(f"✅ Logged in {admin_key}: {admin_creds['email']}")
