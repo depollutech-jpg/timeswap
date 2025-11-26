@@ -80,14 +80,20 @@ class ServiceCreate(BaseModel):
     type: str  # "offer" or "request"
     location: str
     coordinates: Optional[Dict[str, float]] = None
+    photos: Optional[List[str]] = []  # Liste de base64, max 3 photos
 
 class ExchangeCreate(BaseModel):
     serviceId: str
     message: Optional[str] = None
 
+class ExchangeAccept(BaseModel):
+    message: Optional[str] = None
+
+class ExchangeCancel(BaseModel):
+    reason: str
+
 class RatingCreate(BaseModel):
-    exchangeId: str
-    rating: int
+    rating: int  # 1-5 étoiles
     review: Optional[str] = None
 
 class ChatCreate(BaseModel):
@@ -96,6 +102,12 @@ class ChatCreate(BaseModel):
 
 class MessageCreate(BaseModel):
     content: str
+
+class ReportCreate(BaseModel):
+    targetType: str  # "service", "user", "message"
+    targetId: str
+    reason: str
+    description: Optional[str] = None
 
 
 class CheckoutRequest(BaseModel):
