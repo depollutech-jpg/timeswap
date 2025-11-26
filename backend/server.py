@@ -1588,6 +1588,282 @@ async def get_all_transactions(skip: int = 0, limit: int = 50, admin: dict = Dep
     
     return enriched
 
+# ============= RATINGS ROUTES =============
+
+@api_router.post("/exchanges/{exchange_id}/rate")
+async def rate_exchange(
+    exchange_id: str,
+    rating_data: RatingCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Noter un échange terminé (système d'avis type Vinted)
+    """
+    exchange = await db.exchanges.find_one({"_id": exchange_id})
+    if not exchange:
+        raise HTTPException(404, "Exchange not found")
+    
+    if exchange["status"] != "completed":
+        raise HTTPException(400, "Cannot rate an incomplete exchange")
+    
+    is_provider = exchange["providerId"] == current_user["_id"]
+    is_requester = exchange["requesterId"] == current_user["_id"]
+    
+    if not is_provider and not is_requester:
+        raise HTTPException(403, "Not authorized")
+    
+    # Vérifier si l'utilisateur a déjà noté
+    existing_rating = await db.ratings.find_one({
+        "exchangeId": exchange_id,
+        "fromUserId": current_user["_id"]
+    })
+    
+    if existing_rating:
+        raise HTTPException(400, "You have already rated this exchange")
+    
+    # Valider la note (1-5)
+    if rating_data.rating < 1 or rating_data.rating > 5:
+        raise HTTPException(400, "Rating must be between 1 and 5")
+    
+    # Déterminer qui est noté
+    rated_user_id = exchange["providerId"] if is_requester else exchange["requesterId"]
+    
+    # Créer la notation
+    rating_id = str(uuid.uuid4())
+    rating = {
+        "_id": rating_id,
+        "exchangeId": exchange_id,
+        "serviceId": exchange["serviceId"],
+        "fromUserId": current_user["_id"],
+        "toUserId": rated_user_id,
+        "rating": rating_data.rating,
+        "review": rating_data.review,
+        "createdAt": datetime.utcnow()
+    }
+    
+    await db.ratings.insert_one(rating)
+    
+    # Mettre à jour la moyenne de l'utilisateur noté
+    all_ratings = await db.ratings.find({"toUserId": rated_user_id}).to_list(length=None)
+    avg_rating = sum(r["rating"] for r in all_ratings) / len(all_ratings)
+    rating_count = len(all_ratings)
+    
+    await db.users.update_one(
+        {"_id": rated_user_id},
+        {
+            "$set": {
+                "rating": {
+                    "average": round(avg_rating, 2),
+                    "count": rating_count
+                }
+            }
+        }
+    )
+    
+    # Notification
+    notification = {
+        "_id": str(uuid.uuid4()),
+        "userId": rated_user_id,
+        "type": "system",
+        "content": f"Vous avez reçu une note de {rating_data.rating}/5 ⭐",
+        "exchangeId": exchange_id,
+        "timestamp": datetime.utcnow(),
+        "read": False
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "message": "Rating submitted successfully",
+        "ratingId": rating_id,
+        "newAverage": round(avg_rating, 2)
+    }
+
+@api_router.get("/users/{user_id}/ratings")
+async def get_user_ratings(user_id: str):
+    """
+    Récupérer toutes les notes d'un utilisateur
+    """
+    user = await db.users.find_one({"_id": user_id})
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    ratings = await db.ratings.find({"toUserId": user_id}).sort("createdAt", -1).to_list(length=100)
+    
+    # Enrichir avec les infos des auteurs
+    enriched_ratings = []
+    for rating in ratings:
+        from_user = await db.users.find_one({"_id": rating["fromUserId"]})
+        service = await db.services.find_one({"_id": rating["serviceId"]})
+        
+        enriched_ratings.append({
+            **rating,
+            "fromUser": {
+                "name": f"{from_user['profile']['firstName']} {from_user['profile']['lastName']}",
+                "photo": from_user['profile'].get("photo_base64"),
+                "level": from_user["gamification"]["level"]
+            },
+            "serviceTitle": service["title"] if service else "Service supprimé"
+        })
+    
+    return {
+        "averageRating": user.get("rating", {}).get("average", 0),
+        "ratingCount": user.get("rating", {}).get("count", 0),
+        "ratings": enriched_ratings
+    }
+
+# ============= REPORTS ROUTES =============
+
+@api_router.post("/reports")
+async def create_report(report_data: ReportCreate, current_user: dict = Depends(get_current_user)):
+    """
+    Créer un signalement (service, utilisateur, message)
+    """
+    report_id = str(uuid.uuid4())
+    
+    # Déterminer l'utilisateur signalé selon le type
+    reported_user_id = None
+    
+    if report_data.targetType == "user":
+        reported_user_id = report_data.targetId
+    elif report_data.targetType == "service":
+        service = await db.services.find_one({"_id": report_data.targetId})
+        if service:
+            reported_user_id = service["userId"]
+    elif report_data.targetType == "message":
+        message = await db.messages.find_one({"_id": report_data.targetId})
+        if message:
+            reported_user_id = message["senderId"]
+    
+    report = {
+        "_id": report_id,
+        "reporterId": current_user["_id"],
+        "reportedUserId": reported_user_id,
+        "targetType": report_data.targetType,
+        "targetId": report_data.targetId,
+        "reason": report_data.reason,
+        "description": report_data.description,
+        "status": "pending",  # pending, reviewed, resolved, dismissed
+        "createdAt": datetime.utcnow(),
+        "reviewedAt": None,
+        "reviewedBy": None
+    }
+    
+    await db.reports.insert_one(report)
+    
+    return {
+        "message": "Report submitted successfully",
+        "reportId": report_id
+    }
+
+@api_router.get("/admin/reports")
+async def get_all_reports(
+    status: Optional[str] = None,
+    admin: dict = Depends(check_admin)
+):
+    """
+    Récupérer tous les signalements (admin uniquement)
+    """
+    query = {}
+    if status:
+        query["status"] = status
+    
+    reports = await db.reports.find(query).sort("createdAt", -1).to_list(length=200)
+    
+    # Enrichir avec les infos des utilisateurs
+    enriched_reports = []
+    for report in reports:
+        reporter = await db.users.find_one({"_id": report["reporterId"]})
+        reported = await db.users.find_one({"_id": report.get("reportedUserId")}) if report.get("reportedUserId") else None
+        
+        enriched_reports.append({
+            **report,
+            "reporter": {
+                "name": f"{reporter['profile']['firstName']} {reporter['profile']['lastName']}",
+                "email": reporter["email"]
+            } if reporter else None,
+            "reported": {
+                "name": f"{reported['profile']['firstName']} {reported['profile']['lastName']}",
+                "email": reported["email"]
+            } if reported else None
+        })
+    
+    return enriched_reports
+
+@api_router.put("/admin/reports/{report_id}/status")
+async def update_report_status(
+    report_id: str,
+    status: str,
+    admin: dict = Depends(check_admin)
+):
+    """
+    Mettre à jour le statut d'un signalement (admin uniquement)
+    """
+    if status not in ["pending", "reviewed", "resolved", "dismissed"]:
+        raise HTTPException(400, "Invalid status")
+    
+    await db.reports.update_one(
+        {"_id": report_id},
+        {
+            "$set": {
+                "status": status,
+                "reviewedAt": datetime.utcnow(),
+                "reviewedBy": admin["_id"]
+            }
+        }
+    )
+    
+    return {"message": "Report status updated successfully"}
+
+# ============= USER PROFILE ENRICHED =============
+
+@api_router.get("/users/{user_id}/profile")
+async def get_user_profile(user_id: str):
+    """
+    Profil utilisateur enrichi avec stats, badges, notes (public)
+    """
+    user = await db.users.find_one({"_id": user_id})
+    if not user:
+        raise HTTPException(404, "User not found")
+    
+    # Compter les échanges terminés
+    completed_exchanges = await db.exchanges.count_documents({
+        "$or": [{"providerId": user_id}, {"requesterId": user_id}],
+        "status": "completed"
+    })
+    
+    # Récupérer la note moyenne
+    rating_info = user.get("rating", {"average": 0, "count": 0})
+    
+    # Récupérer les dernières notes
+    recent_ratings = await db.ratings.find({"toUserId": user_id}).sort("createdAt", -1).limit(5).to_list(length=5)
+    
+    enriched_ratings = []
+    for rating in recent_ratings:
+        from_user = await db.users.find_one({"_id": rating["fromUserId"]})
+        enriched_ratings.append({
+            "rating": rating["rating"],
+            "review": rating["review"],
+            "fromUserName": f"{from_user['profile']['firstName']} {from_user['profile']['lastName']}" if from_user else "Utilisateur",
+            "createdAt": rating["createdAt"]
+        })
+    
+    return {
+        "_id": user["_id"],
+        "name": f"{user['profile']['firstName']} {user['profile']['lastName']}",
+        "photo": user["profile"].get("photo_base64"),
+        "bio": user["profile"].get("bio", ""),
+        "location": user["profile"].get("location", ""),
+        "level": user["gamification"]["level"],
+        "xp": user["gamification"]["xp"],
+        "badges": user["gamification"].get("badges", []),
+        "stats": user["gamification"].get("stats", {}),
+        "isVerified": user["verification"]["isVerified"],
+        "rating": rating_info,
+        "completedExchanges": completed_exchanges,
+        "recentRatings": enriched_ratings,
+        "memberSince": user["createdAt"]
+    }
+
 # ============= HEALTH CHECK =============
 
 @api_router.get("/")
