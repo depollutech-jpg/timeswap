@@ -89,33 +89,11 @@ export default function TabsLayout() {
   return (
     <>
       <Tabs
+        tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
           headerShown: false,
           tabBarActiveTintColor: Colors.primary,
           tabBarInactiveTintColor: Colors.textSecondary,
-          tabBarStyle: {
-            borderTopWidth: 1,
-            borderTopColor: Colors.border,
-            paddingTop: 8,
-            paddingBottom: insets.bottom + 8,
-            paddingHorizontal: 0,
-            height: 68 + insets.bottom,
-            backgroundColor: '#FFFFFF',
-            overflow: 'visible',
-          },
-          tabBarLabelStyle: {
-            fontSize: 10,
-            fontWeight: '600',
-            marginTop: 2,
-          },
-          tabBarIconStyle: {
-            marginTop: 4,
-          },
-          tabBarScrollEnabled: true,
-          tabBarItemStyle: {
-            paddingHorizontal: 8,
-            minWidth: 75,
-          },
         }}
       >
         <Tabs.Screen
