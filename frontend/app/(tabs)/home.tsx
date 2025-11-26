@@ -354,16 +354,35 @@ export default function HomeScreen() {
                       <Ionicons name="location-outline" size={16} color="#6B7280" />
                       <Text style={styles.serviceInfoText}>{service.location}</Text>
                     </View>
+                    {service.distance_km && (
+                      <View style={[styles.distanceBadge]}>
+                        <Ionicons name="navigate" size={12} color="#10B981" />
+                        <Text style={styles.distanceText}>{service.distance_km.toFixed(1)} km</Text>
+                      </View>
+                    )}
                     <View style={[styles.categoryBadge]}>
                       <Text style={styles.categoryText}>{service.category}</Text>
                     </View>
                   </View>
 
-                  <TouchableOpacity style={[styles.proposeButton, { backgroundColor: buttonColor }]}>
-                    <Text style={styles.proposeButtonText}>
-                      {isOffer ? 'Proposer un échange' : 'Proposer mon aide'}
-                    </Text>
-                  </TouchableOpacity>
+                  <View style={styles.actionsRow}>
+                    <TouchableOpacity 
+                      style={[styles.proposeButton, { backgroundColor: buttonColor, flex: 1 }]}
+                    >
+                      <Text style={styles.proposeButtonText}>
+                        {isOffer ? 'Proposer un échange' : 'Proposer mon aide'}
+                      </Text>
+                    </TouchableOpacity>
+                    
+                    {service.userId === user?._id && (
+                      <TouchableOpacity 
+                        style={styles.deleteButton}
+                        onPress={() => handleDeleteService(service._id)}
+                      >
+                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                      </TouchableOpacity>
+                    )}
+                  </View>
                 </TouchableOpacity>
               );
             })
