@@ -883,6 +883,125 @@ async def get_badges():
     ]
     return badges
 
+
+
+# ============= CHAT ROUTES =============
+
+@api_router.post("/chats")
+async def create_chat(chat_data: ChatCreate, current_user: dict = Depends(get_current_user)):
+    """Create a new chat or return existing one"""
+    service = await db.services.find_one({"_id": chat_data.serviceId})
+    if not service:
+        raise HTTPException(404, "Service not found")
+    
+    # Check if chat already exists between these users for this service
+    existing_chat = await db.chats.find_one({
+        "serviceId": chat_data.serviceId,
+        "participants": {"$all": [current_user["_id"], chat_data.participantId]}
+    })
+    
+    if existing_chat:
+        return existing_chat
+    
+    # Create new chat
+    chat = {
+        "_id": str(uuid.uuid4()),
+        "serviceId": chat_data.serviceId,
+        "serviceTitle": service["title"],
+        "participants": [current_user["_id"], chat_data.participantId],
+        "createdAt": datetime.utcnow(),
+        "lastMessage": None,
+        "lastMessageAt": datetime.utcnow()
+    }
+    
+    await db.chats.insert_one(chat)
+    return chat
+
+@api_router.get("/chats")
+async def get_my_chats(current_user: dict = Depends(get_current_user)):
+    """Get all chats for current user"""
+    chats = await db.chats.find({
+        "participants": current_user["_id"]
+    }).sort("lastMessageAt", -1).to_list(length=50)
+    
+    # Enrich with other user data
+    enriched_chats = []
+    for chat in chats:
+        other_user_id = [p for p in chat["participants"] if p != current_user["_id"]][0]
+        other_user = await db.users.find_one({"_id": other_user_id})
+        
+        enriched_chat = {
+            **chat,
+            "otherUser": {
+                "_id": other_user["_id"],
+                "name": f"{other_user['profile']['firstName']} {other_user['profile']['lastName']}",
+                "photo": other_user["profile"].get("photo_base64"),
+            }
+        }
+        enriched_chats.append(enriched_chat)
+    
+    return enriched_chats
+
+@api_router.get("/chats/{chat_id}")
+async def get_chat(chat_id: str, current_user: dict = Depends(get_current_user)):
+    """Get chat details"""
+    chat = await db.chats.find_one({"_id": chat_id})
+    if not chat:
+        raise HTTPException(404, "Chat not found")
+    
+    if current_user["_id"] not in chat["participants"]:
+        raise HTTPException(403, "Access denied")
+    
+    return chat
+
+@api_router.get("/chats/{chat_id}/messages")
+async def get_chat_messages(chat_id: str, current_user: dict = Depends(get_current_user)):
+    """Get all messages for a chat"""
+    chat = await db.chats.find_one({"_id": chat_id})
+    if not chat or current_user["_id"] not in chat["participants"]:
+        raise HTTPException(403, "Access denied")
+    
+    messages = await db.messages.find({
+        "chatId": chat_id
+    }).sort("createdAt", 1).to_list(length=500)
+    
+    return messages
+
+@api_router.post("/chats/{chat_id}/messages")
+async def send_message(
+    chat_id: str,
+    message_data: MessageCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """Send a message in a chat"""
+    chat = await db.chats.find_one({"_id": chat_id})
+    if not chat or current_user["_id"] not in chat["participants"]:
+        raise HTTPException(403, "Access denied")
+    
+    message = {
+        "_id": str(uuid.uuid4()),
+        "chatId": chat_id,
+        "senderId": current_user["_id"],
+        "senderName": f"{current_user['profile']['firstName']} {current_user['profile']['lastName']}",
+        "content": message_data.content,
+        "createdAt": datetime.utcnow()
+    }
+    
+    await db.messages.insert_one(message)
+    
+    # Update chat last message
+    await db.chats.update_one(
+        {"_id": chat_id},
+        {
+            "$set": {
+                "lastMessage": message_data.content,
+                "lastMessageAt": datetime.utcnow()
+            }
+        }
+    )
+    
+    return message
+
 # ============= ADMIN ROUTES =============
 
 async def check_admin(current_user: dict = Depends(get_current_user)):
