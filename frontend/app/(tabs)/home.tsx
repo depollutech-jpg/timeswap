@@ -84,11 +84,16 @@ export default function HomeScreen() {
               <TouchableOpacity style={styles.iconButton}>
                 <Ionicons name="calendar-outline" size={24} color="#FFFFFF" />
               </TouchableOpacity>
-              <TouchableOpacity style={styles.iconButton}>
+              <TouchableOpacity 
+                style={styles.iconButton}
+                onPress={() => router.push('/(tabs)/messages')}
+              >
                 <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
-                <View style={styles.notificationBadge}>
-                  <Text style={styles.badgeText}>3</Text>
-                </View>
+                {unreadCount > 0 && (
+                  <View style={styles.notificationBadge}>
+                    <Text style={styles.badgeText}>{unreadCount}</Text>
+                  </View>
+                )}
               </TouchableOpacity>
             </View>
           </View>
