@@ -984,7 +984,8 @@ async def send_message(
         "senderId": current_user["_id"],
         "senderName": f"{current_user['profile']['firstName']} {current_user['profile']['lastName']}",
         "content": message_data.content,
-        "createdAt": datetime.utcnow()
+        "createdAt": datetime.utcnow(),
+        "readBy": [current_user["_id"]]  # Le sender a déjà "lu" son message
     }
     
     await db.messages.insert_one(message)
