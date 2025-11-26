@@ -368,14 +368,6 @@ export default function HomeScreen() {
                   </View>
 
                   <View style={styles.actionsRow}>
-                    <TouchableOpacity 
-                      style={[styles.proposeButton, { backgroundColor: buttonColor, flex: 1 }]}
-                    >
-                      <Text style={styles.proposeButtonText}>
-                        {isOffer ? 'Proposer un échange' : 'Proposer mon aide'}
-                      </Text>
-                    </TouchableOpacity>
-                    
                     {service.userId === user?._id && (
                       <TouchableOpacity 
                         style={styles.deleteButton}
