@@ -160,41 +160,35 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#E5E7EB',
   },
-  headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#1F2937',
   },
-  badge: {
-    backgroundColor: Colors.primary,
-    borderRadius: 12,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    minWidth: 24,
+  composeButton: {
+    padding: 8,
+  },
+  searchSection: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    backgroundColor: '#FFFFFF',
+  },
+  searchBar: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#F3F4F6',
+    borderRadius: 12,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    gap: 12,
   },
-  badgeText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: 'bold',
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1F2937',
   },
-  markAllButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-  },
-  markAllText: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: '600',
-  },
-  scrollContent: {
-    padding: 16,
+  content: {
+    flex: 1,
   },
   emptyState: {
     alignItems: 'center',
@@ -215,56 +209,72 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
-  notificationCard: {
+  conversationCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
     padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 2,
-    elevation: 2,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
   },
-  notificationUnread: {
-    backgroundColor: '#FFF7ED',
-    borderLeftWidth: 3,
-    borderLeftColor: Colors.primary,
-  },
-  iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+  avatar: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: Colors.primary,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
   },
-  notificationContent: {
-    flex: 1,
+  avatarText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#FFFFFF',
   },
-  notificationTitle: {
+  conversationContent: {
+    flex: 1,
+    justifyContent: 'center',
+  },
+  conversationHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  conversationName: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
-    marginBottom: 4,
   },
-  notificationMessage: {
-    fontSize: 14,
-    color: '#6B7280',
-    lineHeight: 20,
-    marginBottom: 4,
-  },
-  notificationTime: {
+  conversationTime: {
     fontSize: 12,
     color: '#9CA3AF',
   },
-  unreadDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+  conversationFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  conversationMessage: {
+    fontSize: 14,
+    color: '#6B7280',
+    flex: 1,
+  },
+  conversationMessageUnread: {
+    fontWeight: '600',
+    color: '#1F2937',
+  },
+  unreadBadge: {
     backgroundColor: Colors.primary,
+    borderRadius: 10,
+    width: 20,
+    height: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
     marginLeft: 8,
-    alignSelf: 'center',
+  },
+  unreadBadgeText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontWeight: 'bold',
   },
 });
