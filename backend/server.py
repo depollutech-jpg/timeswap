@@ -604,130 +604,451 @@ async def delete_service(service_id: str, current_user: dict = Depends(get_curre
     
     return {"message": "Service deleted successfully"}
 
-# ============= EXCHANGES ROUTES =============
+# ============= EXCHANGES ROUTES (Type Vinted) =============
 
-@api_router.post("/exchanges")
-async def create_exchange(exchange_data: ExchangeCreate, current_user: dict = Depends(get_current_user)):
-    service = await db.services.find_one({"_id": exchange_data.serviceId})
+@api_router.post("/services/{service_id}/accept-exchange")
+async def accept_exchange_from_service(
+    service_id: str,
+    exchange_data: ExchangeAccept,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Accepter un échange depuis une annonce (équivalent du bouton 'Accepter l'échange')
+    - Vérifie que le service est disponible
+    - Crée un échange avec status 'accepted'
+    - Verrouille l'annonce
+    - Crée/récupère le chat entre les deux utilisateurs
+    """
+    service = await db.services.find_one({"_id": service_id})
     if not service:
         raise HTTPException(404, "Service not found")
     
+    if service["status"] != "active":
+        raise HTTPException(400, "Service is no longer available")
+    
     if service["userId"] == current_user["_id"]:
-        raise HTTPException(400, "Cannot exchange with yourself")
+        raise HTTPException(400, "Cannot accept your own service")
     
-    # Check if user has enough credits for request
-    if service["type"] == "offer" and current_user["credits"]["available"] < service["duration"]:
-        raise HTTPException(400, "Insufficient credits")
+    # Vérifier le solde selon le type de service
+    requester_id = current_user["_id"]
+    provider_id = service["userId"]
     
+    if service["type"] == "offer":
+        # L'utilisateur actuel demande un service, il doit avoir assez d'heures
+        if current_user["credits"]["available"] < service["duration"]:
+            raise HTTPException(400, f"Solde insuffisant. Vous avez {current_user['credits']['available']}h, il vous faut {service['duration']}h")
+    
+    # Créer l'échange
     exchange_id = str(uuid.uuid4())
-    
     exchange = {
         "_id": exchange_id,
-        "serviceId": exchange_data.serviceId,
-        "providerId": service["userId"] if service["type"] == "offer" else current_user["_id"],
-        "receiverId": current_user["_id"] if service["type"] == "offer" else service["userId"],
+        "serviceId": service_id,
+        "providerId": provider_id,  # Celui qui offre le service
+        "requesterId": requester_id,  # Celui qui demande le service
         "duration": service["duration"],
-        "status": "pending",
-        "xpAwarded": 0,
-        "rating": None,
-        "review": None,
+        "status": "accepted",  # Statut: pending, accepted, in_progress, completed, cancelled
+        "providerConfirmed": False,
+        "requesterConfirmed": False,
+        "cancelledBy": None,
+        "cancellationReason": None,
+        "penaltyApplied": False,
         "createdAt": datetime.utcnow(),
-        "completedAt": None
+        "acceptedAt": datetime.utcnow(),
+        "completedAt": None,
+        "xpAwarded": 0
     }
     
     await db.exchanges.insert_one(exchange)
     
-    return {"message": "Exchange request created", "exchangeId": exchange_id}
-
-@api_router.put("/exchanges/{exchange_id}/accept")
-async def accept_exchange(exchange_id: str, current_user: dict = Depends(get_current_user)):
-    exchange = await db.exchanges.find_one({"_id": exchange_id})
-    if not exchange:
-        raise HTTPException(404, "Exchange not found")
-    
-    if exchange["providerId"] != current_user["_id"] and exchange["receiverId"] != current_user["_id"]:
-        raise HTTPException(403, "Not authorized")
-    
-    await db.exchanges.update_one(
-        {"_id": exchange_id},
-        {"$set": {"status": "accepted"}}
-    )
-    
-    return {"message": "Exchange accepted"}
-
-@api_router.put("/exchanges/{exchange_id}/complete")
-async def complete_exchange(exchange_id: str, current_user: dict = Depends(get_current_user)):
-    exchange = await db.exchanges.find_one({"_id": exchange_id})
-    if not exchange:
-        raise HTTPException(404, "Exchange not found")
-    
-    if exchange["providerId"] != current_user["_id"] and exchange["receiverId"] != current_user["_id"]:
-        raise HTTPException(403, "Not authorized")
-    
-    # Award XP and update credits
-    xp_awarded = int(exchange["duration"] * 10)  # 10 XP per hour
-    
-    # Update provider (gains credits and XP)
-    await db.users.update_one(
-        {"_id": exchange["providerId"]},
+    # Verrouiller l'annonce
+    await db.services.update_one(
+        {"_id": service_id},
         {
-            "$inc": {
-                "credits.available": exchange["duration"],
-                "credits.given": exchange["duration"],
-                "gamification.xp": xp_awarded,
-                "gamification.stats.force": 1
+            "$set": {
+                "status": "locked",
+                "lockedBy": requester_id,
+                "lockedAt": datetime.utcnow()
             }
         }
     )
     
-    # Update receiver (uses credits)
-    await db.users.update_one(
-        {"_id": exchange["receiverId"]},
-        {
-            "$inc": {
-                "credits.available": -exchange["duration"],
-                "credits.received": exchange["duration"],
-                "gamification.xp": xp_awarded // 2,  # Half XP for receiver
-                "gamification.stats.sagesse": 1
-            }
-        }
-    )
+    # Trouver ou créer le chat entre les deux utilisateurs
+    chat = await db.chats.find_one({
+        "serviceId": service_id,
+        "participants": {"$all": [provider_id, requester_id]}
+    })
     
-    # Update exchange
+    if not chat:
+        chat_id = str(uuid.uuid4())
+        chat = {
+            "_id": chat_id,
+            "serviceId": service_id,
+            "participants": [provider_id, requester_id],
+            "createdAt": datetime.utcnow(),
+            "lastMessage": exchange_data.message or "Échange accepté",
+            "lastMessageAt": datetime.utcnow()
+        }
+        await db.chats.insert_one(chat)
+    else:
+        chat_id = chat["_id"]
+    
+    # Créer un message automatique dans le chat
+    message = {
+        "_id": str(uuid.uuid4()),
+        "chatId": chat_id,
+        "senderId": "system",
+        "senderName": "Système",
+        "content": f"🤝 Échange accepté ! Mission en cours. Les deux parties doivent confirmer 'Tâche réalisée' pour finaliser.",
+        "createdAt": datetime.utcnow(),
+        "readBy": []
+    }
+    await db.messages.insert_one(message)
+    
+    # Créer une notification pour le provider
+    notification = {
+        "_id": str(uuid.uuid4()),
+        "userId": provider_id,
+        "type": "system",
+        "content": f"Votre annonce '{service['title']}' a été acceptée !",
+        "exchangeId": exchange_id,
+        "timestamp": datetime.utcnow(),
+        "read": False
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "message": "Exchange accepted successfully",
+        "exchangeId": exchange_id,
+        "chatId": chat_id
+    }
+
+@api_router.get("/exchanges/{exchange_id}")
+async def get_exchange(exchange_id: str, current_user: dict = Depends(get_current_user)):
+    """Récupérer les détails d'un échange"""
+    exchange = await db.exchanges.find_one({"_id": exchange_id})
+    if not exchange:
+        raise HTTPException(404, "Exchange not found")
+    
+    # Vérifier que l'utilisateur est partie prenante
+    if exchange["providerId"] != current_user["_id"] and exchange["requesterId"] != current_user["_id"]:
+        raise HTTPException(403, "Not authorized")
+    
+    # Enrichir avec les données du service et des utilisateurs
+    service = await db.services.find_one({"_id": exchange["serviceId"]})
+    provider = await db.users.find_one({"_id": exchange["providerId"]})
+    requester = await db.users.find_one({"_id": exchange["requesterId"]})
+    
+    return {
+        **exchange,
+        "service": service,
+        "provider": {
+            "_id": provider["_id"],
+            "name": f"{provider['profile']['firstName']} {provider['profile']['lastName']}",
+            "photo": provider["profile"].get("photo_base64"),
+            "level": provider["gamification"]["level"],
+            "xp": provider["gamification"]["xp"]
+        },
+        "requester": {
+            "_id": requester["_id"],
+            "name": f"{requester['profile']['firstName']} {requester['profile']['lastName']}",
+            "photo": requester["profile"].get("photo_base64"),
+            "level": requester["gamification"]["level"],
+            "xp": requester["gamification"]["xp"]
+        }
+    }
+
+@api_router.post("/exchanges/{exchange_id}/confirm-completion")
+async def confirm_completion(exchange_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Confirmer la réalisation de la tâche (double validation type Vinted)
+    - Marque la confirmation de l'utilisateur
+    - Si les deux ont confirmé, déclenche le transfert d'heures
+    """
+    exchange = await db.exchanges.find_one({"_id": exchange_id})
+    if not exchange:
+        raise HTTPException(404, "Exchange not found")
+    
+    if exchange["status"] != "accepted":
+        raise HTTPException(400, f"Exchange status is {exchange['status']}, cannot confirm")
+    
+    # Déterminer qui confirme
+    is_provider = exchange["providerId"] == current_user["_id"]
+    is_requester = exchange["requesterId"] == current_user["_id"]
+    
+    if not is_provider and not is_requester:
+        raise HTTPException(403, "Not authorized")
+    
+    # Vérifier si déjà confirmé
+    if is_provider and exchange["providerConfirmed"]:
+        raise HTTPException(400, "You have already confirmed")
+    if is_requester and exchange["requesterConfirmed"]:
+        raise HTTPException(400, "You have already confirmed")
+    
+    # Marquer la confirmation
+    update_fields = {}
+    if is_provider:
+        update_fields["providerConfirmed"] = True
+    if is_requester:
+        update_fields["requesterConfirmed"] = True
+    
     await db.exchanges.update_one(
         {"_id": exchange_id},
-        {"$set": {
-            "status": "completed",
-            "completedAt": datetime.utcnow(),
-            "xpAwarded": xp_awarded
-        }}
+        {"$set": update_fields}
     )
     
-    # Update levels
-    for user_id in [exchange["providerId"], exchange["receiverId"]]:
-        user = await db.users.find_one({"_id": user_id})
-        new_level = (user["gamification"]["xp"] // 100) + 1
+    # Récupérer l'échange mis à jour
+    exchange = await db.exchanges.find_one({"_id": exchange_id})
+    
+    # Si les deux ont confirmé, finaliser l'échange
+    if exchange["providerConfirmed"] and exchange["requesterConfirmed"]:
+        return await finalize_exchange(exchange_id, exchange)
+    
+    # Sinon, envoyer une notification à l'autre partie
+    other_user_id = exchange["providerId"] if is_requester else exchange["requesterId"]
+    notification = {
+        "_id": str(uuid.uuid4()),
+        "userId": other_user_id,
+        "type": "system",
+        "content": "L'autre partie a confirmé la tâche réalisée. Confirmez à votre tour pour finaliser l'échange.",
+        "exchangeId": exchange_id,
+        "timestamp": datetime.utcnow(),
+        "read": False
+    }
+    await db.notifications.insert_one(notification)
+    
+    return {
+        "message": "Confirmation enregistrée. En attente de la confirmation de l'autre partie.",
+        "providerConfirmed": exchange["providerConfirmed"],
+        "requesterConfirmed": exchange["requesterConfirmed"]
+    }
+
+async def finalize_exchange(exchange_id: str, exchange: dict):
+    """
+    Finaliser l'échange : transfert d'heures, XP, archivage
+    """
+    service = await db.services.find_one({"_id": exchange["serviceId"]})
+    requester = await db.users.find_one({"_id": exchange["requesterId"]})
+    
+    # Vérifier le solde du demandeur
+    if requester["credits"]["available"] < exchange["duration"]:
+        raise HTTPException(400, f"Insufficient credits. Requester has {requester['credits']['available']}h but needs {exchange['duration']}h")
+    
+    # Calculer les XP
+    xp_awarded = int(exchange["duration"] * 10)  # 10 XP par heure
+    
+    # Transaction atomique : débiter le requester et créditer le provider
+    try:
+        # Débiter le demandeur
         await db.users.update_one(
-            {"_id": user_id},
-            {"$set": {"gamification.level": new_level}}
+            {"_id": exchange["requesterId"]},
+            {
+                "$inc": {
+                    "credits.available": -exchange["duration"],
+                    "credits.given": exchange["duration"],
+                    "gamification.xp": xp_awarded // 2,
+                    "gamification.stats.sagesse": 1
+                }
+            }
+        )
+        
+        # Créditer le fournisseur
+        await db.users.update_one(
+            {"_id": exchange["providerId"]},
+            {
+                "$inc": {
+                    "credits.available": exchange["duration"],
+                    "credits.received": exchange["duration"],
+                    "gamification.xp": xp_awarded,
+                    "gamification.stats.force": 1
+                }
+            }
+        )
+        
+        # Marquer l'échange comme terminé
+        await db.exchanges.update_one(
+            {"_id": exchange_id},
+            {
+                "$set": {
+                    "status": "completed",
+                    "completedAt": datetime.utcnow(),
+                    "xpAwarded": xp_awarded
+                }
+            }
+        )
+        
+        # Marquer l'annonce comme terminée
+        await db.services.update_one(
+            {"_id": exchange["serviceId"]},
+            {"$set": {"status": "completed"}}
+        )
+        
+        # Mettre à jour les niveaux
+        for user_id in [exchange["providerId"], exchange["requesterId"]]:
+            user = await db.users.find_one({"_id": user_id})
+            new_level = (user["gamification"]["xp"] // 100) + 1
+            await db.users.update_one(
+                {"_id": user_id},
+                {"$set": {"gamification.level": new_level}}
+            )
+        
+        # Envoyer un message automatique dans le chat
+        chat = await db.chats.find_one({"serviceId": exchange["serviceId"]})
+        if chat:
+            message = {
+                "_id": str(uuid.uuid4()),
+                "chatId": chat["_id"],
+                "senderId": "system",
+                "senderName": "Système",
+                "content": f"✅ La tâche a été confirmée par les deux utilisateurs. Le transfert de {exchange['duration']}h a été effectué avec succès !",
+                "createdAt": datetime.utcnow(),
+                "readBy": []
+            }
+            await db.messages.insert_one(message)
+        
+        # Notifications
+        for user_id in [exchange["providerId"], exchange["requesterId"]]:
+            notification = {
+                "_id": str(uuid.uuid4()),
+                "userId": user_id,
+                "type": "system",
+                "content": f"Échange terminé ! Le transfert de {exchange['duration']}h a été effectué.",
+                "exchangeId": exchange_id,
+                "timestamp": datetime.utcnow(),
+                "read": False
+            }
+            await db.notifications.insert_one(notification)
+        
+        return {
+            "message": "Exchange completed successfully",
+            "status": "completed",
+            "hoursTransferred": exchange["duration"],
+            "xpAwarded": xp_awarded
+        }
+        
+    except Exception as e:
+        # Rollback en cas d'erreur
+        logging.error(f"Error finalizing exchange {exchange_id}: {str(e)}")
+        raise HTTPException(500, "Error processing exchange. Please contact support.")
+
+@api_router.post("/exchanges/{exchange_id}/cancel")
+async def cancel_exchange(
+    exchange_id: str,
+    cancel_data: ExchangeCancel,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Annuler un échange avec pénalités selon le statut
+    """
+    exchange = await db.exchanges.find_one({"_id": exchange_id}")
+    if not exchange:
+        raise HTTPException(404, "Exchange not found")
+    
+    if exchange["status"] not in ["accepted", "in_progress"]:
+        raise HTTPException(400, f"Cannot cancel exchange with status {exchange['status']}")
+    
+    is_provider = exchange["providerId"] == current_user["_id"]
+    is_requester = exchange["requesterId"] == current_user["_id"]
+    
+    if not is_provider and not is_requester:
+        raise HTTPException(403, "Not authorized")
+    
+    # Déterminer la pénalité
+    penalty_hours = 0
+    penalty_xp = 0
+    
+    # Si une partie a déjà confirmé, appliquer une pénalité
+    if exchange.get("providerConfirmed") or exchange.get("requesterConfirmed"):
+        penalty_hours = exchange["duration"] * 0.1  # 10% du temps de l'échange
+        penalty_xp = 50  # Perte de 50 XP
+        
+        # Appliquer la pénalité à celui qui annule
+        await db.users.update_one(
+            {"_id": current_user["_id"]},
+            {
+                "$inc": {
+                    "credits.available": -penalty_hours,
+                    "gamification.xp": -penalty_xp
+                }
+            }
         )
     
-    return {"message": "Exchange completed", "xpAwarded": xp_awarded}
+    # Mettre à jour l'échange
+    await db.exchanges.update_one(
+        {"_id": exchange_id},
+        {
+            "$set": {
+                "status": "cancelled",
+                "cancelledBy": current_user["_id"],
+                "cancellationReason": cancel_data.reason,
+                "penaltyApplied": penalty_hours > 0,
+                "penaltyHours": penalty_hours,
+                "penaltyXP": penalty_xp,
+                "cancelledAt": datetime.utcnow()
+            }
+        }
+    )
+    
+    # Déverrouiller l'annonce
+    await db.services.update_one(
+        {"_id": exchange["serviceId"]},
+        {
+            "$set": {
+                "status": "active",
+                "lockedBy": None,
+                "lockedAt": None
+            }
+        }
+    )
+    
+    # Notifier l'autre partie
+    other_user_id = exchange["providerId"] if is_requester else exchange["requesterId"]
+    notification = {
+        "_id": str(uuid.uuid4()),
+        "userId": other_user_id,
+        "type": "system",
+        "content": f"L'échange a été annulé par l'autre partie. Motif : {cancel_data.reason}",
+        "exchangeId": exchange_id,
+        "timestamp": datetime.utcnow(),
+        "read": False
+    }
+    await db.notifications.insert_one(notification)
+    
+    # Message dans le chat
+    chat = await db.chats.find_one({"serviceId": exchange["serviceId"]})
+    if chat:
+        message = {
+            "_id": str(uuid.uuid4()),
+            "chatId": chat["_id"],
+            "senderId": "system",
+            "senderName": "Système",
+            "content": f"❌ L'échange a été annulé. Motif : {cancel_data.reason}",
+            "createdAt": datetime.utcnow(),
+            "readBy": []
+        }
+        await db.messages.insert_one(message)
+    
+    return {
+        "message": "Exchange cancelled",
+        "penaltyApplied": penalty_hours > 0,
+        "penaltyHours": penalty_hours,
+        "penaltyXP": penalty_xp
+    }
 
 @api_router.get("/exchanges/my/all")
 async def get_my_exchanges(current_user: dict = Depends(get_current_user)):
+    """Récupérer tous les échanges de l'utilisateur"""
     exchanges = await db.exchanges.find({
         "$or": [
             {"providerId": current_user["_id"]},
-            {"receiverId": current_user["_id"]}
+            {"requesterId": current_user["_id"]}
         ]
     }).sort("createdAt", -1).to_list(length=100)
     
-    # Enrich with service and user data
+    # Enrichir avec les données
     enriched_exchanges = []
     for exchange in exchanges:
         service = await db.services.find_one({"_id": exchange["serviceId"]})
-        other_user_id = exchange["providerId"] if exchange["receiverId"] == current_user["_id"] else exchange["receiverId"]
+        other_user_id = exchange["providerId"] if exchange["requesterId"] == current_user["_id"] else exchange["requesterId"]
         other_user = await db.users.find_one({"_id": other_user_id})
         
         enriched_exchanges.append({
