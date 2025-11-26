@@ -236,6 +236,94 @@ export default function AdminScreen() {
     legend: ['Heures données', 'Heures reçues'],
   };
 
+  // Si pas connecté admin, afficher le formulaire
+  if (!isAdminLoggedIn) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <KeyboardAvoidingView
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          style={styles.keyboardView}
+        >
+          <ScrollView contentContainerStyle={styles.loginScrollContent}>
+            <View style={styles.loginHeader}>
+              <View style={styles.iconContainer}>
+                <Ionicons name="shield-checkmark" size={64} color={Colors.primary} />
+              </View>
+              <Text style={styles.loginTitle}>Espace Administrateur</Text>
+              <Text style={styles.loginSubtitle}>
+                Accès réservé aux administrateurs autorisés
+              </Text>
+            </View>
+
+            <View style={styles.form}>
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Email</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="mail-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="admin@timeswap.com"
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    editable={!loginLoading}
+                  />
+                </View>
+              </View>
+
+              <View style={styles.inputContainer}>
+                <Text style={styles.label}>Mot de passe</Text>
+                <View style={styles.inputWrapper}>
+                  <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.input}
+                    placeholder="••••••••"
+                    value={password}
+                    onChangeText={setPassword}
+                    secureTextEntry={!showPassword}
+                    editable={!loginLoading}
+                  />
+                  <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
+                    <Ionicons 
+                      name={showPassword ? "eye-off-outline" : "eye-outline"} 
+                      size={20} 
+                      color="#6B7280" 
+                    />
+                  </TouchableOpacity>
+                </View>
+              </View>
+
+              <TouchableOpacity
+                style={[styles.loginButton, loginLoading && styles.loginButtonDisabled]}
+                onPress={handleAdminLogin}
+                disabled={loginLoading}
+              >
+                {loginLoading ? (
+                  <ActivityIndicator color="#FFFFFF" />
+                ) : (
+                  <>
+                    <Ionicons name="shield-checkmark" size={20} color="#FFFFFF" />
+                    <Text style={styles.loginButtonText}>Accéder au Dashboard</Text>
+                  </>
+                )}
+              </TouchableOpacity>
+
+              <View style={styles.infoBox}>
+                <Ionicons name="information-circle" size={20} color="#3B82F6" />
+                <Text style={styles.infoText}>
+                  Seuls les administrateurs autorisés peuvent accéder à cet espace.
+                </Text>
+              </View>
+            </View>
+          </ScrollView>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
+
+  // Sinon, afficher le dashboard complet
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
