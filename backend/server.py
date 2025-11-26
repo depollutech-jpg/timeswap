@@ -416,13 +416,33 @@ async def create_service(service_data: ServiceCreate, current_user: dict = Depen
     
     return {"message": "Service created successfully", "serviceId": service_id}
 
+def calculate_distance(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
+    """Calculate distance between two points using Haversine formula (in km)"""
+    from math import radians, cos, sin, asin, sqrt
+    
+    # Convert to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Haversine formula
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    
+    # Radius of earth in kilometers
+    r = 6371
+    
+    return c * r
+
 @api_router.get("/services")
 async def get_services(
     type: Optional[str] = None,
     category: Optional[str] = None,
     location: Optional[str] = None,
+    lat: Optional[float] = None,
+    lon: Optional[float] = None,
     skip: int = 0,
-    limit: int = 20
+    limit: int = 50  # Fetch more for better sorting
 ):
     query = {"status": "active"}
     
@@ -433,25 +453,67 @@ async def get_services(
     if location:
         query["location"] = {"$regex": location, "$options": "i"}
     
-    # Sort by boostedScore (verified users first)
-    services = await db.services.find(query).sort("boostedScore", -1).skip(skip).limit(limit).to_list(length=limit)
+    # Fetch all active services
+    services = await db.services.find(query).to_list(length=None)
     
-    # Enrich with user data
+    # Enrich with user data and calculate scores
     enriched_services = []
+    current_time = datetime.utcnow()
+    
     for service in services:
         user = await db.users.find_one({"_id": service["userId"]})
-        enriched_services.append({
+        
+        # Calculate age score (newer = higher score)
+        created_at = service.get("createdAt", current_time)
+        age_hours = (current_time - created_at).total_seconds() / 3600
+        # Normalize: 0-24h = 1.0, 24-168h = 0.5, >168h = 0.1
+        if age_hours <= 24:
+            age_score = 1.0
+        elif age_hours <= 168:  # 1 week
+            age_score = 0.5
+        else:
+            age_score = 0.1
+        
+        # Calculate distance score (closer = higher score)
+        distance_score = 1.0  # Default if no geolocation
+        distance_km = None
+        
+        if lat is not None and lon is not None and service.get("coordinates"):
+            service_lat = service["coordinates"].get("latitude")
+            service_lon = service["coordinates"].get("longitude")
+            
+            if service_lat and service_lon:
+                distance_km = calculate_distance(lat, lon, service_lat, service_lon)
+                # Normalize: 0-5km = 1.0, 5-20km = 0.5, >20km = 0.1
+                if distance_km <= 5:
+                    distance_score = 1.0
+                elif distance_km <= 20:
+                    distance_score = 0.5
+                else:
+                    distance_score = 0.1
+        
+        # Combined score: 60% time, 40% distance
+        combined_score = (0.6 * age_score) + (0.4 * distance_score)
+        
+        enriched_service = {
             **service,
             "user": {
                 "_id": user["_id"],
                 "name": f"{user['profile']['firstName']} {user['profile']['lastName']}",
                 "photo": user["profile"].get("photo_base64"),
                 "isVerified": user["verification"]["isVerified"],
-                "rating": user["gamification"]["xp"] / 100  # Simple rating calculation
-            }
-        })
+                "rating": user["gamification"]["xp"] / 100
+            },
+            "distance_km": distance_km,
+            "score": combined_score
+        }
+        enriched_services.append(enriched_service)
     
-    return enriched_services
+    # Sort by combined score (descending)
+    enriched_services.sort(key=lambda x: x["score"], reverse=True)
+    
+    # Apply pagination
+    return enriched_services[skip:skip + limit]
 
 @api_router.get("/services/{service_id}")
 async def get_service(service_id: str):
