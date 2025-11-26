@@ -44,6 +44,11 @@ export default function ServiceDetailsScreen() {
     try {
       const response = await api.get(`/services/${id}`);
       setService(response.data);
+      
+      // Load user profile
+      if (response.data.userId) {
+        loadUserProfile(response.data.userId);
+      }
     } catch (error) {
       Alert.alert('Erreur', 'Service introuvable');
       router.back();
@@ -52,10 +57,18 @@ export default function ServiceDetailsScreen() {
     }
   };
 
+  const loadUserProfile = async (userId: string) => {
+    try {
+      const response = await api.get(`/users/${userId}/profile`);
+      setUserProfile(response.data);
+    } catch (error) {
+      console.error('Failed to load user profile:', error);
+    }
+  };
+
   const handleContact = async () => {
     if (!service) return;
 
-    // Empêcher de se contacter soi-même
     if (service.userId === user?._id) {
       Alert.alert('Impossible', 'Vous ne pouvez pas contacter votre propre annonce');
       return;
@@ -68,15 +81,34 @@ export default function ServiceDetailsScreen() {
         participantId: service.userId,
       });
 
-      // Rediriger vers le chat
       router.push(`/chat?id=${response.data._id}`);
     } catch (error: any) {
       Alert.alert(
         'Erreur',
-        error.response?.data?.detail || 'Impossible de créer la conversation'
+        error.response?.data?.detail || 'Impossible de creer la conversation'
       );
     } finally {
       setContactLoading(false);
+    }
+  };
+
+  const handleAcceptExchange = async () => {
+    try {
+      const result = await acceptExchange(service._id, 'Je suis interesse par cet echange');
+      Alert.alert(
+        'Succes',
+        'Echange accepte ! L annonce est maintenant verrouillee.',
+        [
+          {
+            text: 'Aller au chat',
+            onPress: () => router.push(`/chat?id=${result.chatId}`),
+          },
+        ]
+      );
+      setShowAcceptModal(false);
+      await loadService(); // Reload to show locked status
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message || 'Impossible d accepter l echange');
     }
   };
 
