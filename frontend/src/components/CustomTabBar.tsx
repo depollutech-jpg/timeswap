@@ -56,6 +56,9 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
           // Récupérer l'icône depuis les options
           const IconComponent = options.tabBarIcon;
 
+          // Afficher le badge uniquement sur l'onglet Messages
+          const showBadge = route.name === 'messages' && unreadCount > 0;
+
           return (
             <TouchableOpacity
               key={route.key}
@@ -82,6 +85,13 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
                       size: 22,
                       focused: isFocused,
                     })}
+                    {showBadge && (
+                      <View style={styles.badge}>
+                        <Text style={styles.badgeText}>
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </Text>
+                      </View>
+                    )}
                   </View>
                 )}
                 <Text
