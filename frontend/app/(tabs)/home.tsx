@@ -309,6 +309,8 @@ export default function HomeScreen() {
                       borderLeftColor: borderColor,
                     }
                   ]}
+                  onPress={() => router.push(`/service-details?id=${service._id}`)}
+                  activeOpacity={0.7}
                 >
                   <View style={styles.serviceHeader}>
                     <View style={styles.userInfo}>
