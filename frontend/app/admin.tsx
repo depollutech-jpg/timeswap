@@ -46,13 +46,19 @@ export default function AdminScreen() {
 
   useEffect(() => {
     // Check if user is admin
+    if (!user) {
+      setLoading(false);
+      return;
+    }
+    
     if (user?.role !== 'admin') {
       Alert.alert('Accès refusé', 'Vous n\'avez pas les permissions nécessaires');
       router.back();
       return;
     }
+    
     loadData();
-  }, []);
+  }, [user]);
 
   const loadData = async () => {
     try {
