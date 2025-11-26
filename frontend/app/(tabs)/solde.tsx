@@ -104,8 +104,23 @@ export default function SoldeScreen() {
           <Text style={styles.title}>Solde de temps</Text>
         </View>
 
-        {/* Carte Solde Principal */}
-        <View style={styles.balanceCard}>
+        {/* Carte Solde Principal avec animation bounce */}
+        <Animated.View
+          style={[
+            styles.balanceCard,
+            {
+              transform: [
+                {
+                  scale: bounceAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.8, 1],
+                  }),
+                },
+              ],
+              opacity: bounceAnim,
+            },
+          ]}
+        >
           <LinearGradient
             colors={['#FF6B9D', '#FF4777']}
             style={styles.balanceGradient}
@@ -130,7 +145,7 @@ export default function SoldeScreen() {
               </View>
             </View>
           </LinearGradient>
-        </View>
+        </Animated.View>
 
         {/* Actions Rapides */}
         <View style={styles.quickActions}>
