@@ -32,10 +32,12 @@ export default function AdminTabScreen() {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
 
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+
   // Vérifier le statut admin au montage
   useEffect(() => {
     if (user?.role === 'admin') {
-      router.push('/admin');
+      setIsAdminLoggedIn(true);
     }
   }, [user?.role]);
 
