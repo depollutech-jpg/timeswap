@@ -21,6 +21,7 @@ import { useRouter } from 'expo-router';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
+  const { unreadCount } = useNotificationStore();
   const router = useRouter();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
