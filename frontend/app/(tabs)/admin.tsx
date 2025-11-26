@@ -253,6 +253,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
   },
+  eyeButton: {
+    padding: 8,
+  },
   button: {
     backgroundColor: Colors.primary,
     padding: 16,
