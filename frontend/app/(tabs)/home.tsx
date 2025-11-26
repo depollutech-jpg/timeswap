@@ -173,8 +173,19 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Filtres de catégories */}
-        <View style={styles.filtersSection}>
+        {/* Filtres de catégories avec animation Slide */}
+        <Animated.View
+          style={[
+            styles.filtersSection,
+            {
+              opacity: slideFiltersAnim.interpolate({
+                inputRange: [0, 50],
+                outputRange: [1, 0],
+              }),
+              transform: [{ translateX: slideFiltersAnim }],
+            },
+          ]}
+        >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <TouchableOpacity style={[styles.filterChip, styles.filterChipActive]}>
               <Text style={styles.filterIcon}>☀️</Text>
@@ -193,7 +204,7 @@ export default function HomeScreen() {
               <Text style={styles.filterText}>Cuisine</Text>
             </TouchableOpacity>
           </ScrollView>
-        </View>
+        </Animated.View>
 
         {/* Liste des services */}
         <View style={styles.servicesSection}>
