@@ -1071,6 +1071,8 @@ async def mark_chat_as_read(chat_id: str, current_user: dict = Depends(get_curre
             "$addToSet": {"readBy": current_user["_id"]}
         }
     )
+    
+    return {"marked_read": result.modified_count}
 
 
 @api_router.get("/notifications")
