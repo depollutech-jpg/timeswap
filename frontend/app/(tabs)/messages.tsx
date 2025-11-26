@@ -75,8 +75,17 @@ export default function MessagesScreen() {
         </View>
       </View>
 
-      <ScrollView style={styles.content}>
-        {filteredConversations.length === 0 ? (
+      <ScrollView 
+        style={styles.content}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        {loading ? (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" color={Colors.primary} />
+          </View>
+        ) : filteredConversations.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="chatbubbles-outline" size={64} color={Colors.textSecondary} />
             <Text style={styles.emptyTitle}>Aucune conversation</Text>
@@ -90,6 +99,7 @@ export default function MessagesScreen() {
               key={conversation._id}
               style={styles.conversationCard}
               activeOpacity={0.7}
+              onPress={() => router.push(`/chat?id=${conversation._id}`)}
             >
               <View style={styles.avatar}>
                 <Text style={styles.avatarText}>{conversation.otherUser.avatar}</Text>
