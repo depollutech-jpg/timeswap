@@ -698,7 +698,7 @@ async def accept_exchange_from_service(
         "chatId": chat_id,
         "senderId": "system",
         "senderName": "Systeme",
-        "content": f"🤝 Echange accepte ! Mission en cours. Les deux parties doivent confirmer \"Tâche realisee\" pour finaliser.",
+        "content": "Echange accepte ! Mission en cours. Les deux parties doivent confirmer la tache realisee pour finaliser.",
         "createdAt": datetime.utcnow(),
         "readBy": []
     }
