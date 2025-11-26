@@ -238,6 +238,12 @@ const styles = StyleSheet.create({
   scrollContent: {
     padding: 16,
   },
+  loadingContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 48,
+    marginTop: 64,
+  },
   emptyState: {
     alignItems: 'center',
     justifyContent: 'center',
