@@ -60,14 +60,14 @@ export default function AdminScreen() {
   const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
-    // Check if user is admin
-    if (user?.role !== 'admin') {
-      Alert.alert('Accès refusé', 'Vous n\'avez pas les permissions nécessaires');
-      router.back();
-      return;
+    // Si l'utilisateur est déjà connecté en tant qu'admin, charger le dashboard
+    if (user?.role === 'admin') {
+      setIsAdminLoggedIn(true);
+      loadData();
+    } else {
+      setLoading(false);
     }
-    loadData();
-  }, []);
+  }, [user]);
 
   const loadData = async () => {
     try {
