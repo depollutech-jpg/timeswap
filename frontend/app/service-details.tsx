@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -15,14 +16,25 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../src/constants/colors';
 import api from '../src/utils/api';
 import { useAuthStore } from '../src/store/authStore';
+import { useExchangeStore } from '../src/store/exchangeStore';
+import UserProfileCard from '../src/components/UserProfileCard';
+import ReportModal from '../src/components/ReportModal';
+import ConfirmationModal from '../src/components/ConfirmationModal';
+
+const { width } = Dimensions.get('window');
 
 export default function ServiceDetailsScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
+  const { acceptExchange } = useExchangeStore();
   const [service, setService] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [contactLoading, setContactLoading] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
 
   useEffect(() => {
     loadService();
