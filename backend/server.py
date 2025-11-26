@@ -1053,6 +1053,42 @@ async def mark_chat_as_read(chat_id: str, current_user: dict = Depends(get_curre
             "$addToSet": {"readBy": current_user["_id"]}
         }
     )
+
+
+@api_router.get("/notifications")
+async def get_notifications(
+    unread_only: bool = False,
+    current_user: dict = Depends(get_current_user)
+):
+    """Get all notifications for current user"""
+    query = {"userId": current_user["_id"]}
+    if unread_only:
+        query["read"] = False
+    
+    notifications = await db.notifications.find(query).sort("timestamp", -1).limit(50).to_list(length=50)
+    return notifications
+
+@api_router.post("/notifications/{notification_id}/mark-read")
+async def mark_notification_read(
+    notification_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Mark a notification as read"""
+    result = await db.notifications.update_one(
+        {"_id": notification_id, "userId": current_user["_id"]},
+        {"$set": {"read": True}}
+    )
+    return {"success": result.modified_count > 0}
+
+@api_router.post("/notifications/mark-all-read")
+async def mark_all_notifications_read(current_user: dict = Depends(get_current_user)):
+    """Mark all notifications as read"""
+    result = await db.notifications.update_many(
+        {"userId": current_user["_id"], "read": False},
+        {"$set": {"read": True}}
+    )
+    return {"marked_read": result.modified_count}
+
     
     return {"marked_read": result.modified_count}
 
