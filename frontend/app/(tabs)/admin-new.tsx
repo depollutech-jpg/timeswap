@@ -32,9 +32,17 @@ try {
 
 const { width } = Dimensions.get('window');
 
+// Liste blanche des emails autorisés
+const AUTHORIZED_ADMIN_EMAILS = [
+  'quentinraffalli@hotmail.com',
+  'depollutech@gmail.com',
+];
+
 export default function AdminScreen() {
   const router = useRouter();
-  const { user } = useAuthStore();
+  const { user, setUser, setToken } = useAuthStore();
+  
+  // États du dashboard
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState<any>(null);
@@ -43,6 +51,13 @@ export default function AdminScreen() {
   const [exchangesFlow, setExchangesFlow] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState('overview');
+  
+  // États du formulaire de connexion
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginLoading, setLoginLoading] = useState(false);
 
   useEffect(() => {
     // Check if user is admin
