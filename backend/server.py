@@ -414,6 +414,17 @@ async def get_user_profile(user_id: str):
 async def create_service(service_data: ServiceCreate, current_user: dict = Depends(get_current_user)):
     service_id = str(uuid.uuid4())
     
+    # Validate photos (max 3, check size)
+    photos = service_data.photos or []
+    if len(photos) > 3:
+        raise HTTPException(400, "Maximum 3 photos allowed")
+    
+    # Check photo sizes (rough estimate: base64 is ~1.37x original size)
+    MAX_PHOTO_SIZE = 5 * 1024 * 1024  # 5MB per photo
+    for i, photo in enumerate(photos):
+        if len(photo) > MAX_PHOTO_SIZE:
+            raise HTTPException(400, f"Photo {i+1} exceeds 5MB limit")
+    
     # Calculate boost score based on verification
     boost_score = 10 if current_user["verification"]["isVerified"] else 1
     
@@ -427,7 +438,9 @@ async def create_service(service_data: ServiceCreate, current_user: dict = Depen
         "type": service_data.type,
         "location": service_data.location,
         "coordinates": service_data.coordinates,
-        "status": "active",
+        "photos": photos,
+        "status": "active",  # Can be: active, locked, completed, cancelled
+        "lockedBy": None,  # User ID who locked the service
         "boostedScore": boost_score,
         "createdAt": datetime.utcnow(),
         "updatedAt": datetime.utcnow()
