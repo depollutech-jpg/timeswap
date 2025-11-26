@@ -278,22 +278,35 @@ export default function AdminScreen() {
             {exchangesFlow && (
               <View style={styles.chartCard}>
                 <Text style={styles.chartTitle}>Heures données vs reçues (Top 8)</Text>
-                <BarChart
-                  data={userBalancesData}
-                  width={width - 48}
-                  height={220}
-                  yAxisLabel=""
-                  yAxisSuffix="h"
-                  chartConfig={{
-                    backgroundColor: Colors.surface,
-                    backgroundGradientFrom: Colors.surface,
-                    backgroundGradientTo: Colors.surface,
-                    decimalPlaces: 0,
-                    color: (opacity = 1) => `rgba(255, 107, 157, ${opacity})`,
-                    labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  }}
-                  style={styles.chart}
-                />
+                {BarChart ? (
+                  <BarChart
+                    data={userBalancesData}
+                    width={width - 48}
+                    height={220}
+                    yAxisLabel=""
+                    yAxisSuffix="h"
+                    chartConfig={{
+                      backgroundColor: Colors.surface,
+                      backgroundGradientFrom: Colors.surface,
+                      backgroundGradientTo: Colors.surface,
+                      decimalPlaces: 0,
+                      color: (opacity = 1) => `rgba(255, 107, 157, ${opacity})`,
+                      labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    }}
+                    style={styles.chart}
+                  />
+                ) : (
+                  <View style={styles.fallbackChart}>
+                    {exchangesFlow?.userBalances.slice(0, 8).map((u: any, index: number) => (
+                      <View key={index} style={styles.fallbackChartItem}>
+                        <Text style={styles.fallbackChartLabel}>{u.name}</Text>
+                        <Text style={styles.fallbackChartValue}>
+                          Données: {u.given}h | Reçues: {u.received}h
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             )}
 
