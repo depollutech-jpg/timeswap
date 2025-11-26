@@ -15,13 +15,13 @@ BASE_URL = "https://swap-community.preview.emergentagent.com/api"
 
 # Test credentials
 USER1_CREDENTIALS = {
-    "email": "quentinraffalli@hotmail.com",
-    "password": "password123"
+    "email": "testuser1@gmail.com",
+    "password": "testpass123"
 }
 
 USER2_CREDENTIALS = {
-    "email": "depollutech@gmail.com", 
-    "password": "password123"
+    "email": "testuser2@gmail.com", 
+    "password": "testpass123"
 }
 
 class NotificationTester:
