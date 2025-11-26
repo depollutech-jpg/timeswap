@@ -107,28 +107,22 @@ export default function MessagesScreen() {
 
               <View style={styles.conversationContent}>
                 <View style={styles.conversationHeader}>
-                  <Text style={styles.conversationName}>{conversation.otherUser.name}</Text>
+                  <Text style={styles.conversationName}>{conversation.otherUser?.name || 'Utilisateur'}</Text>
                   <Text style={styles.conversationTime}>
-                    {formatTime(conversation.lastMessage.timestamp)}
+                    {formatTime(conversation.lastMessageAt || conversation.createdAt)}
                   </Text>
                 </View>
 
                 <View style={styles.conversationFooter}>
                   <Text
-                    style={[
-                      styles.conversationMessage,
-                      conversation.unreadCount > 0 && styles.conversationMessageUnread,
-                    ]}
+                    style={styles.conversationMessage}
                     numberOfLines={1}
                   >
-                    {conversation.lastMessage.isFromMe && 'Vous: '}
-                    {conversation.lastMessage.text}
+                    {conversation.lastMessage || 'Nouvelle conversation'}
                   </Text>
-                  {conversation.unreadCount > 0 && (
-                    <View style={styles.unreadBadge}>
-                      <Text style={styles.unreadBadgeText}>{conversation.unreadCount}</Text>
-                    </View>
-                  )}
+                  <Text style={styles.serviceTitle} numberOfLines={1}>
+                    {conversation.serviceTitle}
+                  </Text>
                 </View>
               </View>
             </TouchableOpacity>
