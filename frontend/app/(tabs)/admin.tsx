@@ -10,6 +10,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  RefreshControl,
+  Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,6 +19,20 @@ import { Colors } from '../../src/constants/colors';
 import { useAuthStore } from '../../src/store/authStore';
 import api from '../../src/utils/api';
 import { useRouter } from 'expo-router';
+
+// Import conditionnel pour les graphiques
+let PieChart: any = null;
+let BarChart: any = null;
+
+try {
+  const charts = require('react-native-chart-kit');
+  PieChart = charts.PieChart;
+  BarChart = charts.BarChart;
+} catch (error) {
+  console.log('Charts library not available, using fallback');
+}
+
+const { width } = Dimensions.get('window');
 
 // Liste blanche des emails autorisés
 const AUTHORIZED_ADMIN_EMAILS = [
