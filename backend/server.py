@@ -937,7 +937,7 @@ async def cancel_exchange(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Annuler un échange avec pénalités selon le statut
+    Annuler un echange avec penalites selon le statut
     """
     exchange = await db.exchanges.find_one({"_id": exchange_id}")
     if not exchange:
