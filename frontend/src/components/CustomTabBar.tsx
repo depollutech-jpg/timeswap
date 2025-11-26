@@ -144,6 +144,7 @@ const styles = StyleSheet.create({
   tabContentActive: {},
   iconContainer: {
     marginBottom: 2,
+    position: 'relative',
   },
   tabLabel: {
     fontSize: 11,
@@ -154,5 +155,24 @@ const styles = StyleSheet.create({
   tabLabelActive: {
     color: Colors.primary,
     fontWeight: '600',
+  },
+  badge: {
+    position: 'absolute',
+    top: -4,
+    right: -8,
+    backgroundColor: Colors.primary,
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 4,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
