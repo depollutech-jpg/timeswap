@@ -152,6 +152,56 @@ export default function AdminScreen() {
     );
   };
 
+
+  const handleAdminLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
+      return;
+    }
+
+    const trimmedEmail = email.trim().toLowerCase();
+
+    if (!AUTHORIZED_ADMIN_EMAILS.includes(trimmedEmail)) {
+      Alert.alert(
+        'Accès refusé',
+        "Vous n'êtes pas autorisé à utiliser l'espace administrateur."
+      );
+      return;
+    }
+
+    setLoginLoading(true);
+    try {
+      const response = await api.post('/auth/login', {
+        email: trimmedEmail,
+        password,
+      });
+
+      if (response.data.user.role !== 'admin') {
+        Alert.alert(
+          'Accès refusé',
+          "Vous n'êtes pas autorisé à utiliser l'espace administrateur."
+        );
+        setLoginLoading(false);
+        return;
+      }
+
+      await setToken(response.data.token);
+      setUser(response.data.user);
+      setIsAdminLoggedIn(true);
+      Alert.alert('Connexion réussie', "Bienvenue dans l'espace administrateur !");
+      
+      // Charger les données du dashboard
+      loadData();
+    } catch (error: any) {
+      Alert.alert(
+        'Erreur de connexion',
+        error.response?.data?.detail || 'Email ou mot de passe incorrect'
+      );
+    } finally {
+      setLoginLoading(false);
+    }
+  };
+
   if (loading) {
     return (
       <View style={styles.loadingContainer}>
