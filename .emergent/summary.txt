@@ -1,90 +1,85 @@
 <analysis>
-The user's primary language is French. All future responses must be in French.
+The user's primary language is French; all future responses must be in French.
 
-The trajectory details the iterative development of a React Native (Expo) mobile application named TimeSwap. The process began with a detailed product description, followed by clarification questions and the decision to use free-tier APIs. The AI engineer then scaffolded the full-stack application, including a FastAPI backend and an Expo frontend, and progressively added features based on the user's detailed, iterative requests.
+The trajectory documents the iterative development of a full-stack React Native (Expo) and FastAPI application named TimeSwap. The process was highly interactive, beginning with a product concept and evolving through a series of detailed user requests.
 
-Key development phases included:
-1.  **Initial Scaffolding:** Setting up the project structure, backend server, and basic frontend navigation.
-2.  **Core Feature Implementation:** Building authentication, user profiles, a credit system, and pages for services.
-3.  **UI/UX Refinement:** Implementing user-provided mockups, adding a floating action button, creating new pages (Balance, Rewards), and adjusting layouts based on specific feedback.
-4.  **Admin Functionality:** Creating a backend admin role, a protected admin dashboard with statistics, and a conditional button for access.
-5.  **Bug Fixing & Stabilization:** Diagnosing and resolving critical issues, such as a broken app due to syntax errors and missing dependencies, and fixing an incorrect admin role assignment in the database.
-6.  **Advanced UI Enhancement:** The last task was a major UI overhaul of the bottom navigation, transforming it from a static tab bar into a horizontally scrollable menu to accommodate future growth. This involved creating a new custom tab bar component.
+Development followed a clear pattern:
+1.  **Backend First:** The AI engineer typically started by implementing or modifying FastAPI endpoints in .
+2.  **Frontend Implementation:** Frontend screens and logic were then built in the  directory, using  for navigation and Zustand for state management.
+3.  **Iterative Debugging:** Several features, particularly the Admin Dashboard access, required multiple rounds of debugging. This involved fixing issues on both the frontend (e.g., missing  in the auth store, incorrect component rendering logic) and backend (e.g., login endpoint not returning the user's role).
+
+Key features implemented include a sophisticated authentication system with role-based access, a password reset flow, a feature-rich home feed with intelligent sorting (geolocation and recency) and user-specific actions (delete post), a complete private messaging system (from ad details to a private chat room), and a complex admin dashboard.
+
+The most recent work involves building a real-time notification system for new messages, starting with backend modifications. The previous attempt to integrate the full admin dashboard into a single tab file proved too complex and was reverted to a simpler, more stable version.
 </analysis>
 
 <product_requirements>
-The project is TimeSwap, a mobile application for iOS and Android designed for service and time exchange without money. It incorporates gamification elements to engage users.
+The project, TimeSwap, is a mobile app for a service and time exchange community, designed to operate without monetary transactions. It features gamification elements like XP and levels to encourage user engagement.
 
-**Core Goal:** To create a platform where users can offer and request services, earning XP, leveling up, and receiving local rewards (vouchers, services). The target audience includes individuals, seniors, associations, and local businesses.
-
-**Implemented Features:**
--   **Authentication:** Email/password login. A role-based system (user/admin) is in place.
--   **User Profile:** View and edit profile picture, name, interests, and availability. 2 free hours are granted upon registration.
--   **Credit System:** A Solde (Balance) page shows credit hours and transaction history. A page to buy more hours is implemented with multiple pricing tiers.
--   **Service Exchange:** Users can post offers and requests, which appear on a central feed (Home page).
--   **Navigation:** A tab-based navigation system with a central, elevated + button for creating posts. It includes Home, Balance, Rewards, Messages, and Profile tabs.
--   **Admin Dashboard:** A dedicated page for administrators (, ) to manage users, listings, and view stats. Access is granted via a conditional button on the home screen.
-
-**Recent Requests & UI/UX:**
--   The bottom tab bar was converted into a horizontally scrollable menu.
--   Service offers and requests are visually differentiated by color on the home feed.
--   The Admin button is positioned in the header.
+**Core Functional Requirements:**
+- **User Management:** Secure user registration, login, and password reset via email.
+- **Role-Based Access:** A two-tiered system for user and admin roles, with specific accounts (, ) designated as administrators.
+- **Service Marketplace:** A main feed where users can post and browse service offers and requests. This feed supports intelligent sorting by recency and the user's geographical proximity. Users have the ability to delete their own posts.
+- **Private Messaging:** A complete chat system allowing users to initiate conversations directly from a service details page. The flow is: Ad on Home Feed -> Detailed Ad Page -> Contact button -> Private Chat Room.
+- **Admin Dashboard:** A secure, dedicated section for administrators to view application statistics (e.g., user activity, financial flows via charts) and perform management tasks. Access is provided through a dedicated, secured Admin tab in the main navigation.
+- **Dynamic UI:** The application features a horizontally scrollable bottom navigation bar to accommodate future expansion and subtle animations (bounce, slide) on the home page to enhance user experience.
 </product_requirements>
 
 <key_technical_concepts>
-- **Frontend:** React Native with Expo, file-based routing with .
-- **State Management:** Zustand for global client-side state (e.g., auth status, user info).
-- **UI & Navigation:** , custom tab bar components,  for animations, .
-- **Backend:** Python with FastAPI, providing a REST API.
-- **Database:** MongoDB for data persistence (users, services, etc.).
-- **Authentication:** JWT-based with a custom role system ('user', 'admin') managed in the backend.
+- **Frontend:** React Native (Expo) with TypeScript.
+- **Routing:** File-based routing using .
+- **State Management:** Zustand for global client-side state (user authentication, profile, role).
+- **UI/Navigation:** , custom scrollable tab bar component,  for animations,  for admin dashboard charts.
+- **Backend:** Python with FastAPI, serving a RESTful API.
+- **Database:** MongoDB for data persistence.
+- **Authentication:** JWT-based token system with a custom role (, ) verification mechanism.
+- **Geolocation:** Using  to fetch user coordinates for proximity-based sorting.
 </key_technical_concepts>
 
 <code_architecture>
-The project is a monorepo with a  (Expo) and  (FastAPI) directory.
+The project is a monorepo containing a  and .
 
 
 
-- ****
-    - **Importance:** This is the single backend file containing the entire FastAPI application. It defines all API endpoints for authentication (, ), user data, services, fetching admin statistics, and handling payments. It connects to the MongoDB database to manage all application data.
-    - **Changes:** It has been heavily modified to add models for users (with roles), services, and transactions. Endpoints were added for admin stats, and pricing packages for buying hours were updated.
+- ****: The monolithic FastAPI backend. It's the brain of the application, managing all database interactions and API logic. It was heavily modified to add endpoints for service deletion, geospatial sorting, password reset, and a full chat system (creating chats, sending messages). The latest change was adding schemas and an endpoint for a new  collection.
 
-- ****
-    - **Importance:** This file is the core of the app's navigation. It uses Expo Router's layout route to define the bottom tab navigator. It's responsible for rendering the tabs, their icons, and the overall structure of the main user interface.
-    - **Changes:** This file has undergone significant changes. Initially a standard tab bar, it was modified to include a custom, elevated, central + button. Most recently, it was rewritten to replace the static tab bar with a -based horizontal menu, using the new  component.
+- ****: The main screen. It was significantly updated to request the user's location, pass coordinates to the backend for sorting, display a delete button on the user's own posts (with a confirmation alert), and handle the redirection to the new  page upon clicking an ad. The Propose Exchange button was removed in favor of this new flow.
 
-- ****
-    - **Importance:** This new component was created to fulfill the user's request for a horizontally scrollable navigation bar. It encapsulates the logic and styling for the scrollable tab menu, keeping the  file cleaner. It iterates over the navigation routes and renders them inside a .
+- ****: This file is critical due to its troubled history. It was initially complex, attempting to embed the entire dashboard. After causing instability, it was **reverted to a simple, stable version**. It now displays a secure login form for non-admins. Upon successful admin login, it shows a success message and a button linking to the full dashboard at . This separation resolved critical rendering and redirection issues.
 
-- ****
-    - **Importance:** The main screen of the application. It fetches and displays the list of service offers and demands. It also contains the header with the app logo, a conditional Admin button, and notification icons.
-    - **Changes:** It was modified to add a search bar, differentiate services by color, and include the logic to display the Admin button only if the logged-in user (from the Zustand store) has the 'admin' role.
+- ****: The separate, full-featured Admin Dashboard page. It contains the  charts and user lists. A bug fix was implemented here to correctly check the user's role from the Zustand store upon focusing the screen, ensuring only authorized admins can view it.
 
-- ****
-    - **Importance:** A Zustand store that manages global authentication state. It holds the user's token, profile information, and critically, their role ( or ). This allows components across the app, like , to conditionally render UI elements.
+- ****: A new screen created to display the full details of a service/ad when a user taps on it from the home feed. It contains the Contacter pour un échange button which initiates the chat creation process.
 
-- ****
-    - **Importance:** The Admin Dashboard page. It is a protected route meant to display charts and management tools for administrators.
-    - **Changes:** Created from scratch to provide a dedicated interface for admin functions. It includes placeholders for charts and user management lists.
+- ****: A new screen that functions as the private chat room. It receives a  and fetches/displays messages between two users.
+
+- ****: The central Zustand store. A critical fix was made here to add the  property to the  interface. This was the root cause of early issues where the frontend was unaware of the user's admin status despite the backend sending it.
+
+- ****: Modified to include a Mot de passe oublié ? link, which navigates to the new password reset flow.
 </code_architecture>
 
 <pending_tasks>
-- **Implement Notifications:** Activate the notifications tab for private messages and new, relevant service announcements based on user interests.
-- **Implement Animations:** Add the remaining subtle animations to make the UI more dynamic (e.g., on the Balance page and for search tabs), as requested in message 111.
-- **Complete Admin Dashboard:** The admin page is created, but the detailed data visualizations (charts for financial flows, user activity, etc.) and management functionalities (banning users, editing posts) are not fully implemented.
+- **Complete Frontend Notification System:** Implement the client-side logic for the notification system. This includes:
+  - Creating a Zustand store for notifications.
+  - Implementing polling or a listener to fetch unread notifications.
+  - Displaying a toast/banner for new messages.
+  - Showing a badge counter on the main notification icon and the Messages tab.
+  - Marking notifications/messages as read when a chat is opened.
 </pending_tasks>
 
 <current_work>
-The most recent task was to address the user's request to transform the static bottom navigation bar into a horizontally scrollable menu. This was done to allow for the addition of future tabs without cluttering the UI, while keeping the main tabs visible and the central + button accessible.
+The last task initiated was the implementation of a comprehensive notification system for new private messages, as per the user's detailed request. The work began on the backend.
 
-To achieve this, the following actions were taken:
-1.  **A new component was created:** . This component uses a  to render the navigation tabs horizontally, making them scrollable.
-2.  **The main navigation layout was updated:** The file  was completely rewritten. It now imports and uses  as the  for the  navigator. This change implements the new scrollable design while maintaining the existing tab structure and the elevated central + button.
-3.  **The application was restarted:** The AI engineer issued a command to restart the Expo server (expo: ERROR (not running)
-expo: started) to apply these significant structural changes to the navigation. The final step was to verify that this new menu is active and functional.
+**Actions Taken:**
+1.  **Backend Schema Creation:** The file  was modified to define Pydantic models for  and . This establishes the data structure for notifications in the database, including fields like , , , and .
+2.  **Backend Endpoint Addition:** New API endpoints were added to :
+    -   : To fetch all notifications for the currently authenticated user.
+    -   : To mark a specific notification as read.
+    -   : To mark all of a user's notifications as read.
+
+The immediate next step planned was to integrate notification creation into the existing message-sending logic.
 </current_work>
 
 <optional_next_step>
-Restart the application with expo: stopped
-expo: started and verify that the new horizontal scrollable tab bar is functional and correctly styled, ensuring the + button remains correctly positioned above it.
+Modify the  endpoint in  to automatically create a new document in the  collection for the message recipient.
 </optional_next_step>
