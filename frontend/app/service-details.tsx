@@ -140,6 +140,57 @@ export default function ServiceDetailsScreen() {
       </View>
 
       <ScrollView style={styles.content}>
+        {/* Status Badge */}
+        {service.status === 'locked' && (
+          <View style={styles.statusBanner}>
+            <Ionicons name="lock-closed" size={20} color="#F59E0B" />
+            <Text style={styles.statusText}>Annonce verrouillee - Echange en cours</Text>
+          </View>
+        )}
+        {service.status === 'completed' && (
+          <View style={[styles.statusBanner, { backgroundColor: '#D1FAE5' }]}>
+            <Ionicons name="checkmark-circle" size={20} color="#10B981" />
+            <Text style={[styles.statusText, { color: '#10B981' }]}>Echange termine</Text>
+          </View>
+        )}
+
+        {/* Photos Carousel */}
+        {service.photos && service.photos.length > 0 && (
+          <View style={styles.photosContainer}>
+            <ScrollView
+              horizontal
+              pagingEnabled
+              showsHorizontalScrollIndicator={false}
+              onMomentumScrollEnd={(event) => {
+                const index = Math.round(event.nativeEvent.contentOffset.x / width);
+                setCurrentPhotoIndex(index);
+              }}
+            >
+              {service.photos.map((photo: string, index: number) => (
+                <Image
+                  key={index}
+                  source={{ uri: photo }}
+                  style={styles.photo}
+                  resizeMode="cover"
+                />
+              ))}
+            </ScrollView>
+            {service.photos.length > 1 && (
+              <View style={styles.photoIndicators}>
+                {service.photos.map((_: any, index: number) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.photoIndicator,
+                      index === currentPhotoIndex && styles.photoIndicatorActive,
+                    ]}
+                  />
+                ))}
+              </View>
+            )}
+          </View>
+        )}
+
         {/* Type Badge */}
         <View style={[styles.typeBadge, { backgroundColor: badgeColor }]}>
           <Text style={styles.typeBadgeText}>
@@ -171,58 +222,35 @@ export default function ServiceDetailsScreen() {
           <Text style={styles.description}>{service.description}</Text>
         </View>
 
-        {/* Creator Info */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Proposé par</Text>
-          <View style={styles.creatorCard}>
-            <View style={styles.creatorAvatar}>
-              {service.user?.photo ? (
-                <Image
-                  source={{ uri: service.user.photo }}
-                  style={styles.creatorAvatarImage}
-                />
-              ) : (
-                <Text style={styles.creatorAvatarText}>
-                  {service.user?.name?.split(' ').map((n: string) => n[0]).join('') || '?'}
-                </Text>
-              )}
-            </View>
-            <View style={styles.creatorInfo}>
-              <Text style={styles.creatorName}>{service.user?.name}</Text>
-              <View style={styles.creatorStats}>
-                <View style={styles.statItem}>
-                  <Ionicons name="star" size={16} color="#F59E0B" />
-                  <Text style={styles.statText}>{service.user?.rating?.toFixed(1) || '0.0'}</Text>
-                </View>
-                <View style={styles.statItem}>
-                  <Ionicons name="flash" size={16} color={Colors.primary} />
-                  <Text style={styles.statText}>{service.user?.xp || 0} XP</Text>
-                </View>
-                {service.user?.isVerified && (
-                  <View style={styles.verifiedBadge}>
-                    <Ionicons name="checkmark-circle" size={16} color="#10B981" />
-                    <Text style={styles.verifiedText}>Vérifié</Text>
-                  </View>
-                )}
-              </View>
-            </View>
+        {/* User Profile Card */}
+        {userProfile && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Propose par</Text>
+            <UserProfileCard user={userProfile} />
           </View>
-        </View>
+        )}
 
         {/* Distance if available */}
         {service.distance_km && (
           <View style={styles.distanceCard}>
             <Ionicons name="navigate" size={24} color="#10B981" />
             <Text style={styles.distanceText}>
-              À {service.distance_km.toFixed(1)} km de vous
+              A {service.distance_km.toFixed(1)} km de vous
             </Text>
           </View>
         )}
       </ScrollView>
 
-      {/* Contact Button */}
-      {service.userId !== user?._id && (
+      {/* Actions Footer */}
+      {service.userId !== user?._id && service.status === 'active' && (
         <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.reportButton}
+            onPress={() => setShowReportModal(true)}
+          >
+            <Ionicons name="flag-outline" size={20} color={Colors.textSecondary} />
+          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.contactButton, contactLoading && styles.contactButtonDisabled]}
             onPress={handleContact}
@@ -233,12 +261,40 @@ export default function ServiceDetailsScreen() {
             ) : (
               <>
                 <Ionicons name="chatbubble" size={20} color="#FFFFFF" />
-                <Text style={styles.contactButtonText}>Contacter pour un échange</Text>
+                <Text style={styles.contactButtonText}>Contacter</Text>
               </>
             )}
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.acceptButton}
+            onPress={() => setShowAcceptModal(true)}
+          >
+            <Ionicons name="checkmark-circle" size={20} color="#FFFFFF" />
+            <Text style={styles.acceptButtonText}>Accepter</Text>
+          </TouchableOpacity>
         </View>
       )}
+
+      {/* Modals */}
+      <ReportModal
+        visible={showReportModal}
+        targetType="service"
+        targetId={service._id}
+        onClose={() => setShowReportModal(false)}
+      />
+
+      <ConfirmationModal
+        visible={showAcceptModal}
+        title="Accepter l'echange"
+        message={`Voulez-vous accepter cet echange de ${service.duration}h ? L'annonce sera verrouillee et vous pourrez discuter avec ${userProfile?.name || 'l utilisateur'}.`}
+        confirmText="Accepter"
+        cancelText="Annuler"
+        icon="handshake"
+        iconColor={Colors.primary}
+        onConfirm={handleAcceptExchange}
+        onCancel={() => setShowAcceptModal(false)}
+      />
     </SafeAreaView>
   );
 }
