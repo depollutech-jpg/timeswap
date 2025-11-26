@@ -20,12 +20,13 @@ ADMIN_CREDENTIALS = [
 
 class TimeSwapTester:
     def __init__(self):
-        self.user1_token = None
-        self.user2_token = None
-        self.user1_id = None
-        self.user2_id = None
-        self.test_chat_id = None
-        self.test_service_id = None
+        self.base_url = BASE_URL
+        self.tokens = {}
+        self.users = {}
+        self.services = {}
+        self.exchanges = {}
+        self.chats = {}
+        self.reports = {}
         self.test_results = []
         
     def log_test(self, test_name: str, success: bool, message: str, details: str = ""):
