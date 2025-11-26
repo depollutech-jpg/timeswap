@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../src/store/authStore';
+import { useNotificationStore } from '../../src/store/notificationStore';
 import { Colors } from '../../src/constants/colors';
 import api from '../../src/utils/api';
 import { Ionicons } from '@expo/vector-icons';
