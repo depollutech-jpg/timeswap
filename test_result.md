@@ -187,6 +187,44 @@ test_plan:
   test_all: false
   test_priority: "high_first"
 
+  - task: "Séparation Messages/Notifications"
+    implemented: true
+    working: true
+    file: "app/(tabs)/messages.tsx, app/notifications.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Page Messages restaurée pour les vraies conversations. Page Notifications créée séparément (app/notifications.tsx). L'icône de notification dans le header redirige maintenant vers /notifications au lieu de /messages."
+
+  - task: "Compatibilité mobile - Graphiques"
+    implemented: true
+    working: true
+    file: "app/admin.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Import conditionnel de react-native-chart-kit pour éviter les crashs sur mobile. Fallback UI ajouté pour afficher les données sans graphiques si la bibliothèque ne charge pas."
+
 agent_communication:
   - agent: "main"
-    message: "Toutes les tâches prioritaires ont été implémentées. Le bouton Admin devrait maintenant être visible pour les utilisateurs avec le rôle 'admin'. Le système de notifications est en place avec des données de démonstration. Les animations bounce/slide sont ajoutées sur la page Solde. Le Dashboard Admin est complet avec des graphiques et des fonctionnalités de gestion."
+    message: |
+      CORRECTIONS MAJEURES EFFECTUÉES:
+      
+      1. ✅ SÉPARATION MESSAGES/NOTIFICATIONS
+         - La page Messages (app/(tabs)/messages.tsx) contient maintenant UNIQUEMENT les conversations
+         - Les notifications ont été déplacées vers app/notifications.tsx
+         - L'icône de notification dans le header redirige vers /notifications
+         - 3 conversations de démonstration dans la page Messages
+      
+      2. ✅ COMPATIBILITÉ MOBILE AMÉLIORÉE
+         - Import conditionnel de react-native-chart-kit pour éviter les erreurs
+         - Fallback UI ajouté pour afficher les données si les graphiques ne chargent pas
+         - L'application devrait maintenant fonctionner sur smartphone
+      
+      Prêt pour les tests sur mobile et PC.
