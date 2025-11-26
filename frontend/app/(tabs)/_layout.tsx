@@ -150,6 +150,15 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="admin"
+          options={{
+            title: 'Admin',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="shield-checkmark" size={22} color={color} />
+            ),
+          }}
+        />
         {/* Pages cachées */}
         <Tabs.Screen
           name="placeholder"
