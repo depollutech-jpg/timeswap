@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { Tabs, useRouter } from 'expo-router';
+import { Tabs, useRouter, useSegments, usePathname } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
 import { TouchableOpacity, View, StyleSheet, Modal, Text, ScrollView, Animated } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import CustomTabBar from '../../src/components/CustomTabBar';
 
 function FloatingAddButton() {
   const router = useRouter();
