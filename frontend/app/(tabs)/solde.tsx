@@ -147,8 +147,16 @@ export default function SoldeScreen() {
           </LinearGradient>
         </Animated.View>
 
-        {/* Actions Rapides */}
-        <View style={styles.quickActions}>
+        {/* Actions Rapides avec animation slide */}
+        <Animated.View
+          style={[
+            styles.quickActions,
+            {
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            },
+          ]}
+        >
           <TouchableOpacity
             style={[styles.actionCard, { backgroundColor: Colors.primary }]}
             onPress={() => router.push('/buy-hours')}
@@ -163,7 +171,7 @@ export default function SoldeScreen() {
             <Ionicons name="gift" size={24} color="#FFFFFF" />
             <Text style={styles.actionText}>Donner des heures</Text>
           </TouchableOpacity>
-        </View>
+        </Animated.View>
 
         {/* Objectif mensuel */}
         <View style={styles.goalCard}>
