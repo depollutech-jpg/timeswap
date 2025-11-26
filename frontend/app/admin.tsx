@@ -248,18 +248,29 @@ export default function AdminScreen() {
             {servicesCategoryData.length > 0 && (
               <View style={styles.chartCard}>
                 <Text style={styles.chartTitle}>Répartition des services par catégorie</Text>
-                <PieChart
-                  data={servicesCategoryData}
-                  width={width - 48}
-                  height={220}
-                  chartConfig={{
-                    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-                  }}
-                  accessor="population"
-                  backgroundColor="transparent"
-                  paddingLeft="15"
-                  absolute
-                />
+                {PieChart ? (
+                  <PieChart
+                    data={servicesCategoryData}
+                    width={width - 48}
+                    height={220}
+                    chartConfig={{
+                      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    }}
+                    accessor="population"
+                    backgroundColor="transparent"
+                    paddingLeft="15"
+                    absolute
+                  />
+                ) : (
+                  <View style={styles.fallbackChart}>
+                    {servicesCategoryData.map((item: any, index: number) => (
+                      <View key={index} style={styles.fallbackChartItem}>
+                        <Text style={styles.fallbackChartLabel}>{item.name}</Text>
+                        <Text style={styles.fallbackChartValue}>{item.population}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
               </View>
             )}
 
