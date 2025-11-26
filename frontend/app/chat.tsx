@@ -16,11 +16,13 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../src/constants/colors';
 import api from '../src/utils/api';
 import { useAuthStore } from '../src/store/authStore';
+import { useNotificationStore } from '../src/store/notificationStore';
 
 export default function ChatScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
+  const { notifications, fetchNotifications } = useNotificationStore();
   const [chat, setChat] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
@@ -31,7 +33,30 @@ export default function ChatScreen() {
   useEffect(() => {
     loadChat();
     loadMessages();
+    markChatNotificationsAsRead();
   }, [id]);
+
+  // Marquer toutes les notifications liées à ce chat comme lues
+  const markChatNotificationsAsRead = async () => {
+    try {
+      // Récupérer les notifications liées à ce chat
+      const chatNotifications = notifications.filter(
+        (notif) => notif.chatId === id && !notif.read
+      );
+
+      // Marquer chaque notification comme lue
+      for (const notif of chatNotifications) {
+        await api.post(`/notifications/${notif._id}/mark-read`);
+      }
+
+      // Rafraîchir les notifications
+      if (chatNotifications.length > 0) {
+        await fetchNotifications();
+      }
+    } catch (error) {
+      console.error('Failed to mark chat notifications as read:', error);
+    }
+  };
 
   const loadChat = async () => {
     try {
