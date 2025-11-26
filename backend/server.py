@@ -1107,11 +1107,6 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
     )
     return {"marked_read": result.modified_count}
 
-    
-    return {"marked_read": result.modified_count}
-
-    return message
-
 # ============= ADMIN ROUTES =============
 
 async def check_admin(current_user: dict = Depends(get_current_user)):
