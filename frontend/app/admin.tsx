@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -16,7 +17,18 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../src/constants/colors';
 import api from '../src/utils/api';
 import { useAuthStore } from '../src/store/authStore';
-import { PieChart, BarChart } from 'react-native-chart-kit';
+
+// Import conditionnel pour éviter les problèmes sur mobile
+let PieChart: any = null;
+let BarChart: any = null;
+
+try {
+  const charts = require('react-native-chart-kit');
+  PieChart = charts.PieChart;
+  BarChart = charts.BarChart;
+} catch (error) {
+  console.log('Charts library not available, using fallback');
+}
 
 const { width } = Dimensions.get('window');
 
