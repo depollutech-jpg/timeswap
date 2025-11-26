@@ -206,8 +206,23 @@ export default function HomeScreen() {
           </ScrollView>
         </Animated.View>
 
-        {/* Liste des services */}
-        <View style={styles.servicesSection}>
+        {/* Liste des services avec animation Bounce */}
+        <Animated.View
+          style={[
+            styles.servicesSection,
+            {
+              transform: [
+                {
+                  scale: bounceServicesAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.95, 1],
+                  }),
+                },
+              ],
+              opacity: bounceServicesAnim,
+            },
+          ]}
+        >
           {services.length === 0 ? (
             <View style={styles.emptyState}>
               <Ionicons name="leaf-outline" size={48} color={Colors.textSecondary} />
