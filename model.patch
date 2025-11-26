@@ -1,175 +1,206 @@
+diff --git a/frontend/app/(tabs)/admin-new.tsx b/frontend/app/(tabs)/admin-new.tsx
+index a4d040c..4d0e546 100644
+--- a/frontend/app/(tabs)/admin-new.tsx
++++ b/frontend/app/(tabs)/admin-new.tsx
+@@ -60,14 +60,14 @@ export default function AdminScreen() {
+   const [loginLoading, setLoginLoading] = useState(false);
+ 
+   useEffect(() => {
+-    // Check if user is admin
+-    if (user?.role !== 'admin') {
+-      Alert.alert('Accès refusé', 'Vous n\'avez pas les permissions nécessaires');
+-      router.back();
+-      return;
++    // Si l'utilisateur est déjà connecté en tant qu'admin, charger le dashboard
++    if (user?.role === 'admin') {
++      setIsAdminLoggedIn(true);
++      loadData();
++    } else {
++      setLoading(false);
+     }
+-    loadData();
+-  }, []);
++  }, [user]);
+ 
+   const loadData = async () => {
+     try {
 diff --git a/model.patch b/model.patch
-index a9707d0..e69de29 100644
+index 0682065..e69de29 100644
 --- a/model.patch
 +++ b/model.patch
-@@ -1,170 +0,0 @@
--diff --git a/frontend/app/(tabs)/messages.tsx b/frontend/app/(tabs)/messages.tsx
--index 460a7a8..583c9c7 100644
----- a/frontend/app/(tabs)/messages.tsx
--+++ b/frontend/app/(tabs)/messages.tsx
--@@ -160,41 +160,35 @@ const styles = StyleSheet.create({
--     borderBottomWidth: 1,
--     borderBottomColor: '#E5E7EB',
--   },
---  headerLeft: {
---    flexDirection: 'row',
---    alignItems: 'center',
---    gap: 8,
---  },
--   title: {
--     fontSize: 24,
--     fontWeight: 'bold',
--     color: '#1F2937',
--   },
---  badge: {
---    backgroundColor: Colors.primary,
---    borderRadius: 12,
---    paddingHorizontal: 8,
---    paddingVertical: 2,
---    minWidth: 24,
---    alignItems: 'center',
---    justifyContent: 'center',
--+  composeButton: {
--+    padding: 8,
--   },
---  badgeText: {
---    color: '#FFFFFF',
---    fontSize: 12,
---    fontWeight: 'bold',
--+  searchSection: {
--+    paddingHorizontal: 16,
--+    paddingVertical: 12,
--+    backgroundColor: '#FFFFFF',
--   },
---  markAllButton: {
---    paddingHorizontal: 12,
---    paddingVertical: 6,
--+  searchBar: {
--+    flexDirection: 'row',
--+    alignItems: 'center',
--+    backgroundColor: '#F3F4F6',
--+    borderRadius: 12,
--+    paddingHorizontal: 16,
--+    paddingVertical: 10,
--+    gap: 12,
--   },
---  markAllText: {
---    color: Colors.primary,
---    fontSize: 14,
---    fontWeight: '600',
--+  searchInput: {
--+    flex: 1,
--+    fontSize: 16,
--+    color: '#1F2937',
--   },
---  scrollContent: {
---    padding: 16,
--+  content: {
--+    flex: 1,
--   },
--   emptyState: {
--     alignItems: 'center',
--@@ -215,56 +209,72 @@ const styles = StyleSheet.create({
--     textAlign: 'center',
--     lineHeight: 20,
--   },
---  notificationCard: {
--+  conversationCard: {
--     flexDirection: 'row',
--     backgroundColor: '#FFFFFF',
---    borderRadius: 12,
--     padding: 16,
---    marginBottom: 12,
---    shadowColor: '#000',
---    shadowOffset: { width: 0, height: 1 },
---    shadowOpacity: 0.05,
---    shadowRadius: 2,
---    elevation: 2,
---  },
---  notificationUnread: {
---    backgroundColor: '#FFF7ED',
---    borderLeftWidth: 3,
---    borderLeftColor: Colors.primary,
--+    borderBottomWidth: 1,
--+    borderBottomColor: '#E5E7EB',
--   },
---  iconContainer: {
---    width: 48,
---    height: 48,
---    borderRadius: 24,
--+  avatar: {
--+    width: 56,
--+    height: 56,
--+    borderRadius: 28,
--+    backgroundColor: Colors.primary,
--     justifyContent: 'center',
--     alignItems: 'center',
--     marginRight: 12,
--   },
---  notificationContent: {
--+  avatarText: {
--+    fontSize: 18,
--+    fontWeight: 'bold',
--+    color: '#FFFFFF',
--+  },
--+  conversationContent: {
--     flex: 1,
--+    justifyContent: 'center',
--+  },
--+  conversationHeader: {
--+    flexDirection: 'row',
--+    justifyContent: 'space-between',
--+    alignItems: 'center',
--+    marginBottom: 4,
--   },
---  notificationTitle: {
--+  conversationName: {
--     fontSize: 16,
--     fontWeight: '600',
--     color: '#1F2937',
---    marginBottom: 4,
--   },
---  notificationMessage: {
--+  conversationTime: {
--+    fontSize: 12,
--+    color: '#9CA3AF',
--+  },
--+  conversationFooter: {
--+    flexDirection: 'row',
--+    alignItems: 'center',
--+    justifyContent: 'space-between',
--+  },
--+  conversationMessage: {
--     fontSize: 14,
--     color: '#6B7280',
---    lineHeight: 20,
---    marginBottom: 4,
--+    flex: 1,
--   },
---  notificationTime: {
---    fontSize: 12,
---    color: '#9CA3AF',
--+  conversationMessageUnread: {
--+    fontWeight: '600',
--+    color: '#1F2937',
--   },
---  unreadDot: {
---    width: 8,
---    height: 8,
---    borderRadius: 4,
--+  unreadBadge: {
--     backgroundColor: Colors.primary,
--+    borderRadius: 10,
--+    width: 20,
--+    height: 20,
--+    justifyContent: 'center',
--+    alignItems: 'center',
--     marginLeft: 8,
---    alignSelf: 'center',
--+  },
--+  unreadBadgeText: {
--+    color: '#FFFFFF',
--+    fontSize: 12,
--+    fontWeight: 'bold',
--   },
-- });
+@@ -1,175 +0,0 @@
+-diff --git a/model.patch b/model.patch
+-index a9707d0..e69de29 100644
+---- a/model.patch
+-+++ b/model.patch
+-@@ -1,170 +0,0 @@
+--diff --git a/frontend/app/(tabs)/messages.tsx b/frontend/app/(tabs)/messages.tsx
+--index 460a7a8..583c9c7 100644
+----- a/frontend/app/(tabs)/messages.tsx
+--+++ b/frontend/app/(tabs)/messages.tsx
+--@@ -160,41 +160,35 @@ const styles = StyleSheet.create({
+--     borderBottomWidth: 1,
+--     borderBottomColor: '#E5E7EB',
+--   },
+---  headerLeft: {
+---    flexDirection: 'row',
+---    alignItems: 'center',
+---    gap: 8,
+---  },
+--   title: {
+--     fontSize: 24,
+--     fontWeight: 'bold',
+--     color: '#1F2937',
+--   },
+---  badge: {
+---    backgroundColor: Colors.primary,
+---    borderRadius: 12,
+---    paddingHorizontal: 8,
+---    paddingVertical: 2,
+---    minWidth: 24,
+---    alignItems: 'center',
+---    justifyContent: 'center',
+--+  composeButton: {
+--+    padding: 8,
+--   },
+---  badgeText: {
+---    color: '#FFFFFF',
+---    fontSize: 12,
+---    fontWeight: 'bold',
+--+  searchSection: {
+--+    paddingHorizontal: 16,
+--+    paddingVertical: 12,
+--+    backgroundColor: '#FFFFFF',
+--   },
+---  markAllButton: {
+---    paddingHorizontal: 12,
+---    paddingVertical: 6,
+--+  searchBar: {
+--+    flexDirection: 'row',
+--+    alignItems: 'center',
+--+    backgroundColor: '#F3F4F6',
+--+    borderRadius: 12,
+--+    paddingHorizontal: 16,
+--+    paddingVertical: 10,
+--+    gap: 12,
+--   },
+---  markAllText: {
+---    color: Colors.primary,
+---    fontSize: 14,
+---    fontWeight: '600',
+--+  searchInput: {
+--+    flex: 1,
+--+    fontSize: 16,
+--+    color: '#1F2937',
+--   },
+---  scrollContent: {
+---    padding: 16,
+--+  content: {
+--+    flex: 1,
+--   },
+--   emptyState: {
+--     alignItems: 'center',
+--@@ -215,56 +209,72 @@ const styles = StyleSheet.create({
+--     textAlign: 'center',
+--     lineHeight: 20,
+--   },
+---  notificationCard: {
+--+  conversationCard: {
+--     flexDirection: 'row',
+--     backgroundColor: '#FFFFFF',
+---    borderRadius: 12,
+--     padding: 16,
+---    marginBottom: 12,
+---    shadowColor: '#000',
+---    shadowOffset: { width: 0, height: 1 },
+---    shadowOpacity: 0.05,
+---    shadowRadius: 2,
+---    elevation: 2,
+---  },
+---  notificationUnread: {
+---    backgroundColor: '#FFF7ED',
+---    borderLeftWidth: 3,
+---    borderLeftColor: Colors.primary,
+--+    borderBottomWidth: 1,
+--+    borderBottomColor: '#E5E7EB',
+--   },
+---  iconContainer: {
+---    width: 48,
+---    height: 48,
+---    borderRadius: 24,
+--+  avatar: {
+--+    width: 56,
+--+    height: 56,
+--+    borderRadius: 28,
+--+    backgroundColor: Colors.primary,
+--     justifyContent: 'center',
+--     alignItems: 'center',
+--     marginRight: 12,
+--   },
+---  notificationContent: {
+--+  avatarText: {
+--+    fontSize: 18,
+--+    fontWeight: 'bold',
+--+    color: '#FFFFFF',
+--+  },
+--+  conversationContent: {
+--     flex: 1,
+--+    justifyContent: 'center',
+--+  },
+--+  conversationHeader: {
+--+    flexDirection: 'row',
+--+    justifyContent: 'space-between',
+--+    alignItems: 'center',
+--+    marginBottom: 4,
+--   },
+---  notificationTitle: {
+--+  conversationName: {
+--     fontSize: 16,
+--     fontWeight: '600',
+--     color: '#1F2937',
+---    marginBottom: 4,
+--   },
+---  notificationMessage: {
+--+  conversationTime: {
+--+    fontSize: 12,
+--+    color: '#9CA3AF',
+--+  },
+--+  conversationFooter: {
+--+    flexDirection: 'row',
+--+    alignItems: 'center',
+--+    justifyContent: 'space-between',
+--+  },
+--+  conversationMessage: {
+--     fontSize: 14,
+--     color: '#6B7280',
+---    lineHeight: 20,
+---    marginBottom: 4,
+--+    flex: 1,
+--   },
+---  notificationTime: {
+---    fontSize: 12,
+---    color: '#9CA3AF',
+--+  conversationMessageUnread: {
+--+    fontWeight: '600',
+--+    color: '#1F2937',
+--   },
+---  unreadDot: {
+---    width: 8,
+---    height: 8,
+---    borderRadius: 4,
+--+  unreadBadge: {
+--     backgroundColor: Colors.primary,
+--+    borderRadius: 10,
+--+    width: 20,
+--+    height: 20,
+--+    justifyContent: 'center',
+--+    alignItems: 'center',
+--     marginLeft: 8,
+---    alignSelf: 'center',
+--+  },
+--+  unreadBadgeText: {
+--+    color: '#FFFFFF',
+--+    fontSize: 12,
+--+    fontWeight: 'bold',
+--   },
+-- });
