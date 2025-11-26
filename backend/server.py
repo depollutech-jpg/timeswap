@@ -93,7 +93,7 @@ class ExchangeCancel(BaseModel):
     reason: str
 
 class RatingCreate(BaseModel):
-    rating: int  # 1-5 étoiles
+    rating: int  # 1-5 etoiles
     review: Optional[str] = None
 
 class ChatCreate(BaseModel):
@@ -613,11 +613,11 @@ async def accept_exchange_from_service(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Accepter un échange depuis une annonce (équivalent du bouton 'Accepter l'échange')
-    - Vérifie que le service est disponible
-    - Crée un échange avec status 'accepted'
+    Accepter un echange depuis une annonce (equivalent du bouton 'Accepter l'echange')
+    - Verifie que le service est disponible
+    - Cree un echange avec status 'accepted'
     - Verrouille l'annonce
-    - Crée/récupère le chat entre les deux utilisateurs
+    - Cree/recupere le chat entre les deux utilisateurs
     """
     service = await db.services.find_one({"_id": service_id})
     if not service:
@@ -629,7 +629,7 @@ async def accept_exchange_from_service(
     if service["userId"] == current_user["_id"]:
         raise HTTPException(400, "Cannot accept your own service")
     
-    # Vérifier le solde selon le type de service
+    # Verifier le solde selon le type de service
     requester_id = current_user["_id"]
     provider_id = service["userId"]
     
@@ -638,7 +638,7 @@ async def accept_exchange_from_service(
         if current_user["credits"]["available"] < service["duration"]:
             raise HTTPException(400, f"Solde insuffisant. Vous avez {current_user['credits']['available']}h, il vous faut {service['duration']}h")
     
-    # Créer l'échange
+    # Creer l'echange
     exchange_id = str(uuid.uuid4())
     exchange = {
         "_id": exchange_id,
@@ -672,7 +672,7 @@ async def accept_exchange_from_service(
         }
     )
     
-    # Trouver ou créer le chat entre les deux utilisateurs
+    # Trouver ou creer le chat entre les deux utilisateurs
     chat = await db.chats.find_one({
         "serviceId": service_id,
         "participants": {"$all": [provider_id, requester_id]}
@@ -685,31 +685,31 @@ async def accept_exchange_from_service(
             "serviceId": service_id,
             "participants": [provider_id, requester_id],
             "createdAt": datetime.utcnow(),
-            "lastMessage": exchange_data.message or "Échange accepté",
+            "lastMessage": exchange_data.message or "Echange accepte",
             "lastMessageAt": datetime.utcnow()
         }
         await db.chats.insert_one(chat)
     else:
         chat_id = chat["_id"]
     
-    # Créer un message automatique dans le chat
+    # Creer un message automatique dans le chat
     message = {
         "_id": str(uuid.uuid4()),
         "chatId": chat_id,
         "senderId": "system",
-        "senderName": "Système",
-        "content": f"🤝 Échange accepté ! Mission en cours. Les deux parties doivent confirmer \"Tâche réalisée\" pour finaliser.",
+        "senderName": "Systeme",
+        "content": f"🤝 Echange accepte ! Mission en cours. Les deux parties doivent confirmer \"Tâche realisee\" pour finaliser.",
         "createdAt": datetime.utcnow(),
         "readBy": []
     }
     await db.messages.insert_one(message)
     
-    # Créer une notification pour le provider
+    # Creer une notification pour le provider
     notification = {
         "_id": str(uuid.uuid4()),
         "userId": provider_id,
         "type": "system",
-        "content": f"Votre annonce \"{service['title']}\" a été acceptée !",
+        "content": f"Votre annonce \"{service['title']}\" a ete acceptee !",
         "exchangeId": exchange_id,
         "timestamp": datetime.utcnow(),
         "read": False
@@ -724,16 +724,16 @@ async def accept_exchange_from_service(
 
 @api_router.get("/exchanges/{exchange_id}")
 async def get_exchange(exchange_id: str, current_user: dict = Depends(get_current_user)):
-    """Récupérer les détails d'un échange"""
+    """Recuperer les details d'un echange"""
     exchange = await db.exchanges.find_one({"_id": exchange_id})
     if not exchange:
         raise HTTPException(404, "Exchange not found")
     
-    # Vérifier que l'utilisateur est partie prenante
+    # Verifier que l'utilisateur est partie prenante
     if exchange["providerId"] != current_user["_id"] and exchange["requesterId"] != current_user["_id"]:
         raise HTTPException(403, "Not authorized")
     
-    # Enrichir avec les données du service et des utilisateurs
+    # Enrichir avec les donnees du service et des utilisateurs
     service = await db.services.find_one({"_id": exchange["serviceId"]})
     provider = await db.users.find_one({"_id": exchange["providerId"]})
     requester = await db.users.find_one({"_id": exchange["requesterId"]})
@@ -760,9 +760,9 @@ async def get_exchange(exchange_id: str, current_user: dict = Depends(get_curren
 @api_router.post("/exchanges/{exchange_id}/confirm-completion")
 async def confirm_completion(exchange_id: str, current_user: dict = Depends(get_current_user)):
     """
-    Confirmer la réalisation de la tâche (double validation type Vinted)
+    Confirmer la realisation de la tâche (double validation type Vinted)
     - Marque la confirmation de l'utilisateur
-    - Si les deux ont confirmé, déclenche le transfert d'heures
+    - Si les deux ont confirme, declenche le transfert d'heures
     """
     exchange = await db.exchanges.find_one({"_id": exchange_id})
     if not exchange:
@@ -771,14 +771,14 @@ async def confirm_completion(exchange_id: str, current_user: dict = Depends(get_
     if exchange["status"] != "accepted":
         raise HTTPException(400, f"Exchange status is {exchange['status']}, cannot confirm")
     
-    # Déterminer qui confirme
+    # Determiner qui confirme
     is_provider = exchange["providerId"] == current_user["_id"]
     is_requester = exchange["requesterId"] == current_user["_id"]
     
     if not is_provider and not is_requester:
         raise HTTPException(403, "Not authorized")
     
-    # Vérifier si déjà confirmé
+    # Verifier si deja confirme
     if is_provider and exchange["providerConfirmed"]:
         raise HTTPException(400, "You have already confirmed")
     if is_requester and exchange["requesterConfirmed"]:
@@ -796,20 +796,20 @@ async def confirm_completion(exchange_id: str, current_user: dict = Depends(get_
         {"$set": update_fields}
     )
     
-    # Récupérer l'échange mis à jour
+    # Recuperer l'echange mis a jour
     exchange = await db.exchanges.find_one({"_id": exchange_id})
     
-    # Si les deux ont confirmé, finaliser l'échange
+    # Si les deux ont confirme, finaliser l'echange
     if exchange["providerConfirmed"] and exchange["requesterConfirmed"]:
         return await finalize_exchange(exchange_id, exchange)
     
-    # Sinon, envoyer une notification à l'autre partie
+    # Sinon, envoyer une notification a l'autre partie
     other_user_id = exchange["providerId"] if is_requester else exchange["requesterId"]
     notification = {
         "_id": str(uuid.uuid4()),
         "userId": other_user_id,
         "type": "system",
-        "content": "L'autre partie a confirmé la tâche réalisée. Confirmez à votre tour pour finaliser l'échange.",
+        "content": "L'autre partie a confirme la tâche realisee. Confirmez a votre tour pour finaliser l'echange.",
         "exchangeId": exchange_id,
         "timestamp": datetime.utcnow(),
         "read": False
@@ -817,28 +817,28 @@ async def confirm_completion(exchange_id: str, current_user: dict = Depends(get_
     await db.notifications.insert_one(notification)
     
     return {
-        "message": "Confirmation enregistrée. En attente de la confirmation de l'autre partie.",
+        "message": "Confirmation enregistree. En attente de la confirmation de l'autre partie.",
         "providerConfirmed": exchange["providerConfirmed"],
         "requesterConfirmed": exchange["requesterConfirmed"]
     }
 
 async def finalize_exchange(exchange_id: str, exchange: dict):
     """
-    Finaliser l'échange : transfert d'heures, XP, archivage
+    Finaliser l'echange : transfert d'heures, XP, archivage
     """
     service = await db.services.find_one({"_id": exchange["serviceId"]})
     requester = await db.users.find_one({"_id": exchange["requesterId"]})
     
-    # Vérifier le solde du demandeur
+    # Verifier le solde du demandeur
     if requester["credits"]["available"] < exchange["duration"]:
         raise HTTPException(400, f"Insufficient credits. Requester has {requester['credits']['available']}h but needs {exchange['duration']}h")
     
     # Calculer les XP
     xp_awarded = int(exchange["duration"] * 10)  # 10 XP par heure
     
-    # Transaction atomique : débiter le requester et créditer le provider
+    # Transaction atomique : debiter le requester et crediter le provider
     try:
-        # Débiter le demandeur
+        # Debiter le demandeur
         await db.users.update_one(
             {"_id": exchange["requesterId"]},
             {
@@ -851,7 +851,7 @@ async def finalize_exchange(exchange_id: str, exchange: dict):
             }
         )
         
-        # Créditer le fournisseur
+        # Crediter le fournisseur
         await db.users.update_one(
             {"_id": exchange["providerId"]},
             {
@@ -864,7 +864,7 @@ async def finalize_exchange(exchange_id: str, exchange: dict):
             }
         )
         
-        # Marquer l'échange comme terminé
+        # Marquer l'echange comme termine
         await db.exchanges.update_one(
             {"_id": exchange_id},
             {
@@ -876,13 +876,13 @@ async def finalize_exchange(exchange_id: str, exchange: dict):
             }
         )
         
-        # Marquer l'annonce comme terminée
+        # Marquer l'annonce comme terminee
         await db.services.update_one(
             {"_id": exchange["serviceId"]},
             {"$set": {"status": "completed"}}
         )
         
-        # Mettre à jour les niveaux
+        # Mettre a jour les niveaux
         for user_id in [exchange["providerId"], exchange["requesterId"]]:
             user = await db.users.find_one({"_id": user_id})
             new_level = (user["gamification"]["xp"] // 100) + 1
@@ -898,8 +898,8 @@ async def finalize_exchange(exchange_id: str, exchange: dict):
                 "_id": str(uuid.uuid4()),
                 "chatId": chat["_id"],
                 "senderId": "system",
-                "senderName": "Système",
-                "content": f"✅ La tâche a été confirmée par les deux utilisateurs. Le transfert de {exchange['duration']}h a été effectué avec succès !",
+                "senderName": "Systeme",
+                "content": f"✅ La tâche a ete confirmee par les deux utilisateurs. Le transfert de {exchange['duration']}h a ete effectue avec succes !",
                 "createdAt": datetime.utcnow(),
                 "readBy": []
             }
@@ -911,7 +911,7 @@ async def finalize_exchange(exchange_id: str, exchange: dict):
                 "_id": str(uuid.uuid4()),
                 "userId": user_id,
                 "type": "system",
-                "content": f"Échange terminé ! Le transfert de {exchange['duration']}h a été effectué.",
+                "content": f"Echange termine ! Le transfert de {exchange['duration']}h a ete effectue.",
                 "exchangeId": exchange_id,
                 "timestamp": datetime.utcnow(),
                 "read": False
@@ -952,16 +952,16 @@ async def cancel_exchange(
     if not is_provider and not is_requester:
         raise HTTPException(403, "Not authorized")
     
-    # Déterminer la pénalité
+    # Determiner la penalite
     penalty_hours = 0
     penalty_xp = 0
     
-    # Si une partie a déjà confirmé, appliquer une pénalité
+    # Si une partie a deja confirme, appliquer une penalite
     if exchange.get("providerConfirmed") or exchange.get("requesterConfirmed"):
-        penalty_hours = exchange["duration"] * 0.1  # 10% du temps de l'échange
+        penalty_hours = exchange["duration"] * 0.1  # 10% du temps de l'echange
         penalty_xp = 50  # Perte de 50 XP
         
-        # Appliquer la pénalité à celui qui annule
+        # Appliquer la penalite a celui qui annule
         await db.users.update_one(
             {"_id": current_user["_id"]},
             {
@@ -972,7 +972,7 @@ async def cancel_exchange(
             }
         )
     
-    # Mettre à jour l'échange
+    # Mettre a jour l'echange
     await db.exchanges.update_one(
         {"_id": exchange_id},
         {
@@ -988,7 +988,7 @@ async def cancel_exchange(
         }
     )
     
-    # Déverrouiller l'annonce
+    # Deverrouiller l'annonce
     await db.services.update_one(
         {"_id": exchange["serviceId"]},
         {
@@ -1006,7 +1006,7 @@ async def cancel_exchange(
         "_id": str(uuid.uuid4()),
         "userId": other_user_id,
         "type": "system",
-        "content": f"L'échange a été annulé par l'autre partie. Motif : {cancel_data.reason}",
+        "content": f"L'echange a ete annule par l'autre partie. Motif : {cancel_data.reason}",
         "exchangeId": exchange_id,
         "timestamp": datetime.utcnow(),
         "read": False
@@ -1020,8 +1020,8 @@ async def cancel_exchange(
             "_id": str(uuid.uuid4()),
             "chatId": chat["_id"],
             "senderId": "system",
-            "senderName": "Système",
-            "content": f"❌ L'échange a été annulé. Motif : {cancel_data.reason}",
+            "senderName": "Systeme",
+            "content": f"❌ L'echange a ete annule. Motif : {cancel_data.reason}",
             "createdAt": datetime.utcnow(),
             "readBy": []
         }
@@ -1036,7 +1036,7 @@ async def cancel_exchange(
 
 @api_router.get("/exchanges/my/all")
 async def get_my_exchanges(current_user: dict = Depends(get_current_user)):
-    """Récupérer tous les échanges de l'utilisateur"""
+    """Recuperer tous les echanges de l'utilisateur"""
     exchanges = await db.exchanges.find({
         "$or": [
             {"providerId": current_user["_id"]},
@@ -1044,7 +1044,7 @@ async def get_my_exchanges(current_user: dict = Depends(get_current_user)):
         ]
     }).sort("createdAt", -1).to_list(length=100)
     
-    # Enrichir avec les données
+    # Enrichir avec les donnees
     enriched_exchanges = []
     for exchange in exchanges:
         service = await db.services.find_one({"_id": exchange["serviceId"]})
@@ -1222,8 +1222,8 @@ async def get_leaderboard(limit: int = 10):
 async def get_badges():
     # Predefined badges
     badges = [
-        {"id": "first_exchange", "name": "Premier Échange", "description": "Complétez votre premier échange", "icon": "🎉", "xp": 50},
-        {"id": "verified", "name": "Profil Vérifié", "description": "Vérifiez votre identité", "icon": "✅", "xp": 100},
+        {"id": "first_exchange", "name": "Premier Echange", "description": "Completez votre premier echange", "icon": "🎉", "xp": 50},
+        {"id": "verified", "name": "Profil Verifie", "description": "Verifiez votre identite", "icon": "✅", "xp": 100},
         {"id": "helper", "name": "Bon Samaritain", "description": "Aidez 10 personnes", "icon": "💪", "xp": 200},
         {"id": "mentor", "name": "Mentor", "description": "Atteignez le niveau 10", "icon": "🏆", "xp": 500}
     ]
@@ -1331,7 +1331,7 @@ async def send_message(
         "senderName": f"{current_user['profile']['firstName']} {current_user['profile']['lastName']}",
         "content": message_data.content,
         "createdAt": datetime.utcnow(),
-        "readBy": [current_user["_id"]]  # Le sender a déjà "lu" son message
+        "readBy": [current_user["_id"]]  # Le sender a deja "lu" son message
     }
     
     await db.messages.insert_one(message)
@@ -1597,7 +1597,7 @@ async def rate_exchange(
     current_user: dict = Depends(get_current_user)
 ):
     """
-    Noter un échange terminé (système d'avis type Vinted)
+    Noter un echange termine (systeme d'avis type Vinted)
     """
     exchange = await db.exchanges.find_one({"_id": exchange_id})
     if not exchange:
@@ -1612,7 +1612,7 @@ async def rate_exchange(
     if not is_provider and not is_requester:
         raise HTTPException(403, "Not authorized")
     
-    # Vérifier si l'utilisateur a déjà noté
+    # Verifier si l'utilisateur a deja note
     existing_rating = await db.ratings.find_one({
         "exchangeId": exchange_id,
         "fromUserId": current_user["_id"]
@@ -1625,10 +1625,10 @@ async def rate_exchange(
     if rating_data.rating < 1 or rating_data.rating > 5:
         raise HTTPException(400, "Rating must be between 1 and 5")
     
-    # Déterminer qui est noté
+    # Determiner qui est note
     rated_user_id = exchange["providerId"] if is_requester else exchange["requesterId"]
     
-    # Créer la notation
+    # Creer la notation
     rating_id = str(uuid.uuid4())
     rating = {
         "_id": rating_id,
@@ -1643,7 +1643,7 @@ async def rate_exchange(
     
     await db.ratings.insert_one(rating)
     
-    # Mettre à jour la moyenne de l'utilisateur noté
+    # Mettre a jour la moyenne de l'utilisateur note
     all_ratings = await db.ratings.find({"toUserId": rated_user_id}).to_list(length=None)
     avg_rating = sum(r["rating"] for r in all_ratings) / len(all_ratings)
     rating_count = len(all_ratings)
@@ -1665,7 +1665,7 @@ async def rate_exchange(
         "_id": str(uuid.uuid4()),
         "userId": rated_user_id,
         "type": "system",
-        "content": f"Vous avez reçu une note de {rating_data.rating}/5 ⭐",
+        "content": f"Vous avez recu une note de {rating_data.rating}/5 ⭐",
         "exchangeId": exchange_id,
         "timestamp": datetime.utcnow(),
         "read": False
@@ -1681,7 +1681,7 @@ async def rate_exchange(
 @api_router.get("/users/{user_id}/ratings")
 async def get_user_ratings(user_id: str):
     """
-    Récupérer toutes les notes d'un utilisateur
+    Recuperer toutes les notes d'un utilisateur
     """
     user = await db.users.find_one({"_id": user_id})
     if not user:
@@ -1702,7 +1702,7 @@ async def get_user_ratings(user_id: str):
                 "photo": from_user['profile'].get("photo_base64"),
                 "level": from_user["gamification"]["level"]
             },
-            "serviceTitle": service["title"] if service else "Service supprimé"
+            "serviceTitle": service["title"] if service else "Service supprime"
         })
     
     return {
@@ -1716,11 +1716,11 @@ async def get_user_ratings(user_id: str):
 @api_router.post("/reports")
 async def create_report(report_data: ReportCreate, current_user: dict = Depends(get_current_user)):
     """
-    Créer un signalement (service, utilisateur, message)
+    Creer un signalement (service, utilisateur, message)
     """
     report_id = str(uuid.uuid4())
     
-    # Déterminer l'utilisateur signalé selon le type
+    # Determiner l'utilisateur signale selon le type
     reported_user_id = None
     
     if report_data.targetType == "user":
@@ -1761,7 +1761,7 @@ async def get_all_reports(
     admin: dict = Depends(check_admin)
 ):
     """
-    Récupérer tous les signalements (admin uniquement)
+    Recuperer tous les signalements (admin uniquement)
     """
     query = {}
     if status:
@@ -1796,7 +1796,7 @@ async def update_report_status(
     admin: dict = Depends(check_admin)
 ):
     """
-    Mettre à jour le statut d'un signalement (admin uniquement)
+    Mettre a jour le statut d'un signalement (admin uniquement)
     """
     if status not in ["pending", "reviewed", "resolved", "dismissed"]:
         raise HTTPException(400, "Invalid status")
@@ -1825,16 +1825,16 @@ async def get_user_profile(user_id: str):
     if not user:
         raise HTTPException(404, "User not found")
     
-    # Compter les échanges terminés
+    # Compter les echanges termines
     completed_exchanges = await db.exchanges.count_documents({
         "$or": [{"providerId": user_id}, {"requesterId": user_id}],
         "status": "completed"
     })
     
-    # Récupérer la note moyenne
+    # Recuperer la note moyenne
     rating_info = user.get("rating", {"average": 0, "count": 0})
     
-    # Récupérer les dernières notes
+    # Recuperer les dernieres notes
     recent_ratings = await db.ratings.find({"toUserId": user_id}).sort("createdAt", -1).limit(5).to_list(length=5)
     
     enriched_ratings = []
