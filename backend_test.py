@@ -1,30 +1,24 @@
 #!/usr/bin/env python3
 """
-Backend API Tests for TimeSwap Notification System
-Tests the real-time notification system implementation
+Comprehensive Backend Testing for TimeSwap Vinted-Style Exchange System
+Tests all new endpoints: exchanges, ratings, reports, enriched profiles, and services with photos
 """
 
 import requests
 import json
-import time
+import uuid
+import base64
 from datetime import datetime
-from typing import Dict, List, Optional
+import time
 
 # Configuration
 BASE_URL = "https://swap-community.preview.emergentagent.com/api"
+ADMIN_CREDENTIALS = [
+    {"email": "quentinraffalli@hotmail.com", "password": "password123"},
+    {"email": "depollutech@gmail.com", "password": "password123"}
+]
 
-# Test credentials
-USER1_CREDENTIALS = {
-    "email": "testuser1@gmail.com",
-    "password": "testpass123"
-}
-
-USER2_CREDENTIALS = {
-    "email": "testuser2@gmail.com", 
-    "password": "testpass123"
-}
-
-class NotificationTester:
+class TimeSwapTester:
     def __init__(self):
         self.user1_token = None
         self.user2_token = None
