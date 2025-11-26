@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Animated, RefreshControl, ActivityIndicator } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../src/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
@@ -8,60 +8,13 @@ import { useRouter } from 'expo-router';
 
 export default function NotificationsScreen() {
   const router = useRouter();
-  const { notifications, markAsRead, markAllAsRead } = useNotificationStore();
+  const { notifications, markAsRead, markAllAsRead, fetchNotifications, isLoading } = useNotificationStore();
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const [refreshing, setRefreshing] = React.useState(false);
 
-  // Générer des notifications de démonstration basées sur les intérêts de l'utilisateur
   useEffect(() => {
-    const demoNotifications = [
-      {
-        _id: '1',
-        type: 'service' as const,
-        title: '🌱 Nouveau service correspondant !',
-        message: 'Marie propose un service de jardinage dans votre quartier',
-        isRead: false,
-        createdAt: new Date(Date.now() - 3600000).toISOString(),
-        relatedUser: {
-          name: 'Marie Dupont',
-        },
-        relatedService: {
-          id: 'service-1',
-          title: 'Aide au jardinage',
-        },
-      },
-      {
-        _id: '2',
-        type: 'message' as const,
-        title: '💬 Nouveau message',
-        message: 'Pierre vous a envoyé un message concernant votre offre',
-        isRead: false,
-        createdAt: new Date(Date.now() - 7200000).toISOString(),
-        relatedUser: {
-          name: 'Pierre Martin',
-        },
-      },
-      {
-        _id: '3',
-        type: 'reward' as const,
-        title: '🎁 Nouvelle récompense débloquée !',
-        message: 'Vous avez atteint le niveau 3 et gagné 50 XP',
-        isRead: true,
-        createdAt: new Date(Date.now() - 86400000).toISOString(),
-      },
-      {
-        _id: '4',
-        type: 'system' as const,
-        title: '⭐ Échange confirmé',
-        message: 'Votre échange avec Sophie a été confirmé avec succès',
-        isRead: true,
-        createdAt: new Date(Date.now() - 172800000).toISOString(),
-        relatedUser: {
-          name: 'Sophie Leblanc',
-        },
-      },
-    ];
-
-    useNotificationStore.getState().setNotifications(demoNotifications);
+    // Fetch notifications when screen loads
+    fetchNotifications();
 
     // Animation de slide au montage
     Animated.timing(slideAnim, {
@@ -70,6 +23,24 @@ export default function NotificationsScreen() {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchNotifications();
+    setRefreshing(false);
+  };
+
+  const handleNotificationPress = async (notification: any) => {
+    // Mark as read
+    if (!notification.read) {
+      await markAsRead(notification._id);
+    }
+
+    // Navigate to the appropriate screen based on notification type
+    if (notification.type === 'message' && notification.chatId) {
+      router.push(`/chat?id=${notification.chatId}`);
+    }
+  };
 
   const getIconForType = (type: string) => {
     switch (type) {
