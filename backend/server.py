@@ -709,7 +709,7 @@ async def accept_exchange_from_service(
         "_id": str(uuid.uuid4()),
         "userId": provider_id,
         "type": "system",
-        "content": f"Votre annonce '{service['title']}' a été acceptée !",
+        "content": f"Votre annonce \"{service['title']}\" a été acceptée !",
         "exchangeId": exchange_id,
         "timestamp": datetime.utcnow(),
         "read": False
