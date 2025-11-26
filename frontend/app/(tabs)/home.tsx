@@ -86,7 +86,7 @@ export default function HomeScreen() {
               </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.iconButton}
-                onPress={() => router.push('/(tabs)/messages')}
+                onPress={() => router.push('/notifications')}
               >
                 <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
                 {unreadCount > 0 && (
