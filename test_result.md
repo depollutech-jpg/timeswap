@@ -214,63 +214,35 @@ test_plan:
   - task: "Système de notifications temps réel"
     implemented: true
     working: true
-    file: "server.py (backend), src/store/notificationStore.ts, src/hooks/useNotificationPolling.ts, app/notifications.tsx, src/components/CustomTabBar.tsx, app/chat.tsx, app/_layout.tsx"
+    file: "src/store/notificationStore.ts, src/hooks/useNotificationPolling.ts, app/notifications.tsx, src/components/CustomTabBar.tsx, app/chat.tsx, app/_layout.tsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: true
+        agent: "testing"
+        comment: "Backend testé avec succès (20/21 tests passés). Frontend implémenté."
+
+  - task: "Système d'échanges type Vinted - Backend"
+    implemented: true
+    working: "NA"
+    file: "backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
         agent: "main"
         comment: |
-          Système de notifications temps réel complété:
-          1. Store de notifications mis à jour avec API réelles
-          2. Hook de polling créé (fetchNotifications toutes les 10s)
-          3. Polling intégré dans _layout.tsx
-          4. Page notifications.tsx mise à jour pour utiliser vraies données
-          5. Badge avec compteur ajouté sur l'onglet Messages
-          6. Auto-marquage des notifications comme lues lors de l'ouverture d'un chat
-          7. Navigation automatique vers le chat lors du clic sur notification
-      - working: true
-        agent: "testing"
-        comment: |
-          ✅ BACKEND NOTIFICATION SYSTEM FULLY TESTED AND WORKING:
-          
-          COMPREHENSIVE TESTING COMPLETED (20/21 tests passed):
-          
-          1. ✅ AUTOMATIC NOTIFICATION CREATION:
-             - Notifications automatically created when messages are sent (lines 1004-1018 in server.py)
-             - Correct structure: userId, type, messageId, chatId, senderId, senderName, content, timestamp, read=false
-             - Notifications only created for recipient, not sender
-          
-          2. ✅ GET /api/notifications ENDPOINT:
-             - Successfully retrieves all notifications for authenticated user
-             - Supports unread_only=true parameter filtering
-             - Returns notifications sorted by timestamp (descending)
-             - Proper authentication required
-          
-          3. ✅ MARK NOTIFICATION READ ENDPOINT:
-             - POST /api/notifications/{id}/mark-read works correctly
-             - Successfully marks individual notifications as read
-             - Security: Users cannot mark other users' notifications
-             - Verification: Notifications properly updated to read=true
-          
-          4. ✅ MARK ALL NOTIFICATIONS READ ENDPOINT:
-             - POST /api/notifications/mark-all-read works correctly
-             - Successfully marks all user notifications as read in bulk
-             - Returns correct count of marked notifications
-             - All notifications verified as read=true after operation
-          
-          5. ✅ SECURITY TESTING:
-             - Users can only see their own notifications
-             - Cross-user access properly prevented
-             - Authentication required for all endpoints
-          
-          BACKEND NOTIFICATION FLOW VERIFIED:
-          - Message sent → Notification created → Notification retrieved → Notification marked read
-          - All endpoints functional and secure
-          - Database operations working correctly
-          
-          Minor: Auth error returns 403 instead of 401 for unauthenticated requests (non-critical)
+          Backend système Vinted complété:
+          1. Modèles: ExchangeAccept, ExchangeCancel, RatingCreate, ReportCreate
+          2. Endpoints échanges: accept-exchange, confirm-completion, cancel
+          3. Système de double validation pour transfert d'heures
+          4. Pénalités pour annulations (10% heures + 50 XP)
+          5. Ratings: créer et consulter les notes utilisateurs
+          6. Signalements: créer et gérer (admin)
+          7. Profil enrichi avec stats et badges
+          8. Support 3 photos max (5MB/photo) dans les services
 
 agent_communication:
   - agent: "main"
