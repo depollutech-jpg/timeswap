@@ -28,6 +28,8 @@ export default function HomeScreen() {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [locationEnabled, setLocationEnabled] = useState(false);
 
   // Animations
   const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
@@ -35,6 +37,7 @@ export default function HomeScreen() {
   const bounceServicesAnim = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    requestLocationPermission();
     loadServices();
 
     // Animation Bounce pour le cadre principal "Bonjour Quentin"
