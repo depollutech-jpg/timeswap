@@ -196,6 +196,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 20,
   },
+  loadingContainer: {
+    padding: 48,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  serviceTitle: {
+    fontSize: 12,
+    color: Colors.primary,
+    marginTop: 4,
+  },
   conversationCard: {
     flexDirection: 'row',
     backgroundColor: '#FFFFFF',
