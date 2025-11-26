@@ -217,6 +217,7 @@ async def login(credentials: UserLogin):
         "user": {
             "_id": user["_id"],
             "email": user["email"],
+            "role": user.get("role", "user"),
             "profile": user["profile"],
             "credits": user["credits"],
             "gamification": user["gamification"],
