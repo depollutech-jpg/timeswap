@@ -165,10 +165,20 @@ const styles = StyleSheet.create({
   inputContainer: {
     gap: 8,
   },
+  labelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   label: {
     fontSize: 14,
     fontWeight: '600',
     color: Colors.text,
+  },
+  forgotPasswordText: {
+    fontSize: 13,
+    color: Colors.primary,
+    fontWeight: '600',
   },
   input: {
     backgroundColor: Colors.surface,
