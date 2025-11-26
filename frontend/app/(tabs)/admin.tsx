@@ -79,8 +79,9 @@ export default function AdminTabScreen() {
       await setToken(response.data.token);
       setUser(response.data.user);
 
-      // Redirection vers le dashboard admin
-      router.replace('/admin');
+      // Activer l'affichage du dashboard
+      setIsAdminLoggedIn(true);
+      Alert.alert('Connexion réussie', 'Bienvenue dans l\'espace administrateur !');
     } catch (error: any) {
       Alert.alert(
         'Erreur de connexion',
