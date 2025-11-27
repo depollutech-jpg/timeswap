@@ -17,6 +17,10 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   const [contentWidth, setContentWidth] = useState(0);
   const animationRef = useRef<any>(null);
 
+  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const inactivityTimerRef = useRef<any>(null);
+  const lastScrollTimeRef = useRef<number>(Date.now());
+
   // Animation de défilement automatique
   useEffect(() => {
     if (contentWidth <= SCREEN_WIDTH) return;
@@ -24,29 +28,92 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     const scrollSpeed = 0.3; // Vitesse très lente (pixels par frame)
     
     const startAutoScroll = () => {
+      // Ne démarre que si l'utilisateur n'est pas en train de scroller
+      if (animationRef.current) {
+        clearInterval(animationRef.current);
+      }
+
       animationRef.current = setInterval(() => {
-        scrollX.current += scrollSpeed;
-        
-        // Boucle infinie : retour au début quand on atteint la moitié
-        if (scrollX.current >= contentWidth / 2) {
-          scrollX.current = 0;
+        // Ne scroll que si l'utilisateur n'interagit pas
+        if (!isUserScrolling) {
+          scrollX.current += scrollSpeed;
+          
+          // Boucle infinie : retour au début quand on atteint la moitié
+          if (scrollX.current >= contentWidth / 2) {
+            scrollX.current = 0;
+          }
+          
+          scrollViewRef.current?.scrollTo({
+            x: scrollX.current,
+            animated: false,
+          });
         }
-        
-        scrollViewRef.current?.scrollTo({
-          x: scrollX.current,
-          animated: false,
-        });
       }, 16); // ~60fps
     };
 
-    startAutoScroll();
+    // Démarrer l'auto-scroll si l'utilisateur n'est pas actif
+    if (!isUserScrolling) {
+      startAutoScroll();
+    }
 
     return () => {
       if (animationRef.current) {
         clearInterval(animationRef.current);
       }
+      if (inactivityTimerRef.current) {
+        clearTimeout(inactivityTimerRef.current);
+      }
     };
-  }, [contentWidth]);
+  }, [contentWidth, isUserScrolling]);
+
+  // Gestion du scroll manuel avec reprise automatique
+  const handleScrollBeginDrag = () => {
+    // L'utilisateur commence à scroller
+    setIsUserScrolling(true);
+    
+    // Annuler le timer d'inactivité précédent
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    
+    // Arrêter l'auto-scroll
+    if (animationRef.current) {
+      clearInterval(animationRef.current);
+      animationRef.current = null;
+    }
+  };
+
+  const handleScrollEndDrag = () => {
+    // L'utilisateur a lâché le scroll
+    lastScrollTimeRef.current = Date.now();
+    
+    // Attendre 3.5 secondes d'inactivité avant de reprendre l'auto-scroll
+    inactivityTimerRef.current = setTimeout(() => {
+      setIsUserScrolling(false);
+    }, 3500);
+  };
+
+  const handleMomentumScrollEnd = (event: any) => {
+    // Fin de l'inertie naturelle
+    const currentScrollX = event.nativeEvent.contentOffset.x;
+    scrollX.current = currentScrollX;
+    
+    // Attendre encore 3.5 secondes après la fin de l'inertie
+    if (inactivityTimerRef.current) {
+      clearTimeout(inactivityTimerRef.current);
+    }
+    
+    inactivityTimerRef.current = setTimeout(() => {
+      setIsUserScrolling(false);
+    }, 3500);
+  };
+
+  const handleScroll = (event: any) => {
+    // Mise à jour de la position actuelle pendant le scroll manuel
+    if (isUserScrolling) {
+      scrollX.current = event.nativeEvent.contentOffset.x;
+    }
+  };
 
   // Dupliquer les routes pour créer l'effet de boucle infinie
   const duplicatedRoutes = [...state.routes, ...state.routes];
