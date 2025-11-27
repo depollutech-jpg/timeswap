@@ -12,7 +12,7 @@ from datetime import datetime
 import time
 
 # Configuration
-BASE_URL = "https://swap-community.preview.emergentagent.com/api"
+BASE_URL = "https://hours-exchange.preview.emergentagent.com/api"
 ADMIN_CREDENTIALS = [
     {"email": "quentinraffalli@hotmail.com", "password": "password123"},
     {"email": "depollutech@gmail.com", "password": "password123"}
