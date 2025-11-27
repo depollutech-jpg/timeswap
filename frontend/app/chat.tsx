@@ -276,11 +276,20 @@ export default function ChatScreen() {
           <Text style={styles.headerTitle} numberOfLines={1}>
             {chat?.serviceTitle || 'Conversation'}
           </Text>
-          <Text style={styles.headerSubtitle}>
-            {chat?.otherUser?.name || 'Utilisateur'}
-          </Text>
+          <TouchableOpacity
+            onPress={() => chat?.otherUser?._id && router.push(`/user-profile?id=${chat.otherUser._id}`)}
+          >
+            <Text style={styles.headerSubtitle}>
+              {chat?.otherUser?.name || 'Utilisateur'} →
+            </Text>
+          </TouchableOpacity>
         </View>
-        <View style={styles.placeholder} />
+        <TouchableOpacity
+          style={styles.profileButton}
+          onPress={() => chat?.otherUser?._id && router.push(`/user-profile?id=${chat.otherUser._id}`)}
+        >
+          <Ionicons name="person-circle" size={28} color={Colors.primary} />
+        </TouchableOpacity>
       </View>
 
       {/* Service Info Card with Image */}
