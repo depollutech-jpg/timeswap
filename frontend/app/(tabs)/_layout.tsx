@@ -151,6 +151,15 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
+          name="calendrier"
+          options={{
+            title: 'Calendrier',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="calendar" size={22} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="admin"
           options={{
             title: 'Admin',
