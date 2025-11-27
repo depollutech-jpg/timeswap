@@ -136,9 +136,15 @@ export default function HomeScreen() {
     );
   };
 
-  const onRefresh = () => {
+  const onRefresh = async () => {
     setRefreshing(true);
-    loadServices();
+    await loadServices(selectedCategory);
+    setRefreshing(false);
+  };
+
+  const handleCategoryPress = (category: string) => {
+    setSelectedCategory(category);
+    loadServices(category);
   };
 
   // Reload when location changes
