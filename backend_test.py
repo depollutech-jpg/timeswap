@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 """
-Comprehensive Backend Testing for TimeSwap Vinted-Style Exchange System
-Tests all new endpoints: exchanges, ratings, reports, enriched profiles, and services with photos
+Backend Test Suite for TimeSwap Calendar Feature
+Testing GET /api/exchanges/my/all endpoint
 """
 
 import requests
 import json
 import uuid
-import base64
-from datetime import datetime
+from datetime import datetime, timedelta
 import time
 
 # Configuration
 BASE_URL = "https://hours-exchange.preview.emergentagent.com/api"
-ADMIN_CREDENTIALS = [
-    {"email": "quentinraffalli@hotmail.com", "password": "password123"},
-    {"email": "depollutech@gmail.com", "password": "password123"}
-]
+HEADERS = {"Content-Type": "application/json"}
 
 class TimeSwapTester:
     def __init__(self):
