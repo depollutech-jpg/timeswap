@@ -283,13 +283,39 @@ export default function ChatScreen() {
         <View style={styles.placeholder} />
       </View>
 
-      {/* Service Info Card */}
-      {chat?.serviceTitle && (
-        <View style={styles.serviceCard}>
-          <Ionicons name="information-circle" size={20} color={Colors.primary} />
-          <Text style={styles.serviceCardText}>
-            Au sujet de : {chat.serviceTitle}
-          </Text>
+      {/* Service Info Card with Image */}
+      {service && (
+        <TouchableOpacity
+          style={styles.serviceCard}
+          onPress={() => router.push(`/service-details?id=${service._id}`)}
+        >
+          {service.photos && service.photos[0] && (
+            <Image source={{ uri: service.photos[0] }} style={styles.serviceImage} />
+          )}
+          <View style={styles.serviceInfo}>
+            <Text style={styles.serviceTitle} numberOfLines={1}>
+              {service.title}
+            </Text>
+            <View style={styles.serviceDetails}>
+              <Ionicons name="time-outline" size={14} color={Colors.textSecondary} />
+              <Text style={styles.serviceDetailText}>{service.duration}h</Text>
+              <Ionicons name="location-outline" size={14} color={Colors.textSecondary} style={{ marginLeft: 8 }} />
+              <Text style={styles.serviceDetailText}>{service.location}</Text>
+            </View>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+        </TouchableOpacity>
+      )}
+
+      {/* Exchange Status Banner */}
+      {exchange && (
+        <View style={{ paddingHorizontal: 16, paddingTop: 8 }}>
+          <ExchangeStatusBanner
+            status={exchange.status}
+            providerConfirmed={exchange.providerConfirmed}
+            requesterConfirmed={exchange.requesterConfirmed}
+            isProvider={exchange.providerId === user?._id}
+          />
         </View>
       )}
 
