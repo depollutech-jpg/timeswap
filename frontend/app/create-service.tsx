@@ -141,6 +141,7 @@ export default function CreateServiceScreen() {
         type: isOffer ? 'offer' : 'request',
         location: location.trim(),
         coordinates: null,
+        photos: photos,
       });
 
       Alert.alert(
