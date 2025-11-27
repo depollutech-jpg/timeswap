@@ -116,7 +116,10 @@ export default function AdminTabScreen() {
 
           <TouchableOpacity 
             style={styles.fullDashboardButton}
-            onPress={() => router.push('/admin')}
+            onPress={() => {
+              console.log('Navigating to admin dashboard...');
+              router.push('/admin');
+            }}
           >
             <Ionicons name="stats-chart" size={20} color="#FFFFFF" />
             <Text style={styles.fullDashboardButtonText}>
