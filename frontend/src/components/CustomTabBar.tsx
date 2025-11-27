@@ -119,9 +119,11 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     const finalScrollX = event.nativeEvent.contentOffset.x;
     scrollX.current = finalScrollX;
     
-    // Reprendre l'auto-scroll IMMÉDIATEMENT après l'inertie (sans délai d'attente)
-    isUserInteractingRef.current = false;
-    startAutoScroll(); // Reprise avec ramp-up
+    // Attendre 3 secondes après le relâchement avant de reprendre l'auto-scroll
+    inactivityTimerRef.current = setTimeout(() => {
+      isUserInteractingRef.current = false;
+      startAutoScroll(); // Reprise avec ramp-up
+    }, 3000); // 3 secondes d'attente
   };
 
   // Suivi du scroll manuel (mise à jour de la position)
