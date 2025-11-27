@@ -516,8 +516,8 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
   },
-  placeholder: {
-    width: 40,
+  profileButton: {
+    padding: 4,
   },
   serviceCard: {
     flexDirection: 'row',
