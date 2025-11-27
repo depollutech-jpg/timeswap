@@ -230,6 +230,34 @@ export default function CreateServiceScreen() {
               <Text style={styles.charCount}>{description.length}/500</Text>
             </View>
 
+            {/* Photos Section */}
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Photos (optionnel, max 3)</Text>
+              <View style={styles.photosContainer}>
+                {photos.map((photo, index) => (
+                  <View key={index} style={styles.photoItem}>
+                    <Image source={{ uri: photo }} style={styles.photoPreview} />
+                    <TouchableOpacity
+                      style={styles.removePhotoButton}
+                      onPress={() => removePhoto(index)}
+                    >
+                      <Ionicons name="close-circle" size={24} color="#EF4444" />
+                    </TouchableOpacity>
+                  </View>
+                ))}
+                
+                {photos.length < 3 && (
+                  <TouchableOpacity style={styles.addPhotoButton} onPress={pickImage}>
+                    <Ionicons name="camera" size={32} color={Colors.primary} />
+                    <Text style={styles.addPhotoText}>Ajouter</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+              <Text style={styles.photoHelp}>
+                Ajoutez jusqu a 3 photos pour illustrer votre annonce (max 5MB par photo)
+              </Text>
+            </View>
+
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Catégorie *</Text>
               <ScrollView horizontal showsHorizontalScrollIndicator={false}>
