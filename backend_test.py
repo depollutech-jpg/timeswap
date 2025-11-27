@@ -30,7 +30,7 @@ class TimeSwapTester:
     def register_test_user(self, email_suffix):
         """Register a test user and return token"""
         user_data = {
-            "email": f"testuser_{email_suffix}@timeswap.test",
+            "email": f"testuser_{email_suffix}@example.com",
             "password": "TestPassword123!",
             "firstName": f"Test{email_suffix}",
             "lastName": "User"
