@@ -1,14 +1,21 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Animated, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useNotificationStore } from '../store/notificationStore';
+import { BlurView } from 'expo-blur';
+
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { unreadCount } = useNotificationStore();
+  const scrollViewRef = useRef<ScrollView>(null);
+  const scrollX = useRef(0);
+  const [contentWidth, setContentWidth] = useState(0);
+  const animationRef = useRef<any>(null);
 
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
