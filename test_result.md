@@ -123,6 +123,18 @@ backend:
         agent: "main"
         comment: "Tous les endpoints admin existent déjà (/admin/stats, /admin/users, /admin/services/stats, /admin/exchanges/flow, /admin/transactions)"
 
+  - task: "Endpoint Calendrier - Liste des échanges"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "L'endpoint /api/exchanges/my/all existe déjà et retourne tous les échanges de l'utilisateur avec données enrichies (service, otherUser). Testé par testing_agent précédemment dans le système Vinted. Besoin de re-vérifier que l'endpoint fonctionne toujours correctement."
+
 frontend:
   - task: "Fix Admin Role Field"
     implemented: true
