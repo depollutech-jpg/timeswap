@@ -118,7 +118,7 @@ export default function AdminTabScreen() {
             style={styles.fullDashboardButton}
             onPress={() => {
               console.log('Navigating to admin dashboard...');
-              router.push('/admin');
+              router.replace('/admin');
             }}
           >
             <Ionicons name="stats-chart" size={20} color="#FFFFFF" />
