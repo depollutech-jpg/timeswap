@@ -363,7 +363,116 @@ export default function ChatScreen() {
             )}
           </TouchableOpacity>
         </View>
+
+        {/* Action Buttons */}
+        {service && exchange && (
+          <View style={styles.actionsBar}>
+            {/* Accepter l'echange - Si pas encore accepte */}
+            {!exchange && service.status === 'active' && service.userId !== user?._id && (
+              <TouchableOpacity
+                style={styles.actionButton}
+                onPress={() => setShowAcceptModal(true)}
+              >
+                <Ionicons name="handshake" size={20} color="#FFFFFF" />
+                <Text style={styles.actionButtonText}>Accepter l echange</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Tache realisee - Si echange accepte */}
+            {exchange && exchange.status === 'accepted' && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.confirmButton]}
+                onPress={() => setShowConfirmModal(true)}
+              >
+                <Ionicons name="checkmark-done" size={20} color="#FFFFFF" />
+                <Text style={styles.actionButtonText}>Tache realisee</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Annuler - Si echange en cours */}
+            {exchange && exchange.status === 'accepted' && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.cancelButton]}
+                onPress={() => setShowCancelModal(true)}
+              >
+                <Ionicons name="close-circle" size={20} color="#FFFFFF" />
+                <Text style={styles.actionButtonText}>Annuler</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Noter - Si echange termine */}
+            {exchange && exchange.status === 'completed' && (
+              <TouchableOpacity
+                style={[styles.actionButton, styles.rateButton]}
+                onPress={() => setShowRatingModal(true)}
+              >
+                <Ionicons name="star" size={20} color="#FFFFFF" />
+                <Text style={styles.actionButtonText}>Noter</Text>
+              </TouchableOpacity>
+            )}
+
+            {/* Signaler */}
+            <TouchableOpacity
+              style={[styles.actionButton, styles.reportButton]}
+              onPress={() => setShowReportModal(true)}
+            >
+              <Ionicons name="flag" size={18} color={Colors.textSecondary} />
+            </TouchableOpacity>
+          </View>
+        )}
       </KeyboardAvoidingView>
+
+      {/* Modals */}
+      <ConfirmationModal
+        visible={showAcceptModal}
+        title="Accepter l'echange"
+        message={`Voulez-vous accepter cet echange de ${service?.duration || 0}h ? L'annonce sera verrouillee.`}
+        confirmText="Accepter"
+        icon="handshake"
+        iconColor={Colors.primary}
+        onConfirm={handleAcceptExchange}
+        onCancel={() => setShowAcceptModal(false)}
+      />
+
+      <ConfirmationModal
+        visible={showConfirmModal}
+        title="Confirmer la tache"
+        message="Confirmez-vous que la tache a ete realisee ? Les deux parties doivent confirmer pour finaliser l'echange."
+        confirmText="Confirmer"
+        icon="checkmark-done"
+        iconColor="#10B981"
+        onConfirm={handleConfirmCompletion}
+        onCancel={() => setShowConfirmModal(false)}
+      />
+
+      <ConfirmationModal
+        visible={showCancelModal}
+        title="Annuler l'echange"
+        message="Voulez-vous vraiment annuler cet echange ? Des penalites peuvent s'appliquer si la tache etait deja commencee."
+        confirmText="Annuler l'echange"
+        cancelText="Retour"
+        icon="close-circle"
+        iconColor="#EF4444"
+        confirmColor="#EF4444"
+        showInput
+        inputPlaceholder="Motif de l'annulation..."
+        onConfirm={handleCancelExchange}
+        onCancel={() => setShowCancelModal(false)}
+      />
+
+      <RatingModal
+        visible={showRatingModal}
+        userName={exchange?.provider?.name || exchange?.requester?.name || 'l utilisateur'}
+        onSubmit={handleRateExchange}
+        onCancel={() => setShowRatingModal(false)}
+      />
+
+      <ReportModal
+        visible={showReportModal}
+        targetType="user"
+        targetId={chat?.otherUser?._id || ''}
+        onClose={() => setShowReportModal(false)}
+      />
     </SafeAreaView>
   );
 }
