@@ -213,10 +213,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Fix Admin Role Field"
-    - "Notification System (in-app)"
-    - "Animations - Solde Page"
-    - "Admin Dashboard Complete"
+    - "Endpoint Calendrier - Liste des échanges"
+    - "Page Calendrier - Liste chronologique des échanges"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
