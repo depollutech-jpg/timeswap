@@ -1,139 +1,238 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
+  Image,
+  RefreshControl,
+  ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
+import { useAuthStore } from '../../src/store/authStore';
+import { router } from 'expo-router';
+import Constants from 'expo-constants';
+
+interface Exchange {
+  _id: string;
+  status: string;
+  duration: number;
+  createdAt: string;
+  completedAt?: string;
+  service: {
+    _id: string;
+    title: string;
+    photos?: string[];
+  };
+  otherUser: {
+    _id: string;
+    name: string;
+    photo?: string;
+  };
+  chatId?: string;
+}
 
 export default function CalendrierScreen() {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  const { token } = useAuthStore();
+  const [exchanges, setExchanges] = useState<Exchange[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month + 1, 0).getDate();
+  const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
+
+  const fetchExchanges = async () => {
+    try {
+      const response = await fetch(`${BACKEND_URL}/api/exchanges/my/all`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch exchanges');
+      }
+
+      const data = await response.json();
+      setExchanges(data);
+    } catch (error) {
+      console.error('Error fetching exchanges:', error);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
-  const getFirstDayOfMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month, 1).getDay();
+  useEffect(() => {
+    if (token) {
+      fetchExchanges();
+    }
+  }, [token]);
+
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+    fetchExchanges();
+  }, []);
+
+  const getStatusInfo = (status: string) => {
+    switch (status) {
+      case 'accepted':
+        return { label: 'En cours', color: Colors.primary, icon: 'hourglass-outline' };
+      case 'completed':
+        return { label: 'Terminé', color: '#10B981', icon: 'checkmark-circle' };
+      case 'cancelled':
+        return { label: 'Annulé', color: '#EF4444', icon: 'close-circle' };
+      case 'pending':
+        return { label: 'En attente', color: '#F59E0B', icon: 'time-outline' };
+      default:
+        return { label: status, color: Colors.textSecondary, icon: 'help-circle-outline' };
+    }
   };
 
-  const monthNames = [
-    'Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin',
-    'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'
-  ];
-
-  const dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-
-  const previousMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1));
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
   };
 
-  const nextMonth = () => {
-    setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1));
+  const handleExchangePress = (exchange: Exchange) => {
+    if (exchange.chatId) {
+      router.push({
+        pathname: '/chat',
+        params: {
+          chatId: exchange.chatId,
+          serviceId: exchange.service._id,
+        },
+      });
+    }
   };
 
-  const renderCalendar = () => {
-    const daysInMonth = getDaysInMonth(currentDate);
-    const firstDay = getFirstDayOfMonth(currentDate);
-    const days = [];
+  const renderExchangeCard = (exchange: Exchange) => {
+    const statusInfo = getStatusInfo(exchange.status);
+    const servicePhoto = exchange.service.photos?.[0];
 
-    // Empty cells for days before the first day of the month
-    for (let i = 0; i < firstDay; i++) {
-      days.push(
-        <View key={`empty-${i}`} style={styles.dayCell}>
-          <Text style={styles.emptyDay}></Text>
+    return (
+      <TouchableOpacity
+        key={exchange._id}
+        style={styles.exchangeCard}
+        onPress={() => handleExchangePress(exchange)}
+        activeOpacity={0.7}
+      >
+        {/* Image du service */}
+        <View style={styles.exchangeImageContainer}>
+          {servicePhoto ? (
+            <Image
+              source={{ uri: servicePhoto }}
+              style={styles.exchangeImage}
+              resizeMode="cover"
+            />
+          ) : (
+            <View style={[styles.exchangeImage, styles.placeholderImage]}>
+              <Ionicons name="image-outline" size={32} color={Colors.textSecondary} />
+            </View>
+          )}
         </View>
-      );
-    }
 
-    // Days of the month
-    const today = new Date();
-    const isCurrentMonth = 
-      currentDate.getMonth() === today.getMonth() &&
-      currentDate.getFullYear() === today.getFullYear();
-
-    for (let day = 1; day <= daysInMonth; day++) {
-      const isToday = isCurrentMonth && day === today.getDate();
-      
-      days.push(
-        <TouchableOpacity
-          key={day}
-          style={[
-            styles.dayCell,
-            isToday && styles.todayCell,
-          ]}
-          onPress={() => {}}
-        >
-          <Text style={[
-            styles.dayText,
-            isToday && styles.todayText,
-          ]}>
-            {day}
+        {/* Contenu */}
+        <View style={styles.exchangeContent}>
+          {/* Titre du service */}
+          <Text style={styles.exchangeTitle} numberOfLines={2}>
+            {exchange.service.title}
           </Text>
-        </TouchableOpacity>
-      );
-    }
 
-    return days;
+          {/* Utilisateur et durée */}
+          <View style={styles.exchangeInfo}>
+            <View style={styles.userInfo}>
+              {exchange.otherUser.photo ? (
+                <Image
+                  source={{ uri: exchange.otherUser.photo }}
+                  style={styles.userAvatar}
+                />
+              ) : (
+                <View style={[styles.userAvatar, styles.avatarPlaceholder]}>
+                  <Ionicons name="person" size={16} color={Colors.textSecondary} />
+                </View>
+              )}
+              <Text style={styles.userName} numberOfLines={1}>
+                {exchange.otherUser.name}
+              </Text>
+            </View>
+
+            <View style={styles.durationBadge}>
+              <Ionicons name="time-outline" size={14} color={Colors.primary} />
+              <Text style={styles.durationText}>{exchange.duration}h</Text>
+            </View>
+          </View>
+
+          {/* Statut et date */}
+          <View style={styles.exchangeFooter}>
+            <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
+              <Ionicons name={statusInfo.icon as any} size={14} color={statusInfo.color} />
+              <Text style={[styles.statusText, { color: statusInfo.color }]}>
+                {statusInfo.label}
+              </Text>
+            </View>
+
+            <Text style={styles.dateText}>
+              {formatDate(exchange.completedAt || exchange.createdAt)}
+            </Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+    );
   };
+
+  if (loading) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Calendrier</Text>
+        </View>
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" color={Colors.primary} />
+        </View>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Calendrier</Text>
+        <Text style={styles.headerSubtitle}>
+          {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
+        </Text>
       </View>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Month Navigation */}
-        <View style={styles.monthNav}>
-          <TouchableOpacity onPress={previousMonth} style={styles.navButton}>
-            <Ionicons name="chevron-back" size={24} color={Colors.primary} />
-          </TouchableOpacity>
-          
-          <Text style={styles.monthTitle}>
-            {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
-          </Text>
-          
-          <TouchableOpacity onPress={nextMonth} style={styles.navButton}>
-            <Ionicons name="chevron-forward" size={24} color={Colors.primary} />
-          </TouchableOpacity>
-        </View>
-
-        {/* Day Names */}
-        <View style={styles.dayNamesContainer}>
-          {dayNames.map((name, index) => (
-            <View key={index} style={styles.dayNameCell}>
-              <Text style={styles.dayNameText}>{name}</Text>
-            </View>
-          ))}
-        </View>
-
-        {/* Calendar Grid */}
-        <View style={styles.calendarGrid}>
-          {renderCalendar()}
-        </View>
-
-        {/* Upcoming Events Section */}
-        <View style={styles.eventsSection}>
-          <Text style={styles.sectionTitle}>Prochains échanges</Text>
-          
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={Colors.primary}
+          />
+        }
+      >
+        {exchanges.length === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="calendar-outline" size={64} color={Colors.textSecondary} />
-            <Text style={styles.emptyText}>Aucun échange planifié</Text>
+            <Text style={styles.emptyText}>Aucun échange</Text>
             <Text style={styles.emptySubtext}>
-              Vos échanges acceptés apparaîtront ici
+              Vos échanges apparaîtront ici
             </Text>
           </View>
-        </View>
+        ) : (
+          <View style={styles.exchangesList}>
+            {exchanges.map((exchange) => renderExchangeCard(exchange))}
+          </View>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
