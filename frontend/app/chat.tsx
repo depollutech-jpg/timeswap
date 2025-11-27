@@ -53,20 +53,23 @@ export default function ChatScreen() {
     markChatNotificationsAsRead();
   }, [id]);
 
-  // Marquer toutes les notifications liées à ce chat comme lues
+  useEffect(() => {
+    if (chat?.serviceId) {
+      loadService();
+      loadExchange();
+    }
+  }, [chat]);
+
   const markChatNotificationsAsRead = async () => {
     try {
-      // Récupérer les notifications liées à ce chat
       const chatNotifications = notifications.filter(
         (notif) => notif.chatId === id && !notif.read
       );
 
-      // Marquer chaque notification comme lue
       for (const notif of chatNotifications) {
         await api.post(`/notifications/${notif._id}/mark-read`);
       }
 
-      // Rafraîchir les notifications
       if (chatNotifications.length > 0) {
         await fetchNotifications();
       }
@@ -85,6 +88,32 @@ export default function ChatScreen() {
     }
   };
 
+  const loadService = async () => {
+    try {
+      if (chat?.serviceId) {
+        const response = await api.get(`/services/${chat.serviceId}`);
+        setService(response.data);
+      }
+    } catch (error) {
+      console.error('Failed to load service:', error);
+    }
+  };
+
+  const loadExchange = async () => {
+    try {
+      // Chercher un echange lie a ce service
+      const response = await api.get('/exchanges/my/all');
+      const relatedExchange = response.data.find(
+        (ex: any) => ex.serviceId === chat?.serviceId
+      );
+      if (relatedExchange) {
+        setExchange(relatedExchange);
+      }
+    } catch (error) {
+      console.error('Failed to load exchange:', error);
+    }
+  };
+
   const loadMessages = async () => {
     try {
       const response = await api.get(`/chats/${id}/messages`);
@@ -93,6 +122,68 @@ export default function ChatScreen() {
       console.error('Failed to load messages:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Exchange Actions
+  const handleAcceptExchange = async () => {
+    try {
+      if (!service) return;
+      await acceptExchange(service._id, 'Je suis interesse');
+      Alert.alert('Succes', 'Echange accepte !');
+      setShowAcceptModal(false);
+      await loadExchange();
+      await loadMessages();
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message);
+    }
+  };
+
+  const handleConfirmCompletion = async () => {
+    try {
+      if (!exchange) return;
+      const result = await confirmCompletion(exchange._id);
+      
+      if (result.status === 'completed') {
+        Alert.alert(
+          'Echange termine !',
+          `Le transfert de ${result.hoursTransferred}h a ete effectue. Vous avez gagne ${result.xpAwarded} XP !`,
+          [{ text: 'Noter', onPress: () => setShowRatingModal(true) }]
+        );
+      } else {
+        Alert.alert('Confirmation enregistree', 'En attente de la confirmation de l autre partie.');
+      }
+      
+      setShowConfirmModal(false);
+      await loadExchange();
+      await loadMessages();
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message);
+    }
+  };
+
+  const handleCancelExchange = async (reason: string) => {
+    try {
+      if (!exchange) return;
+      await cancelExchange(exchange._id, reason);
+      Alert.alert('Echange annule', 'L echange a ete annule.');
+      setShowCancelModal(false);
+      await loadExchange();
+      await loadService();
+      await loadMessages();
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message);
+    }
+  };
+
+  const handleRateExchange = async (rating: number, review: string) => {
+    try {
+      if (!exchange) return;
+      await rateExchange(exchange._id, rating, review);
+      Alert.alert('Merci !', 'Votre note a ete enregistree.');
+      setShowRatingModal(false);
+    } catch (error: any) {
+      Alert.alert('Erreur', error.message);
     }
   };
 
