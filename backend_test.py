@@ -22,763 +22,445 @@ class TimeSwapTester:
         self.test_services = []
         self.test_exchanges = []
         self.tokens = {}
-        self.test_results = []
         
-    def log_test(self, test_name, success, message="", details=None):
-        """Log test results"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status}: {test_name}")
-        if message:
-            print(f"   {message}")
-        if details:
-            print(f"   Details: {details}")
-        
-        self.test_results.append({
-            "test": test_name,
-            "success": success,
-            "message": message,
-            "details": details
-        })
-        print()
-    
-    def make_request(self, method, endpoint, token=None, data=None, params=None):
-        """Make HTTP request with proper headers"""
-        url = f"{self.base_url}{endpoint}"
-        headers = {"Content-Type": "application/json"}
-        
-        if token:
-            headers["Authorization"] = f"Bearer {token}"
-        
-        try:
-            if method == "GET":
-                response = requests.get(url, headers=headers, params=params)
-            elif method == "POST":
-                response = requests.post(url, headers=headers, json=data)
-            elif method == "PUT":
-                response = requests.put(url, headers=headers, json=data)
-            elif method == "DELETE":
-                response = requests.delete(url, headers=headers)
-            
-            return response
-        except Exception as e:
-            print(f"Request failed: {str(e)}")
-            return None
-    
-    def setup_test_users(self):
-        """Create test users and authenticate"""
-        print("🔧 Setting up test users...")
-        
-        # Create regular test users
-        test_users = [
-            {
-                "email": f"provider_{uuid.uuid4().hex[:8]}@test.com",
-                "password": "testpass123",
-                "firstName": "Jean",
-                "lastName": "Provider",
-                "role": "provider"
-            },
-            {
-                "email": f"requester_{uuid.uuid4().hex[:8]}@test.com", 
-                "password": "testpass123",
-                "firstName": "Marie",
-                "lastName": "Requester",
-                "role": "requester"
-            }
-        ]
-        
-        # Register test users
-        for user_data in test_users:
-            response = self.make_request("POST", "/auth/register", data=user_data)
-            if response and response.status_code == 200:
-                result = response.json()
-                self.tokens[user_data["role"]] = result["token"]
-                self.users[user_data["role"]] = result["user"]
-                print(f"✅ Created {user_data['role']}: {user_data['email']}")
-            else:
-                print(f"❌ Failed to create {user_data['role']}: {response.text if response else 'No response'}")
-        
-        # Login admin users
-        for i, admin_creds in enumerate(ADMIN_CREDENTIALS):
-            admin_key = f"admin{i+1}"
-            response = self.make_request("POST", "/auth/login", data=admin_creds)
-            if response and response.status_code == 200:
-                result = response.json()
-                self.tokens[admin_key] = result["token"]
-                self.users[admin_key] = result["user"]
-                print(f"✅ Logged in {admin_key}: {admin_creds['email']}")
-            else:
-                print(f"❌ Failed to login {admin_key}: {response.text if response else 'No response'}")
-        
-        print()
-    
-    def test_service_creation_with_photos(self):
-        """Test POST /api/services with photos (max 3, 5MB limit)"""
-        print("📸 Testing service creation with photos...")
-        
-        # Create a small test image (base64)
-        test_image_data = "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
-        
-        # Test 1: Service with 1 photo
-        service_data = {
-            "title": "Service de jardinage avec photos",
-            "description": "Entretien de jardin professionnel avec photos avant/après",
-            "category": "Jardinage",
-            "duration": 2.0,
-            "type": "offer",
-            "location": "Paris 15ème",
-            "coordinates": {"latitude": 48.8566, "longitude": 2.3522},
-            "photos": [test_image_data]
-        }
-        
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-        if response and response.status_code == 200:
-            result = response.json()
-            self.services["with_photos"] = result["serviceId"]
-            self.log_test("Service creation with 1 photo", True, f"Service ID: {result['serviceId']}")
-        else:
-            self.log_test("Service creation with 1 photo", False, f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 2: Service with 3 photos (max allowed)
-        service_data["photos"] = [test_image_data, test_image_data, test_image_data]
-        service_data["title"] = "Service avec 3 photos"
-        
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-        if response and response.status_code == 200:
-            self.log_test("Service creation with 3 photos", True, "Maximum photos allowed")
-        else:
-            self.log_test("Service creation with 3 photos", False, f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 3: Service with 4 photos (should fail)
-        service_data["photos"] = [test_image_data] * 4
-        service_data["title"] = "Service avec 4 photos (should fail)"
-        
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-        if response and response.status_code == 400:
-            self.log_test("Service creation with 4 photos (validation)", True, "Correctly rejected >3 photos")
-        else:
-            self.log_test("Service creation with 4 photos (validation)", False, "Should have rejected >3 photos")
-        
-        # Create a simple service for exchange testing
-        simple_service = {
-            "title": "Cours de français",
-            "description": "Cours particuliers de français pour débutants",
-            "category": "Education",
-            "duration": 1.5,
-            "type": "offer",
-            "location": "Lyon",
-            "coordinates": {"latitude": 45.7640, "longitude": 4.8357}
-        }
-        
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=simple_service)
-        if response and response.status_code == 200:
-            result = response.json()
-            self.services["main_test"] = result["serviceId"]
-            self.log_test("Simple service creation for exchange testing", True, f"Service ID: {result['serviceId']}")
-        else:
-            self.log_test("Simple service creation for exchange testing", False, "Failed to create test service")
-    
-    def test_exchange_acceptance(self):
-        """Test POST /api/services/{service_id}/accept-exchange"""
-        print("🤝 Testing exchange acceptance...")
-        
-        if "main_test" not in self.services:
-            self.log_test("Exchange acceptance", False, "No test service available")
-            return
-        
-        service_id = self.services["main_test"]
-        
-        # Test 1: Valid exchange acceptance
-        exchange_data = {"message": "Je suis très intéressé par votre cours de français !"}
-        
-        response = self.make_request("POST", f"/services/{service_id}/accept-exchange", 
-                                   token=self.tokens["requester"], data=exchange_data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            self.exchanges["main"] = result["exchangeId"]
-            self.chats["main"] = result["chatId"]
-            self.log_test("Exchange acceptance", True, 
-                         f"Exchange ID: {result['exchangeId']}, Chat ID: {result['chatId']}")
-        else:
-            self.log_test("Exchange acceptance", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-            return
-        
-        # Test 2: Try to accept own service (should fail)
-        response = self.make_request("POST", f"/services/{service_id}/accept-exchange",
-                                   token=self.tokens["provider"], data=exchange_data)
-        
-        if response and response.status_code == 400:
-            self.log_test("Exchange acceptance - own service rejection", True, "Correctly rejected self-acceptance")
-        else:
-            self.log_test("Exchange acceptance - own service rejection", False, "Should reject self-acceptance")
-        
-        # Test 3: Try to accept already locked service (should fail)
-        response = self.make_request("POST", f"/services/{service_id}/accept-exchange",
-                                   token=self.tokens["requester"], data=exchange_data)
-        
-        if response and response.status_code == 400:
-            self.log_test("Exchange acceptance - locked service rejection", True, "Correctly rejected locked service")
-        else:
-            self.log_test("Exchange acceptance - locked service rejection", False, "Should reject locked service")
-    
-    def test_exchange_retrieval(self):
-        """Test GET /api/exchanges/{exchange_id}"""
-        print("📋 Testing exchange retrieval...")
-        
-        if "main" not in self.exchanges:
-            self.log_test("Exchange retrieval", False, "No exchange available")
-            return
-        
-        exchange_id = self.exchanges["main"]
-        
-        # Test 1: Provider retrieves exchange
-        response = self.make_request("GET", f"/exchanges/{exchange_id}", token=self.tokens["provider"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            expected_fields = ["_id", "serviceId", "providerId", "requesterId", "status", "service", "provider", "requester"]
-            missing_fields = [field for field in expected_fields if field not in result]
-            
-            if not missing_fields:
-                self.log_test("Exchange retrieval - provider", True, "All required fields present")
-            else:
-                self.log_test("Exchange retrieval - provider", False, f"Missing fields: {missing_fields}")
-        else:
-            self.log_test("Exchange retrieval - provider", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 2: Requester retrieves exchange
-        response = self.make_request("GET", f"/exchanges/{exchange_id}", token=self.tokens["requester"])
-        
-        if response and response.status_code == 200:
-            self.log_test("Exchange retrieval - requester", True, "Requester can access exchange")
-        else:
-            self.log_test("Exchange retrieval - requester", False, "Requester should access exchange")
-        
-        # Test 3: Unauthorized user tries to access (should fail)
-        if "admin1" in self.tokens:
-            response = self.make_request("GET", f"/exchanges/{exchange_id}", token=self.tokens["admin1"])
-            
-            if response and response.status_code == 403:
-                self.log_test("Exchange retrieval - unauthorized access", True, "Correctly blocked unauthorized access")
-            else:
-                self.log_test("Exchange retrieval - unauthorized access", False, "Should block unauthorized access")
-    
-    def test_exchange_confirmation(self):
-        """Test POST /api/exchanges/{exchange_id}/confirm-completion (double validation)"""
-        print("✅ Testing exchange confirmation (double validation)...")
-        
-        if "main" not in self.exchanges:
-            self.log_test("Exchange confirmation", False, "No exchange available")
-            return
-        
-        exchange_id = self.exchanges["main"]
-        
-        # Test 1: Provider confirms first
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/confirm-completion", 
-                                   token=self.tokens["provider"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if "providerConfirmed" in result and result["providerConfirmed"]:
-                self.log_test("Exchange confirmation - provider first", True, "Provider confirmation recorded")
-            else:
-                self.log_test("Exchange confirmation - provider first", False, "Provider confirmation not recorded")
-        else:
-            self.log_test("Exchange confirmation - provider first", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 2: Provider tries to confirm again (should fail)
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/confirm-completion", 
-                                   token=self.tokens["provider"])
-        
-        if response and response.status_code == 400:
-            self.log_test("Exchange confirmation - double confirmation prevention", True, "Correctly prevented double confirmation")
-        else:
-            self.log_test("Exchange confirmation - double confirmation prevention", False, "Should prevent double confirmation")
-        
-        # Test 3: Requester confirms (should complete exchange and transfer hours)
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/confirm-completion", 
-                                   token=self.tokens["requester"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if result.get("status") == "completed" and "hoursTransferred" in result and "xpAwarded" in result:
-                self.log_test("Exchange confirmation - completion", True, 
-                             f"Exchange completed, {result['hoursTransferred']}h transferred, {result['xpAwarded']} XP awarded")
-            else:
-                self.log_test("Exchange confirmation - completion", False, "Exchange not properly completed")
-        else:
-            self.log_test("Exchange confirmation - completion", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-    
-    def test_exchange_cancellation(self):
-        """Test POST /api/exchanges/{exchange_id}/cancel with penalties"""
-        print("❌ Testing exchange cancellation with penalties...")
-        
-        # Create a new service and exchange for cancellation testing
-        service_data = {
-            "title": "Service pour test d'annulation",
-            "description": "Service créé spécialement pour tester l'annulation",
-            "category": "Test",
-            "duration": 1.0,
-            "type": "offer",
-            "location": "Test City"
-        }
-        
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-        if not response or response.status_code != 200:
-            self.log_test("Exchange cancellation setup", False, "Failed to create test service")
-            return
-        
-        cancel_service_id = response.json()["serviceId"]
-        
-        # Accept the exchange
-        exchange_data = {"message": "Test pour annulation"}
-        response = self.make_request("POST", f"/services/{cancel_service_id}/accept-exchange",
-                                   token=self.tokens["requester"], data=exchange_data)
-        
-        if not response or response.status_code != 200:
-            self.log_test("Exchange cancellation setup", False, "Failed to create test exchange")
-            return
-        
-        cancel_exchange_id = response.json()["exchangeId"]
-        
-        # Test 1: Cancel without prior confirmation (no penalty)
-        cancel_data = {"reason": "Changement de programme"}
-        response = self.make_request("POST", f"/exchanges/{cancel_exchange_id}/cancel",
-                                   token=self.tokens["requester"], data=cancel_data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if not result.get("penaltyApplied"):
-                self.log_test("Exchange cancellation - no penalty", True, "No penalty applied for early cancellation")
-            else:
-                self.log_test("Exchange cancellation - no penalty", False, "Penalty incorrectly applied")
-        else:
-            self.log_test("Exchange cancellation - no penalty", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test cancellation with penalty (create another exchange, confirm, then cancel)
-        service_data["title"] = "Service pour test pénalité"
-        response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-        if response and response.status_code == 200:
-            penalty_service_id = response.json()["serviceId"]
-            
-            # Accept exchange
-            response = self.make_request("POST", f"/services/{penalty_service_id}/accept-exchange",
-                                       token=self.tokens["requester"], data=exchange_data)
-            if response and response.status_code == 200:
-                penalty_exchange_id = response.json()["exchangeId"]
-                
-                # Provider confirms
-                self.make_request("POST", f"/exchanges/{penalty_exchange_id}/confirm-completion",
-                                token=self.tokens["provider"])
-                
-                # Requester cancels (should have penalty)
-                response = self.make_request("POST", f"/exchanges/{penalty_exchange_id}/cancel",
-                                           token=self.tokens["requester"], data=cancel_data)
-                
-                if response and response.status_code == 200:
-                    result = response.json()
-                    if result.get("penaltyApplied") and result.get("penaltyHours", 0) > 0:
-                        self.log_test("Exchange cancellation - with penalty", True, 
-                                     f"Penalty applied: {result['penaltyHours']}h, {result['penaltyXP']} XP")
-                    else:
-                        self.log_test("Exchange cancellation - with penalty", False, "Penalty not applied")
-                else:
-                    self.log_test("Exchange cancellation - with penalty", False, "Cancellation failed")
-    
-    def test_my_exchanges(self):
-        """Test GET /api/exchanges/my/all"""
-        print("📜 Testing my exchanges retrieval...")
-        
-        # Test provider's exchanges
-        response = self.make_request("GET", "/exchanges/my/all", token=self.tokens["provider"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list):
-                provider_exchanges = len(result)
-                self.log_test("My exchanges - provider", True, f"Found {provider_exchanges} exchanges")
-            else:
-                self.log_test("My exchanges - provider", False, "Response not a list")
-        else:
-            self.log_test("My exchanges - provider", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test requester's exchanges
-        response = self.make_request("GET", "/exchanges/my/all", token=self.tokens["requester"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list):
-                requester_exchanges = len(result)
-                self.log_test("My exchanges - requester", True, f"Found {requester_exchanges} exchanges")
-                
-                # Check enriched data
-                if result and "service" in result[0] and "otherUser" in result[0]:
-                    self.log_test("My exchanges - enriched data", True, "Service and otherUser data present")
-                else:
-                    self.log_test("My exchanges - enriched data", False, "Missing enriched data")
-            else:
-                self.log_test("My exchanges - requester", False, "Response not a list")
-        else:
-            self.log_test("My exchanges - requester", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-    
-    def test_rating_system(self):
-        """Test POST /api/exchanges/{exchange_id}/rate and GET /api/users/{user_id}/ratings"""
-        print("⭐ Testing rating system...")
-        
-        if "main" not in self.exchanges:
-            self.log_test("Rating system", False, "No completed exchange available")
-            return
-        
-        exchange_id = self.exchanges["main"]
-        
-        # Test 1: Rate the exchange (requester rates provider)
-        rating_data = {
-            "rating": 5,
-            "review": "Excellent professeur de français ! Très pédagogue et patient."
-        }
-        
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/rate",
-                                   token=self.tokens["requester"], data=rating_data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if "newAverage" in result:
-                self.log_test("Rating creation", True, f"Rating submitted, new average: {result['newAverage']}")
-            else:
-                self.log_test("Rating creation", False, "Rating submitted but no average returned")
-        else:
-            self.log_test("Rating creation", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 2: Try to rate again (should fail)
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/rate",
-                                   token=self.tokens["requester"], data=rating_data)
-        
-        if response and response.status_code == 400:
-            self.log_test("Rating - double rating prevention", True, "Correctly prevented double rating")
-        else:
-            self.log_test("Rating - double rating prevention", False, "Should prevent double rating")
-        
-        # Test 3: Invalid rating (should fail)
-        invalid_rating = {"rating": 6, "review": "Invalid rating"}
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/rate",
-                                   token=self.tokens["provider"], data=invalid_rating)
-        
-        if response and response.status_code == 400:
-            self.log_test("Rating - validation", True, "Correctly rejected invalid rating")
-        else:
-            self.log_test("Rating - validation", False, "Should reject invalid rating")
-        
-        # Test 4: Valid rating from provider
-        provider_rating = {"rating": 4, "review": "Étudiant sérieux et motivé"}
-        response = self.make_request("POST", f"/exchanges/{exchange_id}/rate",
-                                   token=self.tokens["provider"], data=provider_rating)
-        
-        if response and response.status_code == 200:
-            self.log_test("Rating - provider rating", True, "Provider successfully rated requester")
-        else:
-            self.log_test("Rating - provider rating", False, "Provider rating failed")
-        
-        # Test 5: Get user ratings
-        provider_id = self.users["provider"]["_id"]
-        response = self.make_request("GET", f"/users/{provider_id}/ratings")
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            expected_fields = ["averageRating", "ratingCount", "ratings"]
-            missing_fields = [field for field in expected_fields if field not in result]
-            
-            if not missing_fields and result["ratingCount"] > 0:
-                self.log_test("User ratings retrieval", True, 
-                             f"Average: {result['averageRating']}, Count: {result['ratingCount']}")
-            else:
-                self.log_test("User ratings retrieval", False, f"Missing fields or no ratings: {missing_fields}")
-        else:
-            self.log_test("User ratings retrieval", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-    
-    def test_reports_system(self):
-        """Test POST /api/reports, GET /api/admin/reports, PUT /api/admin/reports/{id}/status"""
-        print("🚨 Testing reports system...")
-        
-        # Test 1: Create service report
-        service_id = self.services.get("main_test")
-        if not service_id:
-            self.log_test("Reports system setup", False, "No service available for reporting")
-            return
-        
-        report_data = {
-            "targetType": "service",
-            "targetId": service_id,
-            "reason": "Spam",
-            "description": "Ce service semble être du spam répétitif"
-        }
-        
-        response = self.make_request("POST", "/reports", token=self.tokens["requester"], data=report_data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            self.reports["service"] = result["reportId"]
-            self.log_test("Report creation - service", True, f"Report ID: {result['reportId']}")
-        else:
-            self.log_test("Report creation - service", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 2: Create user report
-        provider_id = self.users["provider"]["_id"]
-        user_report_data = {
-            "targetType": "user",
-            "targetId": provider_id,
-            "reason": "Comportement inapproprié",
-            "description": "Utilisateur impoli dans les messages"
-        }
-        
-        response = self.make_request("POST", "/reports", token=self.tokens["requester"], data=user_report_data)
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            self.reports["user"] = result["reportId"]
-            self.log_test("Report creation - user", True, f"Report ID: {result['reportId']}")
-        else:
-            self.log_test("Report creation - user", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 3: Admin retrieves all reports
-        if "admin1" not in self.tokens:
-            self.log_test("Admin reports retrieval", False, "No admin token available")
-            return
-        
-        response = self.make_request("GET", "/admin/reports", token=self.tokens["admin1"])
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            if isinstance(result, list) and len(result) >= 2:
-                self.log_test("Admin reports retrieval", True, f"Found {len(result)} reports")
-                
-                # Check enriched data
-                if result[0].get("reporter") and result[0].get("reported"):
-                    self.log_test("Admin reports - enriched data", True, "Reporter and reported data present")
-                else:
-                    self.log_test("Admin reports - enriched data", False, "Missing enriched data")
-            else:
-                self.log_test("Admin reports retrieval", False, "No reports found or invalid format")
-        else:
-            self.log_test("Admin reports retrieval", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 4: Filter reports by status
-        response = self.make_request("GET", "/admin/reports", token=self.tokens["admin1"], params={"status": "pending"})
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            pending_reports = [r for r in result if r["status"] == "pending"]
-            if len(pending_reports) == len(result):
-                self.log_test("Admin reports - status filter", True, f"Found {len(pending_reports)} pending reports")
-            else:
-                self.log_test("Admin reports - status filter", False, "Filter not working correctly")
-        else:
-            self.log_test("Admin reports - status filter", False, "Status filter failed")
-        
-        # Test 5: Update report status
-        if "service" in self.reports:
-            report_id = self.reports["service"]
-            response = self.make_request("PUT", f"/admin/reports/{report_id}/status",
-                                       token=self.tokens["admin1"], data={"status": "reviewed"})
-            
-            if response and response.status_code == 200:
-                self.log_test("Report status update", True, "Status updated to reviewed")
-            else:
-                self.log_test("Report status update", False, 
-                             f"Status: {response.status_code if response else 'No response'}")
-        
-        # Test 6: Non-admin tries to access reports (should fail)
-        response = self.make_request("GET", "/admin/reports", token=self.tokens["requester"])
-        
-        if response and response.status_code == 403:
-            self.log_test("Admin reports - access control", True, "Correctly blocked non-admin access")
-        else:
-            self.log_test("Admin reports - access control", False, "Should block non-admin access")
-    
-    def test_enriched_user_profile(self):
-        """Test GET /api/users/{user_id}/profile (enriched profile)"""
-        print("👤 Testing enriched user profile...")
-        
-        provider_id = self.users["provider"]["_id"]
-        response = self.make_request("GET", f"/users/{provider_id}/profile")
-        
-        if response and response.status_code == 200:
-            result = response.json()
-            expected_fields = ["name", "photo", "level", "xp", "badges", "rating", "completedExchanges", "recentRatings"]
-            missing_fields = [field for field in expected_fields if field not in result]
-            
-            if not missing_fields:
-                self.log_test("Enriched user profile", True, 
-                             f"Level: {result['level']}, XP: {result['xp']}, Completed: {result['completedExchanges']}")
-                
-                # Check rating info
-                if "average" in result["rating"] and "count" in result["rating"]:
-                    self.log_test("Enriched profile - rating info", True, 
-                                 f"Rating: {result['rating']['average']}/5 ({result['rating']['count']} reviews)")
-                else:
-                    self.log_test("Enriched profile - rating info", False, "Missing rating details")
-                
-                # Check recent ratings
-                if isinstance(result["recentRatings"], list):
-                    self.log_test("Enriched profile - recent ratings", True, 
-                                 f"Found {len(result['recentRatings'])} recent ratings")
-                else:
-                    self.log_test("Enriched profile - recent ratings", False, "Recent ratings not a list")
-            else:
-                self.log_test("Enriched user profile", False, f"Missing fields: {missing_fields}")
-        else:
-            self.log_test("Enriched user profile", False, 
-                         f"Status: {response.status_code if response else 'No response'}")
-    
-    def test_security_scenarios(self):
-        """Test security scenarios and edge cases"""
-        print("🔒 Testing security scenarios...")
-        
-        # Test 1: Insufficient balance (create user with low balance)
-        low_balance_user = {
-            "email": f"lowbalance_{uuid.uuid4().hex[:8]}@test.com",
-            "password": "testpass123",
-            "firstName": "Poor",
+    def log(self, message, level="INFO"):
+        timestamp = datetime.now().strftime("%H:%M:%S")
+        print(f"[{timestamp}] {level}: {message}")
+        
+    def register_test_user(self, email_suffix):
+        """Register a test user and return token"""
+        user_data = {
+            "email": f"testuser_{email_suffix}@timeswap.test",
+            "password": "TestPassword123!",
+            "firstName": f"Test{email_suffix}",
             "lastName": "User"
         }
         
-        response = self.make_request("POST", "/auth/register", data=low_balance_user)
-        if response and response.status_code == 200:
-            low_balance_token = response.json()["token"]
+        try:
+            response = requests.post(f"{self.base_url}/auth/register", 
+                                   json=user_data, headers=self.headers)
             
-            # Try to accept a service with insufficient balance
-            if "main_test" in self.services:
-                # First create a new service since the main one is locked
-                service_data = {
-                    "title": "Service coûteux",
-                    "description": "Service qui coûte plus que le solde disponible",
-                    "category": "Test",
-                    "duration": 5.0,  # 5 hours, more than default 2h balance
-                    "type": "offer",
-                    "location": "Test"
-                }
-                
-                response = self.make_request("POST", "/services", token=self.tokens["provider"], data=service_data)
-                if response and response.status_code == 200:
-                    expensive_service_id = response.json()["serviceId"]
-                    
-                    # Try to accept with insufficient balance
-                    response = self.make_request("POST", f"/services/{expensive_service_id}/accept-exchange",
-                                               token=low_balance_token, data={"message": "Test"})
-                    
-                    if response and response.status_code == 400 and "insuffisant" in response.text.lower():
-                        self.log_test("Security - insufficient balance", True, "Correctly blocked insufficient balance")
-                    else:
-                        self.log_test("Security - insufficient balance", False, "Should block insufficient balance")
-        
-        # Test 2: Access control on exchanges
-        if "main" in self.exchanges:
-            exchange_id = self.exchanges["main"]
-            
-            # Create another user and try to access the exchange
-            other_user = {
-                "email": f"other_{uuid.uuid4().hex[:8]}@test.com",
-                "password": "testpass123",
-                "firstName": "Other",
-                "lastName": "User"
-            }
-            
-            response = self.make_request("POST", "/auth/register", data=other_user)
-            if response and response.status_code == 200:
-                other_token = response.json()["token"]
-                
-                response = self.make_request("GET", f"/exchanges/{exchange_id}", token=other_token)
-                
-                if response and response.status_code == 403:
-                    self.log_test("Security - exchange access control", True, "Correctly blocked unauthorized access")
+            if response.status_code == 200:
+                data = response.json()
+                token = data.get("token")
+                user_id = data.get("user", {}).get("_id")
+                self.log(f"✅ User registered: {user_data['email']} (ID: {user_id})")
+                self.test_users.append({"email": user_data["email"], "id": user_id, "token": token})
+                self.tokens[user_id] = token
+                return token, user_id
+            else:
+                # Try to login if user already exists
+                login_response = requests.post(f"{self.base_url}/auth/login",
+                                             json={"email": user_data["email"], "password": user_data["password"]},
+                                             headers=self.headers)
+                if login_response.status_code == 200:
+                    data = login_response.json()
+                    token = data.get("token")
+                    user_id = data.get("user", {}).get("_id")
+                    self.log(f"✅ User logged in: {user_data['email']} (ID: {user_id})")
+                    self.test_users.append({"email": user_data["email"], "id": user_id, "token": token})
+                    self.tokens[user_id] = token
+                    return token, user_id
                 else:
-                    self.log_test("Security - exchange access control", False, "Should block unauthorized access")
+                    self.log(f"❌ Failed to register/login user: {response.status_code} - {response.text}", "ERROR")
+                    return None, None
+                    
+        except Exception as e:
+            self.log(f"❌ Exception during user registration: {str(e)}", "ERROR")
+            return None, None
     
-    def run_comprehensive_test(self):
-        """Run all tests in sequence"""
-        print("🚀 Starting comprehensive TimeSwap Vinted-style exchange system testing...")
-        print("=" * 80)
+    def create_test_service(self, token, user_id, service_type="offer", title_suffix=""):
+        """Create a test service"""
+        service_data = {
+            "title": f"Test Service {title_suffix} - {service_type}",
+            "description": f"Test service description for {service_type}",
+            "category": "Informatique",
+            "duration": 2.0,
+            "type": service_type,
+            "location": "Paris, France",
+            "coordinates": {"latitude": 48.8566, "longitude": 2.3522}
+        }
         
-        # Setup
-        self.setup_test_users()
-        
-        # Core functionality tests
-        self.test_service_creation_with_photos()
-        self.test_exchange_acceptance()
-        self.test_exchange_retrieval()
-        self.test_exchange_confirmation()
-        self.test_exchange_cancellation()
-        self.test_my_exchanges()
-        
-        # Rating system tests
-        self.test_rating_system()
-        
-        # Reports system tests
-        self.test_reports_system()
-        
-        # Enriched profile tests
-        self.test_enriched_user_profile()
-        
-        # Security tests
-        self.test_security_scenarios()
-        
-        # Summary
-        self.print_summary()
+        try:
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {token}"
+            
+            response = requests.post(f"{self.base_url}/services", 
+                                   json=service_data, headers=auth_headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                service_id = data.get("serviceId")
+                self.log(f"✅ Service created: {service_data['title']} (ID: {service_id})")
+                self.test_services.append({
+                    "id": service_id, 
+                    "user_id": user_id, 
+                    "type": service_type,
+                    "title": service_data["title"]
+                })
+                return service_id
+            else:
+                self.log(f"❌ Failed to create service: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Exception during service creation: {str(e)}", "ERROR")
+            return None
     
-    def print_summary(self):
-        """Print test summary"""
-        print("=" * 80)
-        print("📊 TEST SUMMARY")
-        print("=" * 80)
+    def accept_exchange(self, requester_token, service_id):
+        """Accept an exchange from a service"""
+        try:
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {requester_token}"
+            
+            exchange_data = {"message": "Je souhaite accepter cet échange"}
+            
+            response = requests.post(f"{self.base_url}/services/{service_id}/accept-exchange",
+                                   json=exchange_data, headers=auth_headers)
+            
+            if response.status_code == 200:
+                data = response.json()
+                exchange_id = data.get("exchangeId")
+                chat_id = data.get("chatId")
+                self.log(f"✅ Exchange accepted: {exchange_id}")
+                self.test_exchanges.append({
+                    "id": exchange_id,
+                    "service_id": service_id,
+                    "chat_id": chat_id
+                })
+                return exchange_id
+            else:
+                self.log(f"❌ Failed to accept exchange: {response.status_code} - {response.text}", "ERROR")
+                return None
+                
+        except Exception as e:
+            self.log(f"❌ Exception during exchange acceptance: {str(e)}", "ERROR")
+            return None
+    
+    def complete_exchange(self, exchange_id, provider_token, requester_token):
+        """Complete an exchange with double validation"""
+        try:
+            # Provider confirms first
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {provider_token}"
+            
+            response1 = requests.post(f"{self.base_url}/exchanges/{exchange_id}/confirm-completion",
+                                    headers=auth_headers)
+            
+            if response1.status_code != 200:
+                self.log(f"❌ Provider confirmation failed: {response1.status_code} - {response1.text}", "ERROR")
+                return False
+            
+            # Requester confirms second
+            auth_headers["Authorization"] = f"Bearer {requester_token}"
+            
+            response2 = requests.post(f"{self.base_url}/exchanges/{exchange_id}/confirm-completion",
+                                    headers=auth_headers)
+            
+            if response2.status_code == 200:
+                self.log(f"✅ Exchange completed: {exchange_id}")
+                return True
+            else:
+                self.log(f"❌ Requester confirmation failed: {response2.status_code} - {response2.text}", "ERROR")
+                return False
+                
+        except Exception as e:
+            self.log(f"❌ Exception during exchange completion: {str(e)}", "ERROR")
+            return False
+
+    def test_authentication(self):
+        """Test 1: Authentication requirements"""
+        self.log("🧪 Testing authentication requirements...")
         
-        total_tests = len(self.test_results)
-        passed_tests = len([t for t in self.test_results if t["success"]])
-        failed_tests = total_tests - passed_tests
+        # Test without token
+        try:
+            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=self.headers)
+            if response.status_code in [401, 403]:
+                self.log("✅ No token correctly rejected")
+            else:
+                self.log(f"❌ No token should be rejected, got: {response.status_code}", "ERROR")
+                return False
+        except Exception as e:
+            self.log(f"❌ Exception testing no token: {str(e)}", "ERROR")
+            return False
         
-        print(f"Total Tests: {total_tests}")
-        print(f"✅ Passed: {passed_tests}")
-        print(f"❌ Failed: {failed_tests}")
-        print(f"Success Rate: {(passed_tests/total_tests)*100:.1f}%")
-        print()
+        # Test with invalid token
+        try:
+            invalid_headers = self.headers.copy()
+            invalid_headers["Authorization"] = "Bearer invalid_token_123"
+            
+            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=invalid_headers)
+            if response.status_code in [401, 403]:
+                self.log("✅ Invalid token correctly rejected")
+            else:
+                self.log(f"❌ Invalid token should be rejected, got: {response.status_code}", "ERROR")
+                return False
+        except Exception as e:
+            self.log(f"❌ Exception testing invalid token: {str(e)}", "ERROR")
+            return False
         
-        if failed_tests > 0:
-            print("❌ FAILED TESTS:")
-            for test in self.test_results:
-                if not test["success"]:
-                    print(f"  - {test['test']}: {test['message']}")
-            print()
+        return True
+    
+    def test_exchange_retrieval(self):
+        """Test 2: Exchange retrieval and sorting"""
+        self.log("🧪 Testing exchange retrieval...")
         
-        print("🎯 CRITICAL FUNCTIONALITY STATUS:")
-        critical_tests = [
-            "Exchange acceptance",
-            "Exchange confirmation - completion", 
-            "Rating creation",
-            "Report creation - service",
-            "Admin reports retrieval",
-            "Enriched user profile"
+        # Create test users
+        token1, user1_id = self.register_test_user("calendar1")
+        token2, user2_id = self.register_test_user("calendar2")
+        
+        if not token1 or not token2:
+            self.log("❌ Failed to create test users", "ERROR")
+            return False
+        
+        # Create services
+        service1_id = self.create_test_service(token1, user1_id, "offer", "Calendar1")
+        service2_id = self.create_test_service(token2, user2_id, "offer", "Calendar2")
+        
+        if not service1_id or not service2_id:
+            self.log("❌ Failed to create test services", "ERROR")
+            return False
+        
+        # Create exchanges
+        # User2 accepts User1's service
+        exchange1_id = self.accept_exchange(token2, service1_id)
+        time.sleep(1)  # Ensure different timestamps
+        
+        # User1 accepts User2's service  
+        exchange2_id = self.accept_exchange(token1, service2_id)
+        
+        if not exchange1_id or not exchange2_id:
+            self.log("❌ Failed to create test exchanges", "ERROR")
+            return False
+        
+        # Test User1's exchanges
+        try:
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {token1}"
+            
+            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            
+            if response.status_code != 200:
+                self.log(f"❌ Failed to get User1 exchanges: {response.status_code} - {response.text}", "ERROR")
+                return False
+            
+            exchanges = response.json()
+            
+            if len(exchanges) < 2:
+                self.log(f"❌ User1 should have at least 2 exchanges, got: {len(exchanges)}", "ERROR")
+                return False
+            
+            # Check if exchanges are sorted by date (descending)
+            timestamps = [datetime.fromisoformat(ex["createdAt"].replace("Z", "+00:00")) for ex in exchanges]
+            if timestamps != sorted(timestamps, reverse=True):
+                self.log("❌ Exchanges not sorted by date descending", "ERROR")
+                return False
+            
+            self.log(f"✅ User1 has {len(exchanges)} exchanges, properly sorted")
+            
+            # Test User2's exchanges
+            auth_headers["Authorization"] = f"Bearer {token2}"
+            
+            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            
+            if response.status_code != 200:
+                self.log(f"❌ Failed to get User2 exchanges: {response.status_code} - {response.text}", "ERROR")
+                return False
+            
+            exchanges = response.json()
+            
+            if len(exchanges) < 2:
+                self.log(f"❌ User2 should have at least 2 exchanges, got: {len(exchanges)}", "ERROR")
+                return False
+            
+            self.log(f"✅ User2 has {len(exchanges)} exchanges")
+            
+        except Exception as e:
+            self.log(f"❌ Exception during exchange retrieval test: {str(e)}", "ERROR")
+            return False
+        
+        return True
+    
+    def test_enriched_data(self):
+        """Test 3: Enriched data structure"""
+        self.log("🧪 Testing enriched data structure...")
+        
+        if not self.test_users or len(self.test_users) < 2:
+            self.log("❌ Need at least 2 test users for enriched data test", "ERROR")
+            return False
+        
+        try:
+            user = self.test_users[0]
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {user['token']}"
+            
+            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            
+            if response.status_code != 200:
+                self.log(f"❌ Failed to get exchanges for enriched data test: {response.status_code}", "ERROR")
+                return False
+            
+            exchanges = response.json()
+            
+            if not exchanges:
+                self.log("❌ No exchanges found for enriched data test", "ERROR")
+                return False
+            
+            # Check first exchange structure
+            exchange = exchanges[0]
+            
+            # Required exchange properties
+            required_props = ["_id", "status", "duration", "createdAt", "serviceId", "providerId", "requesterId"]
+            for prop in required_props:
+                if prop not in exchange:
+                    self.log(f"❌ Missing exchange property: {prop}", "ERROR")
+                    return False
+            
+            # Check service object
+            if "service" not in exchange:
+                self.log("❌ Missing service object in exchange", "ERROR")
+                return False
+            
+            service = exchange["service"]
+            service_required = ["_id", "title"]
+            for prop in service_required:
+                if prop not in service:
+                    self.log(f"❌ Missing service property: {prop}", "ERROR")
+                    return False
+            
+            # Check otherUser object
+            if "otherUser" not in exchange:
+                self.log("❌ Missing otherUser object in exchange", "ERROR")
+                return False
+            
+            other_user = exchange["otherUser"]
+            user_required = ["_id", "name"]
+            for prop in user_required:
+                if prop not in other_user:
+                    self.log(f"❌ Missing otherUser property: {prop}", "ERROR")
+                    return False
+            
+            # Verify otherUser is correctly determined
+            current_user_id = user["id"]
+            if exchange["providerId"] == current_user_id:
+                expected_other_id = exchange["requesterId"]
+            else:
+                expected_other_id = exchange["providerId"]
+            
+            if other_user["_id"] != expected_other_id:
+                self.log("❌ otherUser not correctly determined", "ERROR")
+                return False
+            
+            self.log("✅ Enriched data structure is correct")
+            
+        except Exception as e:
+            self.log(f"❌ Exception during enriched data test: {str(e)}", "ERROR")
+            return False
+        
+        return True
+    
+    def test_user_isolation(self):
+        """Test 4: User isolation"""
+        self.log("🧪 Testing user isolation...")
+        
+        if len(self.test_users) < 2:
+            self.log("❌ Need at least 2 test users for isolation test", "ERROR")
+            return False
+        
+        try:
+            # Get exchanges for User1
+            user1 = self.test_users[0]
+            auth_headers = self.headers.copy()
+            auth_headers["Authorization"] = f"Bearer {user1['token']}"
+            
+            response1 = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            
+            if response1.status_code != 200:
+                self.log(f"❌ Failed to get User1 exchanges: {response1.status_code}", "ERROR")
+                return False
+            
+            user1_exchanges = response1.json()
+            
+            # Get exchanges for User2
+            user2 = self.test_users[1]
+            auth_headers["Authorization"] = f"Bearer {user2['token']}"
+            
+            response2 = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            
+            if response2.status_code != 200:
+                self.log(f"❌ Failed to get User2 exchanges: {response2.status_code}", "ERROR")
+                return False
+            
+            user2_exchanges = response2.json()
+            
+            # Verify each user only sees their own exchanges
+            for exchange in user1_exchanges:
+                if exchange["providerId"] != user1["id"] and exchange["requesterId"] != user1["id"]:
+                    self.log(f"❌ User1 sees exchange they're not part of: {exchange['_id']}", "ERROR")
+                    return False
+            
+            for exchange in user2_exchanges:
+                if exchange["providerId"] != user2["id"] and exchange["requesterId"] != user2["id"]:
+                    self.log(f"❌ User2 sees exchange they're not part of: {exchange['_id']}", "ERROR")
+                    return False
+            
+            self.log("✅ User isolation working correctly")
+            
+        except Exception as e:
+            self.log(f"❌ Exception during user isolation test: {str(e)}", "ERROR")
+            return False
+        
+        return True
+    
+    def run_all_tests(self):
+        """Run all calendar endpoint tests"""
+        self.log("🚀 Starting TimeSwap Calendar Backend Tests")
+        self.log("=" * 60)
+        
+        tests = [
+            ("Authentication", self.test_authentication),
+            ("Exchange Retrieval", self.test_exchange_retrieval),
+            ("Enriched Data", self.test_enriched_data),
+            ("User Isolation", self.test_user_isolation)
         ]
         
-        for critical_test in critical_tests:
-            test_result = next((t for t in self.test_results if t["test"] == critical_test), None)
-            if test_result:
-                status = "✅" if test_result["success"] else "❌"
-                print(f"  {status} {critical_test}")
-            else:
-                print(f"  ⚠️  {critical_test} (not tested)")
+        results = {}
         
-        print("\n" + "=" * 80)
+        for test_name, test_func in tests:
+            self.log(f"\n📋 Running {test_name} Test...")
+            try:
+                result = test_func()
+                results[test_name] = result
+                if result:
+                    self.log(f"✅ {test_name} Test: PASSED")
+                else:
+                    self.log(f"❌ {test_name} Test: FAILED")
+            except Exception as e:
+                self.log(f"❌ {test_name} Test: EXCEPTION - {str(e)}", "ERROR")
+                results[test_name] = False
+        
+        # Summary
+        self.log("\n" + "=" * 60)
+        self.log("📊 TEST SUMMARY")
+        self.log("=" * 60)
+        
+        passed = sum(1 for result in results.values() if result)
+        total = len(results)
+        
+        for test_name, result in results.items():
+            status = "✅ PASSED" if result else "❌ FAILED"
+            self.log(f"{test_name}: {status}")
+        
+        self.log(f"\nOverall: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
+        
+        if passed == total:
+            self.log("🎉 ALL TESTS PASSED - Calendar endpoint is working correctly!")
+            return True
+        else:
+            self.log("⚠️  Some tests failed - Calendar endpoint needs attention")
+            return False
 
 if __name__ == "__main__":
     tester = TimeSwapTester()
-    tester.run_comprehensive_test()
+    success = tester.run_all_tests()
+    exit(0 if success else 1)
