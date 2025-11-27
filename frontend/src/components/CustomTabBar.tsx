@@ -15,102 +15,108 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(0);
   const [contentWidth, setContentWidth] = useState(0);
-  const animationRef = useRef<any>(null);
-
-  const [isUserScrolling, setIsUserScrolling] = useState(false);
+  const animationFrameRef = useRef<number | null>(null);
   const inactivityTimerRef = useRef<any>(null);
-  const lastScrollTimeRef = useRef<number>(Date.now());
+  const isUserInteractingRef = useRef(false);
+  const velocityRef = useRef(0.2); // Vitesse initiale très lente
+  const targetVelocity = 0.2; // Vitesse cible pour l'auto-scroll
 
-  // Animation de défilement automatique
-  useEffect(() => {
-    if (contentWidth <= SCREEN_WIDTH) return;
+  // Animation de défilement automatique avec requestAnimationFrame
+  const autoScroll = useCallback(() => {
+    if (isUserInteractingRef.current || contentWidth <= SCREEN_WIDTH) {
+      return;
+    }
 
-    const scrollSpeed = 0.3; // Vitesse très lente (pixels par frame)
+    // Augmenter progressivement la vitesse (ramp-up)
+    if (velocityRef.current < targetVelocity) {
+      velocityRef.current = Math.min(velocityRef.current + 0.01, targetVelocity);
+    }
+
+    scrollX.current += velocityRef.current;
     
-    const startAutoScroll = () => {
-      // Ne démarre que si l'utilisateur n'est pas en train de scroller
-      if (animationRef.current) {
-        clearInterval(animationRef.current);
-      }
+    // Boucle infinie : retour au début quand on atteint la moitié (contenu dupliqué)
+    if (scrollX.current >= contentWidth / 2) {
+      scrollX.current = 0;
+    }
+    
+    scrollViewRef.current?.scrollTo({
+      x: scrollX.current,
+      animated: false,
+    });
 
-      animationRef.current = setInterval(() => {
-        // Ne scroll que si l'utilisateur n'interagit pas
-        if (!isUserScrolling) {
-          scrollX.current += scrollSpeed;
-          
-          // Boucle infinie : retour au début quand on atteint la moitié
-          if (scrollX.current >= contentWidth / 2) {
-            scrollX.current = 0;
-          }
-          
-          scrollViewRef.current?.scrollTo({
-            x: scrollX.current,
-            animated: false,
-          });
-        }
-      }, 16); // ~60fps
-    };
+    // Continuer l'animation
+    animationFrameRef.current = requestAnimationFrame(autoScroll);
+  }, [contentWidth]);
 
-    // Démarrer l'auto-scroll si l'utilisateur n'est pas actif
-    if (!isUserScrolling) {
+  // Démarrer l'auto-scroll
+  const startAutoScroll = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+    }
+    
+    // Reset velocity pour ramp-up
+    velocityRef.current = 0;
+    
+    animationFrameRef.current = requestAnimationFrame(autoScroll);
+  }, [autoScroll]);
+
+  // Arrêter complètement l'auto-scroll
+  const stopAutoScroll = useCallback(() => {
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
+      animationFrameRef.current = null;
+    }
+    velocityRef.current = 0;
+  }, []);
+
+  // Effet pour démarrer l'auto-scroll initial
+  useEffect(() => {
+    if (contentWidth > SCREEN_WIDTH) {
       startAutoScroll();
     }
 
     return () => {
-      if (animationRef.current) {
-        clearInterval(animationRef.current);
-      }
+      stopAutoScroll();
       if (inactivityTimerRef.current) {
         clearTimeout(inactivityTimerRef.current);
       }
     };
-  }, [contentWidth, isUserScrolling]);
+  }, [contentWidth, startAutoScroll, stopAutoScroll]);
 
-  // Gestion du scroll manuel avec reprise automatique
+  // L'utilisateur commence à toucher
   const handleScrollBeginDrag = () => {
-    // L'utilisateur commence à scroller
-    setIsUserScrolling(true);
+    // Arrêt TOTAL de l'auto-scroll
+    isUserInteractingRef.current = true;
+    stopAutoScroll();
     
-    // Annuler le timer d'inactivité précédent
+    // Annuler tout timer d'inactivité en cours
     if (inactivityTimerRef.current) {
       clearTimeout(inactivityTimerRef.current);
-    }
-    
-    // Arrêter l'auto-scroll
-    if (animationRef.current) {
-      clearInterval(animationRef.current);
-      animationRef.current = null;
+      inactivityTimerRef.current = null;
     }
   };
 
+  // L'utilisateur relâche
   const handleScrollEndDrag = () => {
-    // L'utilisateur a lâché le scroll
-    lastScrollTimeRef.current = Date.now();
-    
-    // Attendre 3.5 secondes d'inactivité avant de reprendre l'auto-scroll
-    inactivityTimerRef.current = setTimeout(() => {
-      setIsUserScrolling(false);
-    }, 3500);
+    // Pas encore de reprise, on attend la fin de l'inertie
   };
 
+  // Fin de l'inertie naturelle
   const handleMomentumScrollEnd = (event: any) => {
-    // Fin de l'inertie naturelle
-    const currentScrollX = event.nativeEvent.contentOffset.x;
-    scrollX.current = currentScrollX;
+    // Capturer la position finale après l'inertie
+    const finalScrollX = event.nativeEvent.contentOffset.x;
+    scrollX.current = finalScrollX;
     
-    // Attendre encore 3.5 secondes après la fin de l'inertie
-    if (inactivityTimerRef.current) {
-      clearTimeout(inactivityTimerRef.current);
-    }
-    
+    // Attendre 2 secondes d'inactivité totale avant de reprendre
     inactivityTimerRef.current = setTimeout(() => {
-      setIsUserScrolling(false);
-    }, 3500);
+      isUserInteractingRef.current = false;
+      startAutoScroll(); // Reprise avec ramp-up
+    }, 2000);
   };
 
+  // Suivi du scroll manuel (mise à jour de la position)
   const handleScroll = (event: any) => {
-    // Mise à jour de la position actuelle pendant le scroll manuel
-    if (isUserScrolling) {
+    if (isUserInteractingRef.current) {
       scrollX.current = event.nativeEvent.contentOffset.x;
     }
   };
