@@ -159,19 +159,6 @@ export default function TabsLayout() {
             ),
           }}
         />
-        {/* Pages cachées */}
-        <Tabs.Screen
-          name="placeholder"
-          options={{
-            href: null,
-          }}
-        />
-        <Tabs.Screen
-          name="search"
-          options={{
-            href: null,
-          }}
-        />
       </Tabs>
       <FloatingAddButton />
     </>
