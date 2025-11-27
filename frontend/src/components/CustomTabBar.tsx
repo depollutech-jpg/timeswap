@@ -83,9 +83,9 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     };
   }, [contentWidth, startAutoScroll, stopAutoScroll]);
 
-  // L'utilisateur commence à toucher
-  const handleScrollBeginDrag = () => {
-    // Arrêt TOTAL à 100% de l'auto-scroll
+  // L'utilisateur TOUCHE le footer (premier contact)
+  const handleTouchStart = () => {
+    // Arrêt IMMÉDIAT à 100% de l'auto-scroll dès le touch
     isUserInteractingRef.current = true;
     stopAutoScroll();
     
@@ -94,6 +94,13 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
       clearTimeout(inactivityTimerRef.current);
       inactivityTimerRef.current = null;
     }
+  };
+
+  // L'utilisateur commence à drag/scroll
+  const handleScrollBeginDrag = () => {
+    // Double sécurité : s'assurer que l'auto-scroll est bien arrêté
+    isUserInteractingRef.current = true;
+    stopAutoScroll();
   };
 
   // L'utilisateur relâche le doigt
