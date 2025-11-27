@@ -17,6 +17,206 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
   const [contentWidth, setContentWidth] = useState(0);
   const animationRef = useRef<any>(null);
 
+  // Animation de défilement automatique
+  useEffect(() => {
+    if (contentWidth <= SCREEN_WIDTH) return;
+
+    const scrollSpeed = 0.3; // Vitesse très lente (pixels par frame)
+    
+    const startAutoScroll = () => {
+      animationRef.current = setInterval(() => {
+        scrollX.current += scrollSpeed;
+        
+        // Boucle infinie : retour au début quand on atteint la moitié
+        if (scrollX.current >= contentWidth / 2) {
+          scrollX.current = 0;
+        }
+        
+        scrollViewRef.current?.scrollTo({
+          x: scrollX.current,
+          animated: false,
+        });
+      }, 16); // ~60fps
+    };
+
+    startAutoScroll();
+
+    return () => {
+      if (animationRef.current) {
+        clearInterval(animationRef.current);
+      }
+    };
+  }, [contentWidth]);
+
+  // Dupliquer les routes pour créer l'effet de boucle infinie
+  const duplicatedRoutes = [...state.routes, ...state.routes];
+
+  const renderTabItem = (route: any, index: number, isDuplicate: boolean = false) => {
+    const actualIndex = index % state.routes.length;
+    const { options } = descriptors[state.routes[actualIndex].key];
+    const label =
+      options.tabBarLabel !== undefined
+        ? options.tabBarLabel
+        : options.title !== undefined
+        ? options.title
+        : route.name;
+
+    const isFocused = state.index === actualIndex && !isDuplicate;
+
+    // Ignorer les routes cachées
+    if (options.href === null) {
+      return null;
+    }
+
+    return (
+      <TabItem
+        key={`${route.key}-${isDuplicate ? 'dup' : 'orig'}`}
+        route={route}
+        label={label}
+        isFocused={isFocused}
+        options={options}
+        navigation={navigation}
+        unreadCount={unreadCount}
+      />
+    );
+  };
+
+  return (
+    <BlurView intensity={80} tint="light" style={[styles.container, { paddingBottom: insets.bottom }]}>
+      <ScrollView
+        ref={scrollViewRef}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+        style={styles.scrollView}
+        scrollEventThrottle={16}
+        onContentSizeChange={(width) => setContentWidth(width)}
+        onScrollBeginDrag={() => {
+          // Pause auto-scroll quand l'utilisateur swipe
+          if (animationRef.current) {
+            clearInterval(animationRef.current);
+          }
+        }}
+        onScrollEndDrag={() => {
+          // Reprendre l'auto-scroll après 2 secondes
+          setTimeout(() => {
+            if (contentWidth > SCREEN_WIDTH) {
+              const scrollSpeed = 0.3;
+              animationRef.current = setInterval(() => {
+                scrollX.current += scrollSpeed;
+                if (scrollX.current >= contentWidth / 2) {
+                  scrollX.current = 0;
+                }
+                scrollViewRef.current?.scrollTo({
+                  x: scrollX.current,
+                  animated: false,
+                });
+              }, 16);
+            }
+          }, 2000);
+        }}
+      >
+        {duplicatedRoutes.map((route, index) => {
+          return renderTabItem(route, index, index >= state.routes.length);
+        })}
+      </ScrollView>
+    </BlurView>
+  );
+}
+
+// Composant TabItem avec animation de scaling
+function TabItem({ route, label, isFocused, options, navigation, unreadCount }: any) {
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
+  const onPress = () => {
+    // Animation de scaling au tap
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(route.name);
+    }
+  };
+
+  const onLongPress = () => {
+    navigation.emit({
+      type: 'tabLongPress',
+      target: route.key,
+    });
+  };
+
+  const IconComponent = options.tabBarIcon;
+  const showBadge = route.name === 'messages' && unreadCount > 0;
+
+  return (
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <TouchableOpacity
+        accessibilityRole="button"
+        accessibilityState={isFocused ? { selected: true } : {}}
+        accessibilityLabel={options.tabBarAccessibilityLabel}
+        testID={options.tabBarTestID}
+        onPress={onPress}
+        onLongPress={onLongPress}
+        style={[
+          styles.tab,
+          isFocused && styles.tabActive,
+        ]}
+        activeOpacity={0.7}
+      >
+        <View style={[
+          styles.tabContent,
+          isFocused && styles.tabContentActive,
+        ]}>
+          {IconComponent && (
+            <View style={styles.iconContainer}>
+              {IconComponent({
+                color: isFocused ? Colors.primary : Colors.textSecondary,
+                size: 22,
+                focused: isFocused,
+              })}
+              {showBadge && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>
+                    {unreadCount > 99 ? '99+' : unreadCount}
+                  </Text>
+                </View>
+              )}
+            </View>
+          )}
+          <Text
+            style={[
+              styles.tabLabel,
+              isFocused && styles.tabLabelActive,
+            ]}
+          >
+            {typeof label === 'string' ? label : ''}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </Animated.View>
+  );
+}
+
+function OldCustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
+  const insets = useSafeAreaInsets();
+  const { unreadCount } = useNotificationStore();
+
   return (
     <View style={[styles.container, { paddingBottom: insets.bottom }]}>
       <ScrollView
