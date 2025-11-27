@@ -175,9 +175,6 @@ export default function HomeScreen() {
                   <Ionicons name="shield-checkmark" size={22} color="#FFFFFF" />
                 </TouchableOpacity>
               )}
-              <TouchableOpacity style={styles.iconButton}>
-                <Ionicons name="calendar-outline" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
               <TouchableOpacity 
                 style={styles.iconButton}
                 onPress={() => router.push('/notifications')}
