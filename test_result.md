@@ -125,15 +125,42 @@ backend:
 
   - task: "Endpoint Calendrier - Liste des échanges"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "L'endpoint /api/exchanges/my/all existe déjà et retourne tous les échanges de l'utilisateur avec données enrichies (service, otherUser). Testé par testing_agent précédemment dans le système Vinted. Besoin de re-vérifier que l'endpoint fonctionne toujours correctement."
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ ENDPOINT CALENDRIER TESTÉ AVEC SUCCÈS - 4/4 TESTS PASSÉS (100%)
+          
+          Tests effectués selon les spécifications de la review request:
+          
+          1. ✅ Test d'authentification:
+             - Endpoint nécessite un token JWT valide
+             - Token invalide correctement rejeté (401/403)
+          
+          2. ✅ Test de récupération des échanges:
+             - Créé 2 échanges de test avec différents statuts
+             - Utilisateur reçoit TOUS ses échanges (provider ET requester)
+             - Échanges triés par date décroissante (plus récent en premier)
+          
+          3. ✅ Test des données enrichies:
+             - Chaque échange contient toutes les propriétés requises (_id, status, duration, createdAt, etc.)
+             - Objet "service" avec _id, title présent
+             - Objet "otherUser" avec _id, name présent
+             - L'autre utilisateur correctement déterminé (provider si on est requester, et vice-versa)
+          
+          4. ✅ Test d'isolation utilisateur:
+             - Chaque utilisateur ne voit QUE ses propres échanges
+             - Isolation parfaite entre utilisateurs
+          
+          L'ENDPOINT /api/exchanges/my/all FONCTIONNE PARFAITEMENT POUR LA FONCTIONNALITÉ CALENDRIER!
 
 frontend:
   - task: "Fix Admin Role Field"
