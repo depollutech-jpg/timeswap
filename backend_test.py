@@ -17,12 +17,11 @@ HEADERS = {"Content-Type": "application/json"}
 class TimeSwapTester:
     def __init__(self):
         self.base_url = BASE_URL
+        self.headers = HEADERS.copy()
+        self.test_users = []
+        self.test_services = []
+        self.test_exchanges = []
         self.tokens = {}
-        self.users = {}
-        self.services = {}
-        self.exchanges = {}
-        self.chats = {}
-        self.reports = {}
         self.test_results = []
         
     def log_test(self, test_name, success, message="", details=None):
