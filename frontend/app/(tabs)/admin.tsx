@@ -1,214 +1,426 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
-  TextInput,
-  TouchableOpacity,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
   ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  Alert,
+  Dimensions,
+  RefreshControl,
+  Platform,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Colors } from '../../src/constants/colors';
-import { useAuthStore } from '../../src/store/authStore';
-import api from '../../src/utils/api';
-import { useRouter, Link } from 'expo-router';
+import { Colors } from '../src/constants/colors';
+import api from '../src/utils/api';
+import { useAuthStore } from '../src/store/authStore';
 
-// Liste blanche des emails autorisés
-const AUTHORIZED_ADMIN_EMAILS = [
-  'quentinraffalli@hotmail.com',
-  'depollutech@gmail.com',
-];
+// Import conditionnel pour éviter les problèmes sur mobile
+let PieChart: any = null;
+let BarChart: any = null;
 
-export default function AdminTabScreen() {
-  const { user, setUser, setToken } = useAuthStore();
+try {
+  const charts = require('react-native-chart-kit');
+  PieChart = charts.PieChart;
+  BarChart = charts.BarChart;
+} catch (error) {
+  console.log('Charts library not available, using fallback');
+}
+
+const { width } = Dimensions.get('window');
+
+export default function AdminScreen() {
   const router = useRouter();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const [loginLoading, setLoginLoading] = useState(false);
-  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
+  const { user } = useAuthStore();
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [stats, setStats] = useState<any>(null);
+  const [users, setUsers] = useState<any[]>([]);
+  const [servicesStats, setServicesStats] = useState<any>(null);
+  const [exchangesFlow, setExchangesFlow] = useState<any>(null);
+  const [transactions, setTransactions] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState('overview');
 
-  // Vérifier si déjà admin au montage
   useEffect(() => {
-    if (user?.role === 'admin') {
-      setIsAdminLoggedIn(true);
+    // Check if user is admin
+    if (!user) {
+      setLoading(false);
+      return;
     }
+    
+    if (user?.role !== 'admin') {
+      Alert.alert('Accès refusé', 'Vous n\'avez pas les permissions nécessaires');
+      router.back();
+      return;
+    }
+    
+    loadData();
   }, [user]);
 
-  const handleAdminLogin = async () => {
-    if (!email || !password) {
-      Alert.alert('Erreur', 'Veuillez remplir tous les champs');
-      return;
-    }
-
-    const trimmedEmail = email.trim().toLowerCase();
-
-    if (!AUTHORIZED_ADMIN_EMAILS.includes(trimmedEmail)) {
-      Alert.alert(
-        'Accès refusé',
-        "Vous n'êtes pas autorisé à utiliser l'espace administrateur."
-      );
-      return;
-    }
-
-    setLoginLoading(true);
+  const loadData = async () => {
     try {
-      const response = await api.post('/auth/login', {
-        email: trimmedEmail,
-        password,
-      });
+      const [
+        statsRes,
+        usersRes,
+        servicesStatsRes,
+        exchangesFlowRes,
+        transactionsRes,
+      ] = await Promise.all([
+        api.get('/admin/stats'),
+        api.get('/admin/users?limit=20'),
+        api.get('/admin/services/stats'),
+        api.get('/admin/exchanges/flow'),
+        api.get('/admin/transactions?limit=20'),
+      ]);
 
-      if (response.data.user.role !== 'admin') {
-        Alert.alert(
-          'Accès refusé',
-          "Vous n'êtes pas autorisé à utiliser l'espace administrateur."
-        );
-        setLoginLoading(false);
-        return;
-      }
-
-      await setToken(response.data.token);
-      setUser(response.data.user);
-      setIsAdminLoggedIn(true);
-      Alert.alert('Connexion réussie', "Bienvenue dans l'espace administrateur !");
+      setStats(statsRes.data);
+      setUsers(usersRes.data);
+      setServicesStats(servicesStatsRes.data);
+      setExchangesFlow(exchangesFlowRes.data);
+      setTransactions(transactionsRes.data);
     } catch (error: any) {
-      Alert.alert(
-        'Erreur de connexion',
-        error.response?.data?.detail || 'Email ou mot de passe incorrect'
-      );
+      console.error('Failed to load admin data:', error);
+      if (error.response?.status === 403) {
+        Alert.alert('Accès refusé', 'Vous n\'avez pas les permissions nécessaires');
+        router.back();
+      }
     } finally {
-      setLoginLoading(false);
+      setLoading(false);
+      setRefreshing(false);
     }
   };
 
-  // Si l'utilisateur est admin connecté, afficher le dashboard simplifié
-  if (isAdminLoggedIn) {
+  const onRefresh = () => {
+    setRefreshing(true);
+    loadData();
+  };
+
+  const handleBanUser = async (userId: string, userName: string) => {
+    Alert.alert(
+      'Bannir l\'utilisateur',
+      `Êtes-vous sûr de vouloir bannir ${userName} ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Bannir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              await api.put(`/admin/users/${userId}/ban`);
+              Alert.alert('Succès', 'Utilisateur banni');
+              loadData();
+            } catch (error) {
+              Alert.alert('Erreur', 'Impossible de bannir l\'utilisateur');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  const handleVerifyUser = async (userId: string, userName: string) => {
+    Alert.alert(
+      'Vérifier l\'utilisateur',
+      `Vérifier le profil de ${userName} ?`,
+      [
+        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Vérifier',
+          onPress: async () => {
+            try {
+              await api.put(`/admin/users/${userId}/verify`);
+              Alert.alert('Succès', 'Utilisateur vérifié');
+              loadData();
+            } catch (error) {
+              Alert.alert('Erreur', 'Impossible de vérifier l\'utilisateur');
+            }
+          },
+        },
+      ]
+    );
+  };
+
+  if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.dashboardHeader}>
-          <Text style={styles.dashboardTitle}>🛡️ Dashboard Admin</Text>
-          <Text style={styles.dashboardSubtitle}>Bienvenue {user?.profile.firstName}</Text>
-        </View>
-        <ScrollView style={styles.dashboardContent}>
-          <View style={styles.statsCard}>
-            <Ionicons name="people" size={32} color={Colors.primary} />
-            <Text style={styles.statsTitle}>Gestion</Text>
-            <Text style={styles.statsSubtitle}>Accès complet aux fonctionnalités admin</Text>
-          </View>
-          
-          <View style={styles.statsCard}>
-            <Ionicons name="stats-chart" size={32} color={Colors.secondary} />
-            <Text style={styles.statsTitle}>Statistiques</Text>
-            <Text style={styles.statsSubtitle}>Tableaux de bord détaillés</Text>
-          </View>
-
-          <View style={styles.infoCard}>
-            <Ionicons name="information-circle" size={24} color="#3B82F6" />
-            <Text style={styles.infoCardText}>
-              Accédez au dashboard complet avec graphiques et outils de gestion.
-            </Text>
-          </View>
-
-          <Link href="/admin" asChild>
-            <TouchableOpacity style={styles.fullDashboardButton}>
-              <Ionicons name="stats-chart" size={20} color="#FFFFFF" />
-              <Text style={styles.fullDashboardButtonText}>
-                Accéder au Dashboard Complet
-              </Text>
-            </TouchableOpacity>
-          </Link>
-        </ScrollView>
-      </SafeAreaView>
+      <View style={styles.loadingContainer}>
+        <ActivityIndicator size="large" color={Colors.primary} />
+      </View>
     );
   }
 
-  // Sinon, afficher le formulaire de connexion
+  // Prepare chart data
+  const servicesCategoryData = servicesStats?.byCategory.slice(0, 5).map((cat: any) => ({
+    name: cat._id,
+    population: cat.count,
+    color: Colors.primary,
+    legendFontColor: Colors.text,
+    legendFontSize: 12,
+  })) || [];
+
+  const userBalancesData = {
+    labels: exchangesFlow?.userBalances.slice(0, 8).map((u: any) => u.name.split(' ')[0]) || [],
+    datasets: [
+      {
+        data: exchangesFlow?.userBalances.slice(0, 8).map((u: any) => u.given) || [],
+        color: () => Colors.primary,
+      },
+      {
+        data: exchangesFlow?.userBalances.slice(0, 8).map((u: any) => u.received) || [],
+        color: () => Colors.secondary,
+      },
+    ],
+    legend: ['Heures données', 'Heures reçues'],
+  };
+
   return (
     <SafeAreaView style={styles.container}>
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        style={styles.keyboardView}
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color={Colors.text} />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Dashboard Admin</Text>
+        <TouchableOpacity onPress={onRefresh}>
+          <Ionicons name="refresh" size={24} color={Colors.text} />
+        </TouchableOpacity>
+      </View>
+
+      {/* Tabs */}
+      <View style={styles.tabs}>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'overview' && styles.tabActive]}
+          onPress={() => setActiveTab('overview')}
+        >
+          <Text style={[styles.tabText, activeTab === 'overview' && styles.tabTextActive]}>
+            Vue d'ensemble
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'users' && styles.tabActive]}
+          onPress={() => setActiveTab('users')}
+        >
+          <Text style={[styles.tabText, activeTab === 'users' && styles.tabTextActive]}>
+            Utilisateurs
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={[styles.tab, activeTab === 'transactions' && styles.tabActive]}
+          onPress={() => setActiveTab('transactions')}
+        >
+          <Text style={[styles.tabText, activeTab === 'transactions' && styles.tabTextActive]}>
+            Transactions
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView
+        contentContainerStyle={styles.scrollContent}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          <View style={styles.header}>
-            <View style={styles.iconContainer}>
-              <Ionicons name="shield-checkmark" size={64} color={Colors.primary} />
-            </View>
-            <Text style={styles.title}>Espace Administrateur</Text>
-            <Text style={styles.subtitle}>
-              Accès réservé aux administrateurs autorisés
-            </Text>
-          </View>
-
-          <View style={styles.form}>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="mail-outline" size={20} color="#6B7280" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="admin@timeswap.com"
-                  value={email}
-                  onChangeText={setEmail}
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                  autoCorrect={false}
-                  editable={!loginLoading}
-                />
+        {activeTab === 'overview' && (
+          <>
+            {/* Stats Cards */}
+            <View style={styles.statsGrid}>
+              <View style={[styles.statCard, { backgroundColor: '#EFF6FF' }]}>
+                <Ionicons name="people" size={32} color="#3B82F6" />
+                <Text style={styles.statValue}>{stats?.users.total}</Text>
+                <Text style={styles.statLabel}>Utilisateurs</Text>
+                <Text style={styles.statSubtext}>{stats?.users.verified} vérifiés</Text>
+              </View>
+              <View style={[styles.statCard, { backgroundColor: '#F0FDF4' }]}>
+                <Ionicons name="list" size={32} color="#10B981" />
+                <Text style={styles.statValue}>{stats?.services.total}</Text>
+                <Text style={styles.statLabel}>Services</Text>
+                <Text style={styles.statSubtext}>{stats?.services.active} actifs</Text>
+              </View>
+              <View style={[styles.statCard, { backgroundColor: '#FEF3C7' }]}>
+                <Ionicons name="swap-horizontal" size={32} color="#F59E0B" />
+                <Text style={styles.statValue}>{stats?.exchanges.total}</Text>
+                <Text style={styles.statLabel}>Échanges</Text>
+                <Text style={styles.statSubtext}>{stats?.exchanges.completed} complétés</Text>
+              </View>
+              <View style={[styles.statCard, { backgroundColor: '#FEE2E2' }]}>
+                <Ionicons name="cash" size={32} color="#EF4444" />
+                <Text style={styles.statValue}>{stats?.revenue.toFixed(2)}€</Text>
+                <Text style={styles.statLabel}>Revenus</Text>
+                <Text style={styles.statSubtext}>{stats?.transactions.paid} paiements</Text>
               </View>
             </View>
 
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Mot de passe</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="lock-closed-outline" size={20} color="#6B7280" style={styles.inputIcon} />
-                <TextInput
-                  style={styles.input}
-                  placeholder="••••••••"
-                  value={password}
-                  onChangeText={setPassword}
-                  secureTextEntry={!showPassword}
-                  editable={!loginLoading}
-                />
-                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeButton}>
-                  <Ionicons 
-                    name={showPassword ? "eye-off-outline" : "eye-outline"} 
-                    size={20} 
-                    color="#6B7280" 
+            {/* Services by Category Chart */}
+            {servicesCategoryData.length > 0 && (
+              <View style={styles.chartCard}>
+                <Text style={styles.chartTitle}>Répartition des services par catégorie</Text>
+                {PieChart ? (
+                  <PieChart
+                    data={servicesCategoryData}
+                    width={width - 48}
+                    height={220}
+                    chartConfig={{
+                      color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    }}
+                    accessor="population"
+                    backgroundColor="transparent"
+                    paddingLeft="15"
+                    absolute
                   />
-                </TouchableOpacity>
+                ) : (
+                  <View style={styles.fallbackChart}>
+                    {servicesCategoryData.map((item: any, index: number) => (
+                      <View key={index} style={styles.fallbackChartItem}>
+                        <Text style={styles.fallbackChartLabel}>{item.name}</Text>
+                        <Text style={styles.fallbackChartValue}>{item.population}</Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* User Balances Chart */}
+            {exchangesFlow && (
+              <View style={styles.chartCard}>
+                <Text style={styles.chartTitle}>Heures données vs reçues (Top 8)</Text>
+                {BarChart ? (
+                  <BarChart
+                    data={userBalancesData}
+                    width={width - 48}
+                    height={220}
+                    yAxisLabel=""
+                    yAxisSuffix="h"
+                    chartConfig={{
+                      backgroundColor: Colors.surface,
+                      backgroundGradientFrom: Colors.surface,
+                      backgroundGradientTo: Colors.surface,
+                      decimalPlaces: 0,
+                      color: (opacity = 1) => `rgba(255, 107, 157, ${opacity})`,
+                      labelColor: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+                    }}
+                    style={styles.chart}
+                  />
+                ) : (
+                  <View style={styles.fallbackChart}>
+                    {exchangesFlow?.userBalances.slice(0, 8).map((u: any, index: number) => (
+                      <View key={index} style={styles.fallbackChartItem}>
+                        <Text style={styles.fallbackChartLabel}>{u.name}</Text>
+                        <Text style={styles.fallbackChartValue}>
+                          Données: {u.given}h | Reçues: {u.received}h
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                )}
+              </View>
+            )}
+
+            {/* Exchanges Flow */}
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Flux d'échanges</Text>
+              <View style={styles.flowStat}>
+                <Ionicons name="infinite" size={24} color={Colors.primary} />
+                <Text style={styles.flowValue}>{exchangesFlow?.totalHoursExchanged.toFixed(0)}h</Text>
+                <Text style={styles.flowLabel}>Total échangé</Text>
               </View>
             </View>
+          </>
+        )}
 
-            <TouchableOpacity
-              style={[styles.button, loginLoading && styles.buttonDisabled]}
-              onPress={handleAdminLogin}
-              disabled={loginLoading}
-            >
-              {loginLoading ? (
-                <ActivityIndicator color="#FFFFFF" />
-              ) : (
-                <>
-                  <Ionicons name="shield-checkmark" size={20} color="#FFFFFF" />
-                  <Text style={styles.buttonText}>Accéder au Dashboard</Text>
-                </>
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.infoBox}>
-              <Ionicons name="information-circle" size={20} color="#3B82F6" />
-              <Text style={styles.infoText}>
-                Seuls les administrateurs autorisés peuvent accéder à cet espace.
-              </Text>
-            </View>
+        {activeTab === 'users' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Gestion des utilisateurs</Text>
+            {users.map((u: any) => (
+              <View key={u._id} style={styles.userCard}>
+                <View style={styles.userInfo}>
+                  <Text style={styles.userName}>
+                    {u.profile.firstName} {u.profile.lastName}
+                  </Text>
+                  <Text style={styles.userEmail}>{u.email}</Text>
+                  <View style={styles.userStats}>
+                    <Text style={styles.userStat}>
+                      Niveau {u.gamification.level} • {u.credits.available.toFixed(1)}h
+                    </Text>
+                    {u.verification.isVerified && (
+                      <Ionicons name="checkmark-circle" size={16} color={Colors.success} />
+                    )}
+                    {u.isBanned && (
+                      <View style={styles.bannedBadge}>
+                        <Text style={styles.bannedText}>Banni</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+                <View style={styles.userActions}>
+                  {!u.verification.isVerified && (
+                    <TouchableOpacity
+                      style={styles.actionButton}
+                      onPress={() => handleVerifyUser(u._id, `${u.profile.firstName} ${u.profile.lastName}`)}
+                    >
+                      <Ionicons name="checkmark" size={20} color={Colors.success} />
+                    </TouchableOpacity>
+                  )}
+                  <TouchableOpacity
+                    style={[styles.actionButton, styles.actionButtonDanger]}
+                    onPress={() => handleBanUser(u._id, `${u.profile.firstName} ${u.profile.lastName}`)}
+                  >
+                    <Ionicons name="ban" size={20} color={Colors.error} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ))}
           </View>
-        </ScrollView>
-      </KeyboardAvoidingView>
+        )}
+
+        {activeTab === 'transactions' && (
+          <View style={styles.card}>
+            <Text style={styles.cardTitle}>Dernières transactions</Text>
+            {transactions.map((t: any) => (
+              <View key={t._id} style={styles.transactionCard}>
+                <View style={styles.transactionInfo}>
+                  <Text style={styles.transactionUser}>{t.userName}</Text>
+                  <Text style={styles.transactionEmail}>{t.userEmail}</Text>
+                  <Text style={styles.transactionDate}>
+                    {new Date(t.createdAt).toLocaleDateString('fr-FR', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </Text>
+                </View>
+                <View style={styles.transactionAmount}>
+                  <Text style={styles.transactionHours}>{t.hours}h</Text>
+                  <Text style={styles.transactionPrice}>{t.amount.toFixed(2)}€</Text>
+                  <View
+                    style={[
+                      styles.statusBadge,
+                      {
+                        backgroundColor:
+                          t.payment_status === 'paid'
+                            ? Colors.success + '20'
+                            : Colors.warning + '20',
+                      },
+                    ]}
+                  >
+                    <Text
+                      style={{
+                        color: t.payment_status === 'paid' ? Colors.success : Colors.warning,
+                        fontSize: 12,
+                        fontWeight: '600',
+                      }}
+                    >
+                      {t.payment_status === 'paid' ? 'Payé' : 'En attente'}
+                    </Text>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 }
@@ -216,180 +428,245 @@ export default function AdminTabScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: Colors.background,
   },
-  keyboardView: {
+  loadingContainer: {
     flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    padding: 24,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-  iconContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: '#FFF1F2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 8,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 15,
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    lineHeight: 22,
-  },
-  form: {
-    gap: 20,
-  },
-  inputContainer: {
-    gap: 8,
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: Colors.border,
-    borderRadius: 12,
-    paddingHorizontal: 16,
-  },
-  inputIcon: {
-    marginRight: 12,
-  },
-  input: {
-    flex: 1,
-    paddingVertical: 16,
-    fontSize: 16,
-    color: Colors.text,
-  },
-  eyeButton: {
-    padding: 8,
-  },
-  button: {
-    backgroundColor: Colors.primary,
+    justifyContent: 'space-between',
     padding: 16,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    marginTop: 8,
-  },
-  buttonDisabled: {
-    opacity: 0.6,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  infoBox: {
-    flexDirection: 'row',
-    backgroundColor: '#EFF6FF',
-    padding: 16,
-    borderRadius: 12,
-    gap: 12,
-    alignItems: 'flex-start',
-    marginTop: 8,
-  },
-  infoText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#1E40AF',
-    lineHeight: 20,
-  },
-  // Styles dashboard
-  dashboardHeader: {
-    padding: 24,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: Colors.border,
+    backgroundColor: Colors.surface,
   },
-  dashboardTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 4,
-  },
-  dashboardSubtitle: {
-    fontSize: 16,
-    color: Colors.textSecondary,
-  },
-  dashboardContent: {
-    flex: 1,
-    padding: 16,
-  },
-  statsCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 20,
-    borderRadius: 16,
-    marginBottom: 16,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statsTitle: {
+  headerTitle: {
     fontSize: 18,
     fontWeight: 'bold',
     color: Colors.text,
-    marginTop: 12,
-    marginBottom: 4,
   },
-  statsSubtitle: {
+  tabs: {
+    flexDirection: 'row',
+    backgroundColor: Colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: 'center',
+  },
+  tabActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: Colors.primary,
+  },
+  tabText: {
     fontSize: 14,
     color: Colors.textSecondary,
-    textAlign: 'center',
   },
-  infoCard: {
-    flexDirection: 'row',
-    backgroundColor: '#EFF6FF',
+  tabTextActive: {
+    color: Colors.primary,
+    fontWeight: '600',
+  },
+  scrollContent: {
     padding: 16,
-    borderRadius: 12,
+    paddingBottom: 100,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 12,
-    alignItems: 'flex-start',
-    marginVertical: 16,
+    marginBottom: 16,
   },
-  infoCardText: {
-    flex: 1,
-    fontSize: 14,
-    color: '#1E40AF',
-    lineHeight: 20,
-  },
-  fullDashboardButton: {
-    backgroundColor: Colors.primary,
+  statCard: {
+    width: (width - 48) / 2,
     padding: 16,
     borderRadius: 12,
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
+  },
+  statValue: {
+    fontSize: 28,
+    fontWeight: 'bold',
+    color: Colors.text,
     marginTop: 8,
   },
-  fullDashboardButtonText: {
-    color: '#FFFFFF',
+  statLabel: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  statSubtext: {
+    fontSize: 10,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  chartCard: {
+    backgroundColor: Colors.surface,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  chartTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 16,
+  },
+  chart: {
+    borderRadius: 8,
+  },
+  card: {
+    backgroundColor: Colors.surface,
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 16,
+  },
+  cardTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 16,
+  },
+  flowStat: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  flowValue: {
+    fontSize: 32,
+    fontWeight: 'bold',
+    color: Colors.primary,
+    marginTop: 8,
+  },
+  flowLabel: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 4,
+  },
+  userCard: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    alignItems: 'center',
+  },
+  userInfo: {
+    flex: 1,
+  },
+  userName: {
     fontSize: 16,
     fontWeight: '600',
+    color: Colors.text,
+  },
+  userEmail: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  userStats: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+  },
+  userStat: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  bannedBadge: {
+    backgroundColor: Colors.error + '20',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  bannedText: {
+    fontSize: 10,
+    color: Colors.error,
+    fontWeight: '600',
+  },
+  userActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  actionButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: Colors.success + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  actionButtonDanger: {
+    backgroundColor: Colors.error + '20',
+  },
+  transactionCard: {
+    flexDirection: 'row',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.border,
+    alignItems: 'center',
+  },
+  transactionInfo: {
+    flex: 1,
+  },
+  transactionUser: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+  },
+  transactionEmail: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  transactionDate: {
+    fontSize: 11,
+    color: Colors.textSecondary,
+    marginTop: 2,
+  },
+  transactionAmount: {
+    alignItems: 'flex-end',
+  },
+  transactionHours: {
+    fontSize: 12,
+    color: Colors.textSecondary,
+  },
+  transactionPrice: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginTop: 2,
+  },
+  statusBadge: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 8,
+    marginTop: 4,
+  },
+  fallbackChart: {
+    backgroundColor: '#F9FAFB',
+    borderRadius: 8,
+    padding: 16,
+  },
+  fallbackChartItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E5E7EB',
+  },
+  fallbackChartLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: Colors.text,
+    flex: 1,
+  },
+  fallbackChartValue: {
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
 });
