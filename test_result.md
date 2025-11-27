@@ -148,6 +148,27 @@ frontend:
         agent: "main"
         comment: "Ajout du champ 'role' (user | admin) dans l'interface User de authStore"
 
+  - task: "Page Calendrier - Liste chronologique des échanges"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/calendrier.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implémentation complète de la page Calendrier avec:
+          1. Récupération des échanges via /api/exchanges/my/all
+          2. Affichage en cartes avec photo du service, nom de l'autre utilisateur, durée
+          3. Badge de statut coloré (En cours, Terminé, Annulé)
+          4. Date formatée en français
+          5. Clic sur carte → navigation vers le chat
+          6. Pull-to-refresh pour actualiser
+          7. État vide si aucun échange
+          8. Indicateur de chargement
+
   - task: "Notification System (in-app)"
     implemented: true
     working: true
