@@ -10,10 +10,13 @@ import {
   ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
 import { Colors } from '../src/constants/colors';
 import { CATEGORIES } from '../src/constants/categories';
 import api from '../src/utils/api';
@@ -31,6 +34,7 @@ export default function CreateServiceScreen() {
   const [category, setCategory] = useState('');
   const [duration, setDuration] = useState('');
   const [location, setLocation] = useState(user?.profile.location || '');
+  const [photos, setPhotos] = useState<string[]>([]);
 
   const isOffer = type === 'offer';
 
