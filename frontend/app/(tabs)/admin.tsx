@@ -16,7 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
 import { useAuthStore } from '../../src/store/authStore';
 import api from '../../src/utils/api';
-import { useRouter } from 'expo-router';
+import { useRouter, Link } from 'expo-router';
 
 // Liste blanche des emails autorisés
 const AUTHORIZED_ADMIN_EMAILS = [
