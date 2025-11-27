@@ -627,4 +627,69 @@ const styles = StyleSheet.create({
   sendButtonDisabled: {
     opacity: 0.5,
   },
+  serviceImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 8,
+    backgroundColor: '#F3F4F6',
+  },
+  serviceInfo: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  serviceTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  serviceDetails: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  serviceDetailText: {
+    fontSize: 13,
+    color: Colors.textSecondary,
+  },
+  actionsBar: {
+    flexDirection: 'row',
+    padding: 12,
+    backgroundColor: '#FFFFFF',
+    borderTopWidth: 1,
+    borderTopColor: '#E5E7EB',
+    gap: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    gap: 6,
+  },
+  confirmButton: {
+    backgroundColor: '#10B981',
+  },
+  cancelButton: {
+    backgroundColor: '#EF4444',
+    flex: 0,
+    paddingHorizontal: 12,
+  },
+  rateButton: {
+    backgroundColor: '#F59E0B',
+  },
+  reportButton: {
+    backgroundColor: '#F3F4F6',
+    flex: 0,
+    paddingHorizontal: 12,
+  },
+  actionButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
 });
