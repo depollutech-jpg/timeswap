@@ -50,6 +50,14 @@ export default function RootLayout() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="auth/login" />
         <Stack.Screen name="auth/register" />
+        <Stack.Screen name="auth/forgot-password" />
+        <Stack.Screen name="auth/reset-password" />
+        <Stack.Screen name="service-details" />
+        <Stack.Screen name="chat" />
+        <Stack.Screen name="create-service" />
+        <Stack.Screen name="notifications" />
+        <Stack.Screen name="user-profile" />
+        <Stack.Screen name="admin" />
       </Stack>
     </>
   );
