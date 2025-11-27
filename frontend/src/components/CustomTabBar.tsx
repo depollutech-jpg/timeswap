@@ -174,6 +174,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
         style={styles.scrollView}
         scrollEventThrottle={16}
         onContentSizeChange={(width) => setContentWidth(width)}
+        onTouchStart={handleTouchStart}
         onScroll={handleScroll}
         onScrollBeginDrag={handleScrollBeginDrag}
         onScrollEndDrag={handleScrollEndDrag}
