@@ -85,7 +85,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
 
   // L'utilisateur commence à toucher
   const handleScrollBeginDrag = () => {
-    // Arrêt TOTAL de l'auto-scroll
+    // Arrêt TOTAL à 100% de l'auto-scroll
     isUserInteractingRef.current = true;
     stopAutoScroll();
     
@@ -96,9 +96,10 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     }
   };
 
-  // L'utilisateur relâche
+  // L'utilisateur relâche le doigt
   const handleScrollEndDrag = () => {
-    // Pas encore de reprise, on attend la fin de l'inertie
+    // Marquer que l'utilisateur a relâché
+    // On attend juste la fin de l'inertie maintenant
   };
 
   // Fin de l'inertie naturelle
@@ -107,11 +108,9 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
     const finalScrollX = event.nativeEvent.contentOffset.x;
     scrollX.current = finalScrollX;
     
-    // Attendre 2 secondes d'inactivité totale avant de reprendre
-    inactivityTimerRef.current = setTimeout(() => {
-      isUserInteractingRef.current = false;
-      startAutoScroll(); // Reprise avec ramp-up
-    }, 2000);
+    // Reprendre l'auto-scroll IMMÉDIATEMENT après l'inertie (sans délai d'attente)
+    isUserInteractingRef.current = false;
+    startAutoScroll(); // Reprise avec ramp-up
   };
 
   // Suivi du scroll manuel (mise à jour de la position)
