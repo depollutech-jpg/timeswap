@@ -259,21 +259,33 @@ export default function HomeScreen() {
           ]}
         >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <TouchableOpacity style={[styles.filterChip, styles.filterChipActive]}>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedCategory === 'Tous' && styles.filterChipActive]}
+              onPress={() => handleCategoryPress('Tous')}
+            >
               <Text style={styles.filterIcon}>☀️</Text>
-              <Text style={[styles.filterText, styles.filterTextActive]}>Tous</Text>
+              <Text style={[styles.filterText, selectedCategory === 'Tous' && styles.filterTextActive]}>Tous</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterChip}>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedCategory === 'Jardinage' && styles.filterChipActive]}
+              onPress={() => handleCategoryPress('Jardinage')}
+            >
               <Text style={styles.filterIcon}>🌱</Text>
-              <Text style={styles.filterText}>Jardinage</Text>
+              <Text style={[styles.filterText, selectedCategory === 'Jardinage' && styles.filterTextActive]}>Jardinage</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterChip}>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedCategory === 'Bricolage' && styles.filterChipActive]}
+              onPress={() => handleCategoryPress('Bricolage')}
+            >
               <Text style={styles.filterIcon}>🔧</Text>
-              <Text style={styles.filterText}>Bricolage</Text>
+              <Text style={[styles.filterText, selectedCategory === 'Bricolage' && styles.filterTextActive]}>Bricolage</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.filterChip}>
-              <Text style={styles.filterIcon}>🔍</Text>
-              <Text style={styles.filterText}>Cuisine</Text>
+            <TouchableOpacity 
+              style={[styles.filterChip, selectedCategory === 'Cuisine' && styles.filterChipActive]}
+              onPress={() => handleCategoryPress('Cuisine')}
+            >
+              <Text style={styles.filterIcon}>🍳</Text>
+              <Text style={[styles.filterText, selectedCategory === 'Cuisine' && styles.filterTextActive]}>Cuisine</Text>
             </TouchableOpacity>
           </ScrollView>
         </Animated.View>
