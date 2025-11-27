@@ -108,6 +108,7 @@ user_problem_statement: |
   2. Implémentation du système de notifications in-app
   3. Ajout d'animations bounce et slide
   4. Finalisation du Dashboard Admin avec graphiques
+  5. Implémentation de la page Calendrier avec liste chronologique des échanges
 
 backend:
   - task: "Endpoints Admin Dashboard"
