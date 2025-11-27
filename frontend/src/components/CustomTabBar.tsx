@@ -158,30 +158,12 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
         style={styles.scrollView}
         scrollEventThrottle={16}
         onContentSizeChange={(width) => setContentWidth(width)}
-        onScrollBeginDrag={() => {
-          // Pause auto-scroll quand l'utilisateur swipe
-          if (animationRef.current) {
-            clearInterval(animationRef.current);
-          }
-        }}
-        onScrollEndDrag={() => {
-          // Reprendre l'auto-scroll après 2 secondes
-          setTimeout(() => {
-            if (contentWidth > SCREEN_WIDTH) {
-              const scrollSpeed = 0.3;
-              animationRef.current = setInterval(() => {
-                scrollX.current += scrollSpeed;
-                if (scrollX.current >= contentWidth / 2) {
-                  scrollX.current = 0;
-                }
-                scrollViewRef.current?.scrollTo({
-                  x: scrollX.current,
-                  animated: false,
-                });
-              }, 16);
-            }
-          }, 2000);
-        }}
+        onScroll={handleScroll}
+        onScrollBeginDrag={handleScrollBeginDrag}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
+        decelerationRate="fast"
+        bounces={false}
       >
         {duplicatedRoutes.map((route, index) => {
           return renderTabItem(route, index, index >= state.routes.length);
