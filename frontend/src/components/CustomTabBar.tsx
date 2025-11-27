@@ -23,7 +23,9 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
 
   // Animation de défilement automatique avec requestAnimationFrame
   const autoScroll = useCallback(() => {
+    // STOP COMPLET si l'utilisateur interagit
     if (isUserInteractingRef.current || contentWidth <= SCREEN_WIDTH) {
+      // Ne pas continuer l'animation si l'utilisateur touche
       return;
     }
 
@@ -44,8 +46,10 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
       animated: false,
     });
 
-    // Continuer l'animation
-    animationFrameRef.current = requestAnimationFrame(autoScroll);
+    // Continuer l'animation SEULEMENT si l'utilisateur n'interagit pas
+    if (!isUserInteractingRef.current) {
+      animationFrameRef.current = requestAnimationFrame(autoScroll);
+    }
   }, [contentWidth]);
 
   // Démarrer l'auto-scroll
