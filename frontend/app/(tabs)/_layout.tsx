@@ -1,105 +1,26 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Tabs, useRouter, useSegments, usePathname } from 'expo-router';
+import React, { useState } from 'react';
+import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
-import { TouchableOpacity, View, StyleSheet, Modal, Text, ScrollView, Dimensions } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Modal, Text } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import CustomTabBar from '../../src/components/CustomTabBar';
-import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, { 
-  useAnimatedStyle, 
-  useSharedValue, 
-  useAnimatedGestureHandler,
-  withSpring,
-  runOnJS
-} from 'react-native-reanimated';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const BUTTON_SIZE = 64;
 
 function FloatingAddButton() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
-  const insets = useSafeAreaInsets();
-  
-  // Position initiale au centre en bas
-  const translateX = useSharedValue(SCREEN_WIDTH / 2 - BUTTON_SIZE / 2);
-  const translateY = useSharedValue(SCREEN_HEIGHT - 150 - insets.bottom);
-  
-  // Charger la position sauvegardée
-  useEffect(() => {
-    loadSavedPosition();
-  }, []);
-
-  const loadSavedPosition = async () => {
-    try {
-      const savedPosition = await AsyncStorage.getItem('floatingButtonPosition');
-      if (savedPosition) {
-        const { x, y } = JSON.parse(savedPosition);
-        translateX.value = x;
-        translateY.value = y;
-      }
-    } catch (error) {
-      console.log('Error loading button position:', error);
-    }
-  };
-
-  const savePosition = async (x: number, y: number) => {
-    try {
-      await AsyncStorage.setItem('floatingButtonPosition', JSON.stringify({ x, y }));
-    } catch (error) {
-      console.log('Error saving button position:', error);
-    }
-  };
-
-  const gestureHandler = useAnimatedGestureHandler({
-    onStart: (_, ctx: any) => {
-      ctx.startX = translateX.value;
-      ctx.startY = translateY.value;
-    },
-    onActive: (event, ctx: any) => {
-      translateX.value = ctx.startX + event.translationX;
-      translateY.value = ctx.startY + event.translationY;
-    },
-    onEnd: () => {
-      // Contraindre le bouton dans les limites de l'écran
-      translateX.value = withSpring(
-        Math.max(10, Math.min(SCREEN_WIDTH - BUTTON_SIZE - 10, translateX.value))
-      );
-      translateY.value = withSpring(
-        Math.max(10, Math.min(SCREEN_HEIGHT - BUTTON_SIZE - 100, translateY.value))
-      );
-      
-      // Sauvegarder la position
-      runOnJS(savePosition)(translateX.value, translateY.value);
-    },
-  });
-
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateX: translateX.value },
-        { translateY: translateY.value },
-      ],
-    };
-  });
 
   return (
     <>
-      <PanGestureHandler onGestureEvent={gestureHandler}>
-        <Animated.View style={[styles.floatingButton, animatedStyle]}>
-          <TouchableOpacity
-            style={styles.floatingButtonTouchable}
-            onPress={() => setShowModal(true)}
-            activeOpacity={0.8}
-          >
-            <View style={styles.floatingButtonInner}>
-              <Ionicons name="add" size={32} color="#FFFFFF" />
-            </View>
-          </TouchableOpacity>
-        </Animated.View>
-      </PanGestureHandler>
+      <TouchableOpacity
+        style={styles.floatingButton}
+        onPress={() => setShowModal(true)}
+        activeOpacity={0.8}
+      >
+        <View style={styles.floatingButtonInner}>
+          <Ionicons name="add" size={32} color="#FFFFFF" />
+        </View>
+      </TouchableOpacity>
 
       <Modal
         visible={showModal}
