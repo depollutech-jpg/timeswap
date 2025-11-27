@@ -85,13 +85,18 @@ export default function HomeScreen() {
     }
   };
 
-  const loadServices = async () => {
+  const loadServices = async (category?: string) => {
     try {
       let url = '/services?limit=20';
       
       // Add location params if available
       if (location) {
         url += `&lat=${location.latitude}&lon=${location.longitude}`;
+      }
+      
+      // Add category filter if not "Tous"
+      if (category && category !== 'Tous') {
+        url += `&category=${encodeURIComponent(category)}`;
       }
       
       const response = await api.get(url);
