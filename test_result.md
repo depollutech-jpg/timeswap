@@ -310,6 +310,40 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
+      ✅ PAGE CALENDRIER - LISTE DES ÉCHANGES IMPLÉMENTÉE:
+      
+      BACKEND (existant):
+      - Endpoint /api/exchanges/my/all déjà existant et fonctionnel
+      - Retourne tous les échanges de l'utilisateur (demandeur ou fournisseur)
+      - Données enrichies avec service et otherUser
+      - Trié par date décroissante (du plus récent au plus ancien)
+      
+      FRONTEND (nouveau):
+      1. Page calendrier complète (app/(tabs)/calendrier.tsx)
+         - Récupération automatique des échanges au chargement
+         - Pull-to-refresh pour actualiser
+         - Indicateur de chargement
+      
+      2. Cartes d'échange
+         - Photo du service (ou placeholder si pas de photo)
+         - Titre du service
+         - Avatar et nom de l'autre utilisateur
+         - Badge de durée (nombre d'heures)
+         - Badge de statut coloré (En cours/Terminé/Annulé)
+         - Date formatée en français
+      
+      3. Navigation
+         - Clic sur une carte → navigation vers le chat de l'échange
+         - Passage des paramètres chatId et serviceId
+      
+      4. États
+         - État vide si aucun échange
+         - Message personnalisé
+      
+      Prêt pour test backend uniquement (endpoint déjà testé précédemment mais besoin de vérifier qu'il fonctionne toujours).
+  
+  - agent: "main"
+    message: |
       ✅ SYSTÈME DE NOTIFICATIONS TEMPS RÉEL IMPLÉMENTÉ:
       
       BACKEND (déjà en place):
