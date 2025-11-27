@@ -226,7 +226,12 @@ export default function ServiceDetailsScreen() {
         {userProfile && (
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Propose par</Text>
-            <UserProfileCard user={userProfile} />
+            <TouchableOpacity
+              onPress={() => router.push(`/user-profile?id=${service.userId}`)}
+              activeOpacity={0.7}
+            >
+              <UserProfileCard user={userProfile} />
+            </TouchableOpacity>
           </View>
         )}
 
