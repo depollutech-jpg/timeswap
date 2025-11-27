@@ -9,6 +9,8 @@ import {
   KeyboardAvoidingView,
   Platform,
   ActivityIndicator,
+  Alert,
+  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter, useLocalSearchParams } from 'expo-router';
@@ -17,18 +19,33 @@ import { Colors } from '../src/constants/colors';
 import api from '../src/utils/api';
 import { useAuthStore } from '../src/store/authStore';
 import { useNotificationStore } from '../src/store/notificationStore';
+import { useExchangeStore } from '../src/store/exchangeStore';
+import ExchangeStatusBanner from '../src/components/ExchangeStatusBanner';
+import ConfirmationModal from '../src/components/ConfirmationModal';
+import RatingModal from '../src/components/RatingModal';
+import ReportModal from '../src/components/ReportModal';
 
 export default function ChatScreen() {
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const { user } = useAuthStore();
   const { notifications, fetchNotifications } = useNotificationStore();
+  const { acceptExchange, confirmCompletion, cancelExchange, rateExchange } = useExchangeStore();
   const [chat, setChat] = useState<any>(null);
+  const [service, setService] = useState<any>(null);
+  const [exchange, setExchange] = useState<any>(null);
   const [messages, setMessages] = useState<any[]>([]);
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const flatListRef = useRef<FlatList>(null);
+  
+  // Modals states
+  const [showAcceptModal, setShowAcceptModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showRatingModal, setShowRatingModal] = useState(false);
+  const [showReportModal, setShowReportModal] = useState(false);
 
   useEffect(() => {
     loadChat();
