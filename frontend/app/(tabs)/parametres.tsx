@@ -78,40 +78,6 @@ export default function ParametresScreen() {
             />
           </TouchableOpacity>
 
-          {/* Mode Sombre */}
-          <TouchableOpacity
-            style={[
-              styles.settingItem,
-              { 
-                backgroundColor: colors.cardBackground,
-                borderColor: colors.border,
-                borderWidth: isDarkMode ? 2 : 1,
-              },
-            ]}
-            onPress={() => handleThemeChange('dark')}
-            activeOpacity={0.7}
-          >
-            <View style={styles.settingLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: '#DBEAFE' }]}>
-                <Ionicons name="moon" size={24} color="#3B82F6" />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingTitle, { color: colors.text }]}>
-                  Mode Sombre
-                </Text>
-                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
-                  Réduit la fatigue oculaire
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={isDarkMode}
-              onValueChange={() => handleThemeChange('dark')}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={isDarkMode ? '#FFFFFF' : '#F3F4F6'}
-            />
-          </TouchableOpacity>
-
           {/* Mode Nuit */}
           <TouchableOpacity
             style={[
