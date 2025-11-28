@@ -409,6 +409,15 @@ export default function HomeScreen() {
                     </View>
                   </View>
 
+                  {/* Countdown Timer */}
+                  {service.expiresAt && (
+                    <CountdownTimer 
+                      expiresAt={service.expiresAt}
+                      createdAt={service.createdAt}
+                      compact={true}
+                    />
+                  )}
+
                   </TouchableOpacity>
                 </View>
               );
