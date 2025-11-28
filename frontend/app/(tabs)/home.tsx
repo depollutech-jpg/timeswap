@@ -415,15 +415,19 @@ export default function HomeScreen() {
                   </View>
 
                   {/* Countdown Timer */}
-                  {service.expiresAt && (
-                    <View style={{ marginTop: 8 }}>
+                  <View style={{ marginTop: 8 }}>
+                    {service.expiresAt ? (
                       <CountdownTimer 
                         expiresAt={service.expiresAt}
                         createdAt={service.createdAt}
                         compact={true}
                       />
-                    </View>
-                  )}
+                    ) : (
+                      <View style={styles.legacyServiceBadge}>
+                        <Text style={styles.legacyServiceText}>📅 Ancienne annonce</Text>
+                      </View>
+                    )}
+                  </View>
 
                   </TouchableOpacity>
                 </View>
