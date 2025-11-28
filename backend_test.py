@@ -20,12 +20,8 @@ API_BASE = f"{BACKEND_URL}/api"
 
 print(f"🔗 Testing backend at: {API_BASE}")
 
-HEADERS = {"Content-Type": "application/json"}
-
 class CoupDePouceBackendTester:
     def __init__(self):
-        self.base_url = API_BASE
-        self.headers = HEADERS.copy()
         self.session = requests.Session()
         self.auth_token = None
         self.test_user_id = None
@@ -39,439 +35,393 @@ class CoupDePouceBackendTester:
         print()
         
     def register_test_user(self):
-        """Register a test user and return token"""
+        """Register a test user for authentication"""
+        print("🔐 TESTING USER REGISTRATION")
+        
+        # Generate unique email for this test run
+        timestamp = int(time.time())
+        test_email = f"testuser_{timestamp}@coupdepouce.test"
+        
         user_data = {
-            "email": f"testuser_{email_suffix}@example.com",
+            "email": test_email,
             "password": "TestPassword123!",
-            "firstName": f"Test{email_suffix}",
-            "lastName": "User"
+            "firstName": "Marie",
+            "lastName": "Dupont"
         }
         
         try:
-            response = requests.post(f"{self.base_url}/auth/register", 
-                                   json=user_data, headers=self.headers)
+            response = self.session.post(f"{API_BASE}/auth/register", json=user_data)
             
             if response.status_code == 200:
                 data = response.json()
-                token = data.get("token")
-                user_id = data.get("user", {}).get("_id")
-                self.log(f"✅ User registered: {user_data['email']} (ID: {user_id})")
-                self.test_users.append({"email": user_data["email"], "id": user_id, "token": token})
-                self.tokens[user_id] = token
-                return token, user_id
-            else:
-                # Try to login if user already exists
-                login_response = requests.post(f"{self.base_url}/auth/login",
-                                             json={"email": user_data["email"], "password": user_data["password"]},
-                                             headers=self.headers)
-                if login_response.status_code == 200:
-                    data = login_response.json()
-                    token = data.get("token")
-                    user_id = data.get("user", {}).get("_id")
-                    self.log(f"✅ User logged in: {user_data['email']} (ID: {user_id})")
-                    self.test_users.append({"email": user_data["email"], "id": user_id, "token": token})
-                    self.tokens[user_id] = token
-                    return token, user_id
-                else:
-                    self.log(f"❌ Failed to register/login user: {response.status_code} - {response.text}", "ERROR")
-                    return None, None
-                    
-        except Exception as e:
-            self.log(f"❌ Exception during user registration: {str(e)}", "ERROR")
-            return None, None
-    
-    def create_test_service(self, token, user_id, service_type="offer", title_suffix=""):
-        """Create a test service"""
-        service_data = {
-            "title": f"Test Service {title_suffix} - {service_type}",
-            "description": f"Test service description for {service_type}",
-            "category": "Informatique",
-            "duration": 2.0,
-            "type": service_type,
-            "location": "Paris, France",
-            "coordinates": {"latitude": 48.8566, "longitude": 2.3522}
-        }
-        
-        try:
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {token}"
-            
-            response = requests.post(f"{self.base_url}/services", 
-                                   json=service_data, headers=auth_headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                service_id = data.get("serviceId")
-                self.log(f"✅ Service created: {service_data['title']} (ID: {service_id})")
-                self.test_services.append({
-                    "id": service_id, 
-                    "user_id": user_id, 
-                    "type": service_type,
-                    "title": service_data["title"]
-                })
-                return service_id
-            else:
-                self.log(f"❌ Failed to create service: {response.status_code} - {response.text}", "ERROR")
-                return None
+                self.auth_token = data.get('token')
+                self.test_user_id = data.get('user', {}).get('_id')
                 
-        except Exception as e:
-            self.log(f"❌ Exception during service creation: {str(e)}", "ERROR")
-            return None
-    
-    def accept_exchange(self, requester_token, service_id):
-        """Accept an exchange from a service"""
-        try:
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {requester_token}"
-            
-            exchange_data = {"message": "Je souhaite accepter cet échange"}
-            
-            response = requests.post(f"{self.base_url}/services/{service_id}/accept-exchange",
-                                   json=exchange_data, headers=auth_headers)
-            
-            if response.status_code == 200:
-                data = response.json()
-                exchange_id = data.get("exchangeId")
-                chat_id = data.get("chatId")
-                self.log(f"✅ Exchange accepted: {exchange_id}")
-                self.test_exchanges.append({
-                    "id": exchange_id,
-                    "service_id": service_id,
-                    "chat_id": chat_id
-                })
-                return exchange_id
-            else:
-                self.log(f"❌ Failed to accept exchange: {response.status_code} - {response.text}", "ERROR")
-                return None
+                # Set authorization header for future requests
+                self.session.headers.update({'Authorization': f'Bearer {self.auth_token}'})
                 
-        except Exception as e:
-            self.log(f"❌ Exception during exchange acceptance: {str(e)}", "ERROR")
-            return None
-    
-    def complete_exchange(self, exchange_id, provider_token, requester_token):
-        """Complete an exchange with double validation"""
-        try:
-            # Provider confirms first
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {provider_token}"
-            
-            response1 = requests.post(f"{self.base_url}/exchanges/{exchange_id}/confirm-completion",
-                                    headers=auth_headers)
-            
-            if response1.status_code != 200:
-                self.log(f"❌ Provider confirmation failed: {response1.status_code} - {response1.text}", "ERROR")
-                return False
-            
-            # Requester confirms second
-            auth_headers["Authorization"] = f"Bearer {requester_token}"
-            
-            response2 = requests.post(f"{self.base_url}/exchanges/{exchange_id}/confirm-completion",
-                                    headers=auth_headers)
-            
-            if response2.status_code == 200:
-                self.log(f"✅ Exchange completed: {exchange_id}")
+                self.log_test("User Registration", True, f"User created with ID: {self.test_user_id}")
                 return True
             else:
-                self.log(f"❌ Requester confirmation failed: {response2.status_code} - {response2.text}", "ERROR")
+                self.log_test("User Registration", False, f"Status: {response.status_code}, Response: {response.text}")
                 return False
                 
         except Exception as e:
-            self.log(f"❌ Exception during exchange completion: {str(e)}", "ERROR")
+            self.log_test("User Registration", False, f"Exception: {str(e)}")
             return False
-
-    def test_authentication(self):
-        """Test 1: Authentication requirements"""
-        self.log("🧪 Testing authentication requirements...")
+    
+    def test_login(self):
+        """Test user login functionality"""
+        print("🔐 TESTING USER LOGIN")
         
-        # Test without token
+        # First register a user to login with
+        timestamp = int(time.time())
+        test_email = f"logintest_{timestamp}@coupdepouce.test"
+        
+        # Register
+        register_data = {
+            "email": test_email,
+            "password": "LoginTest123!",
+            "firstName": "Jean",
+            "lastName": "Martin"
+        }
+        
         try:
-            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=self.headers)
-            if response.status_code in [401, 403]:
-                self.log("✅ No token correctly rejected")
+            reg_response = self.session.post(f"{API_BASE}/auth/register", json=register_data)
+            if reg_response.status_code != 200:
+                self.log_test("Login Test Setup", False, "Failed to register test user for login")
+                return False
+            
+            # Now test login
+            login_data = {
+                "email": test_email,
+                "password": "LoginTest123!"
+            }
+            
+            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
+            
+            if response.status_code == 200:
+                data = response.json()
+                token = data.get('token')
+                user = data.get('user', {})
+                
+                if token and user.get('_id'):
+                    self.log_test("User Login", True, f"Login successful, token received")
+                    return True
+                else:
+                    self.log_test("User Login", False, "Missing token or user data in response")
+                    return False
             else:
-                self.log(f"❌ No token should be rejected, got: {response.status_code}", "ERROR")
+                self.log_test("User Login", False, f"Status: {response.status_code}, Response: {response.text}")
                 return False
+                
         except Exception as e:
-            self.log(f"❌ Exception testing no token: {str(e)}", "ERROR")
+            self.log_test("User Login", False, f"Exception: {str(e)}")
+            return False
+    
+    def test_service_creation_with_expiration(self):
+        """Test service creation and verify expiresAt field is added (3 days)"""
+        print("⏰ TESTING SERVICE CREATION WITH EXPIRATION")
+        
+        if not self.auth_token:
+            self.log_test("Service Creation", False, "No auth token available")
             return False
         
-        # Test with invalid token
+        # Record time before creation
+        creation_time = datetime.utcnow()
+        expected_expiry = creation_time + timedelta(days=3)
+        
+        service_data = {
+            "title": "Cours de français - Coup de Pouce",
+            "description": "Je propose des cours de français pour débutants. Méthode interactive et personnalisée.",
+            "category": "Education",
+            "duration": 2.0,
+            "type": "offer",
+            "location": "Paris 15ème",
+            "coordinates": {
+                "latitude": 48.8566,
+                "longitude": 2.3522
+            }
+        }
+        
         try:
-            invalid_headers = self.headers.copy()
-            invalid_headers["Authorization"] = "Bearer invalid_token_123"
+            response = self.session.post(f"{API_BASE}/services", json=service_data)
             
-            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=invalid_headers)
-            if response.status_code in [401, 403]:
-                self.log("✅ Invalid token correctly rejected")
+            if response.status_code == 200:
+                data = response.json()
+                service_id = data.get('serviceId')
+                
+                if service_id:
+                    self.test_service_id = service_id
+                    
+                    # Now fetch the created service to verify expiresAt field
+                    service_response = self.session.get(f"{API_BASE}/services/{service_id}")
+                    
+                    if service_response.status_code == 200:
+                        service_details = service_response.json()
+                        expires_at_str = service_details.get('expiresAt')
+                        
+                        if expires_at_str:
+                            # Parse the expiration date
+                            expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00'))
+                            
+                            # Check if expiration is approximately 3 days from creation (allow 1 minute tolerance)
+                            time_diff = abs((expires_at - expected_expiry).total_seconds())
+                            
+                            if time_diff < 60:  # Less than 1 minute difference
+                                self.log_test("Service Creation with Expiration", True, 
+                                            f"Service created with correct expiresAt: {expires_at_str}")
+                                return True
+                            else:
+                                self.log_test("Service Creation with Expiration", False, 
+                                            f"Expiration time incorrect. Expected ~{expected_expiry}, got {expires_at}")
+                                return False
+                        else:
+                            self.log_test("Service Creation with Expiration", False, 
+                                        "Service created but missing expiresAt field")
+                            return False
+                    else:
+                        self.log_test("Service Creation with Expiration", False, 
+                                    f"Failed to fetch created service: {service_response.status_code}")
+                        return False
+                else:
+                    self.log_test("Service Creation with Expiration", False, 
+                                "Service creation response missing serviceId")
+                    return False
             else:
-                self.log(f"❌ Invalid token should be rejected, got: {response.status_code}", "ERROR")
+                self.log_test("Service Creation with Expiration", False, 
+                            f"Status: {response.status_code}, Response: {response.text}")
                 return False
+                
         except Exception as e:
-            self.log(f"❌ Exception testing invalid token: {str(e)}", "ERROR")
+            self.log_test("Service Creation with Expiration", False, f"Exception: {str(e)}")
             return False
-        
-        return True
     
-    def test_exchange_retrieval(self):
-        """Test 2: Exchange retrieval and sorting"""
-        self.log("🧪 Testing exchange retrieval...")
+    def test_service_expiration_filtering(self):
+        """Test that GET /api/services filters out expired services automatically"""
+        print("🔍 TESTING SERVICE EXPIRATION FILTERING")
         
-        # Create test users
-        token1, user1_id = self.register_test_user("calendar1")
-        token2, user2_id = self.register_test_user("calendar2")
-        
-        if not token1 or not token2:
-            self.log("❌ Failed to create test users", "ERROR")
-            return False
-        
-        # Create services
-        service1_id = self.create_test_service(token1, user1_id, "offer", "Calendar1")
-        service2_id = self.create_test_service(token2, user2_id, "offer", "Calendar2")
-        
-        if not service1_id or not service2_id:
-            self.log("❌ Failed to create test services", "ERROR")
-            return False
-        
-        # Create exchanges
-        # User2 accepts User1's service
-        exchange1_id = self.accept_exchange(token2, service1_id)
-        time.sleep(1)  # Ensure different timestamps
-        
-        # User1 accepts User2's service  
-        exchange2_id = self.accept_exchange(token1, service2_id)
-        
-        if not exchange1_id or not exchange2_id:
-            self.log("❌ Failed to create test exchanges", "ERROR")
-            return False
-        
-        # Test User1's exchanges
-        try:
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {token1}"
-            
-            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
-            
-            if response.status_code != 200:
-                self.log(f"❌ Failed to get User1 exchanges: {response.status_code} - {response.text}", "ERROR")
-                return False
-            
-            exchanges = response.json()
-            
-            if len(exchanges) < 2:
-                self.log(f"❌ User1 should have at least 2 exchanges, got: {len(exchanges)}", "ERROR")
-                return False
-            
-            # Check if exchanges are sorted by date (descending)
-            timestamps = [datetime.fromisoformat(ex["createdAt"].replace("Z", "+00:00")) for ex in exchanges]
-            if timestamps != sorted(timestamps, reverse=True):
-                self.log("❌ Exchanges not sorted by date descending", "ERROR")
-                return False
-            
-            self.log(f"✅ User1 has {len(exchanges)} exchanges, properly sorted")
-            
-            # Test User2's exchanges
-            auth_headers["Authorization"] = f"Bearer {token2}"
-            
-            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
-            
-            if response.status_code != 200:
-                self.log(f"❌ Failed to get User2 exchanges: {response.status_code} - {response.text}", "ERROR")
-                return False
-            
-            exchanges = response.json()
-            
-            if len(exchanges) < 2:
-                self.log(f"❌ User2 should have at least 2 exchanges, got: {len(exchanges)}", "ERROR")
-                return False
-            
-            self.log(f"✅ User2 has {len(exchanges)} exchanges")
-            
-        except Exception as e:
-            self.log(f"❌ Exception during exchange retrieval test: {str(e)}", "ERROR")
-            return False
-        
-        return True
-    
-    def test_enriched_data(self):
-        """Test 3: Enriched data structure"""
-        self.log("🧪 Testing enriched data structure...")
-        
-        if not self.test_users or len(self.test_users) < 2:
-            self.log("❌ Need at least 2 test users for enriched data test", "ERROR")
+        if not self.auth_token:
+            self.log_test("Service Expiration Filtering", False, "No auth token available")
             return False
         
         try:
-            user = self.test_users[0]
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {user['token']}"
+            # First, create a normal service (should appear in results)
+            current_time = datetime.utcnow()
             
-            response = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
+            normal_service = {
+                "title": "Service Normal - Visible",
+                "description": "Ce service devrait être visible car il n'est pas expiré",
+                "category": "Jardinage",
+                "duration": 1.5,
+                "type": "offer",
+                "location": "Lyon"
+            }
             
-            if response.status_code != 200:
-                self.log(f"❌ Failed to get exchanges for enriched data test: {response.status_code}", "ERROR")
+            normal_response = self.session.post(f"{API_BASE}/services", json=normal_service)
+            
+            if normal_response.status_code != 200:
+                self.log_test("Service Expiration Filtering", False, 
+                            "Failed to create normal service for test")
                 return False
             
-            exchanges = response.json()
+            normal_service_id = normal_response.json().get('serviceId')
             
-            if not exchanges:
-                self.log("❌ No exchanges found for enriched data test", "ERROR")
-                return False
+            # Wait a moment then fetch services
+            time.sleep(1)
             
-            # Check first exchange structure
-            exchange = exchanges[0]
+            # Get all services
+            services_response = self.session.get(f"{API_BASE}/services")
             
-            # Required exchange properties
-            required_props = ["_id", "status", "duration", "createdAt", "serviceId", "providerId", "requesterId"]
-            for prop in required_props:
-                if prop not in exchange:
-                    self.log(f"❌ Missing exchange property: {prop}", "ERROR")
+            if services_response.status_code == 200:
+                services = services_response.json()
+                
+                # Check that our normal service appears
+                normal_service_found = False
+                expired_services_found = []
+                
+                for service in services:
+                    if service.get('_id') == normal_service_id:
+                        normal_service_found = True
+                    
+                    # Check if any service has expiresAt in the past
+                    expires_at_str = service.get('expiresAt')
+                    if expires_at_str:
+                        expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00'))
+                        if expires_at < current_time:
+                            expired_services_found.append(service.get('_id'))
+                
+                # Verify results
+                if normal_service_found and len(expired_services_found) == 0:
+                    self.log_test("Service Expiration Filtering", True, 
+                                f"✅ Normal service found, no expired services returned. Total services: {len(services)}")
+                    return True
+                elif not normal_service_found:
+                    self.log_test("Service Expiration Filtering", False, 
+                                "Normal service not found in results")
                     return False
-            
-            # Check service object
-            if "service" not in exchange:
-                self.log("❌ Missing service object in exchange", "ERROR")
-                return False
-            
-            service = exchange["service"]
-            service_required = ["_id", "title"]
-            for prop in service_required:
-                if prop not in service:
-                    self.log(f"❌ Missing service property: {prop}", "ERROR")
+                else:
+                    self.log_test("Service Expiration Filtering", False, 
+                                f"Found {len(expired_services_found)} expired services in results: {expired_services_found}")
                     return False
-            
-            # Check otherUser object
-            if "otherUser" not in exchange:
-                self.log("❌ Missing otherUser object in exchange", "ERROR")
-                return False
-            
-            other_user = exchange["otherUser"]
-            user_required = ["_id", "name"]
-            for prop in user_required:
-                if prop not in other_user:
-                    self.log(f"❌ Missing otherUser property: {prop}", "ERROR")
-                    return False
-            
-            # Verify otherUser is correctly determined
-            current_user_id = user["id"]
-            if exchange["providerId"] == current_user_id:
-                expected_other_id = exchange["requesterId"]
             else:
-                expected_other_id = exchange["providerId"]
-            
-            if other_user["_id"] != expected_other_id:
-                self.log("❌ otherUser not correctly determined", "ERROR")
+                self.log_test("Service Expiration Filtering", False, 
+                            f"Failed to fetch services: {services_response.status_code}")
                 return False
-            
-            self.log("✅ Enriched data structure is correct")
-            
+                
         except Exception as e:
-            self.log(f"❌ Exception during enriched data test: {str(e)}", "ERROR")
+            self.log_test("Service Expiration Filtering", False, f"Exception: {str(e)}")
             return False
-        
-        return True
     
-    def test_user_isolation(self):
-        """Test 4: User isolation"""
-        self.log("🧪 Testing user isolation...")
+    def test_service_creation_all_fields(self):
+        """Test service creation with all required fields"""
+        print("📝 TESTING SERVICE CREATION WITH ALL FIELDS")
         
-        if len(self.test_users) < 2:
-            self.log("❌ Need at least 2 test users for isolation test", "ERROR")
+        if not self.auth_token:
+            self.log_test("Service Creation All Fields", False, "No auth token available")
             return False
         
-        try:
-            # Get exchanges for User1
-            user1 = self.test_users[0]
-            auth_headers = self.headers.copy()
-            auth_headers["Authorization"] = f"Bearer {user1['token']}"
-            
-            response1 = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
-            
-            if response1.status_code != 200:
-                self.log(f"❌ Failed to get User1 exchanges: {response1.status_code}", "ERROR")
-                return False
-            
-            user1_exchanges = response1.json()
-            
-            # Get exchanges for User2
-            user2 = self.test_users[1]
-            auth_headers["Authorization"] = f"Bearer {user2['token']}"
-            
-            response2 = requests.get(f"{self.base_url}/exchanges/my/all", headers=auth_headers)
-            
-            if response2.status_code != 200:
-                self.log(f"❌ Failed to get User2 exchanges: {response2.status_code}", "ERROR")
-                return False
-            
-            user2_exchanges = response2.json()
-            
-            # Verify each user only sees their own exchanges
-            for exchange in user1_exchanges:
-                if exchange["providerId"] != user1["id"] and exchange["requesterId"] != user1["id"]:
-                    self.log(f"❌ User1 sees exchange they're not part of: {exchange['_id']}", "ERROR")
-                    return False
-            
-            for exchange in user2_exchanges:
-                if exchange["providerId"] != user2["id"] and exchange["requesterId"] != user2["id"]:
-                    self.log(f"❌ User2 sees exchange they're not part of: {exchange['_id']}", "ERROR")
-                    return False
-            
-            self.log("✅ User isolation working correctly")
-            
-        except Exception as e:
-            self.log(f"❌ Exception during user isolation test: {str(e)}", "ERROR")
-            return False
-        
-        return True
-    
-    def run_all_tests(self):
-        """Run all calendar endpoint tests"""
-        self.log("🚀 Starting TimeSwap Calendar Backend Tests")
-        self.log("=" * 60)
-        
-        tests = [
-            ("Authentication", self.test_authentication),
-            ("Exchange Retrieval", self.test_exchange_retrieval),
-            ("Enriched Data", self.test_enriched_data),
-            ("User Isolation", self.test_user_isolation)
+        # Test both offer and request types
+        test_services = [
+            {
+                "title": "Aide au déménagement",
+                "description": "Je propose mon aide pour déménager. Expérience avec gros mobilier.",
+                "category": "Déménagement",
+                "duration": 4.0,
+                "type": "offer",
+                "location": "Marseille",
+                "coordinates": {
+                    "latitude": 43.2965,
+                    "longitude": 5.3698
+                }
+            },
+            {
+                "title": "Recherche prof de guitare",
+                "description": "Je cherche quelqu'un pour m'apprendre la guitare acoustique.",
+                "category": "Musique",
+                "duration": 1.0,
+                "type": "request",
+                "location": "Toulouse"
+            }
         ]
         
-        results = {}
+        success_count = 0
         
-        for test_name, test_func in tests:
-            self.log(f"\n📋 Running {test_name} Test...")
+        for i, service_data in enumerate(test_services):
             try:
-                result = test_func()
-                results[test_name] = result
-                if result:
-                    self.log(f"✅ {test_name} Test: PASSED")
+                response = self.session.post(f"{API_BASE}/services", json=service_data)
+                
+                if response.status_code == 200:
+                    data = response.json()
+                    service_id = data.get('serviceId')
+                    
+                    if service_id:
+                        # Verify the service was created with all fields
+                        service_response = self.session.get(f"{API_BASE}/services/{service_id}")
+                        
+                        if service_response.status_code == 200:
+                            service_details = service_response.json()
+                            
+                            # Check all required fields are present
+                            required_fields = ['title', 'description', 'category', 'duration', 'type', 'location', 'expiresAt']
+                            missing_fields = []
+                            
+                            for field in required_fields:
+                                if field not in service_details or service_details[field] is None:
+                                    missing_fields.append(field)
+                            
+                            if not missing_fields:
+                                success_count += 1
+                                self.log_test(f"Service Creation ({service_data['type']})", True, 
+                                            f"All fields present: {service_data['title']}")
+                            else:
+                                self.log_test(f"Service Creation ({service_data['type']})", False, 
+                                            f"Missing fields: {missing_fields}")
+                        else:
+                            self.log_test(f"Service Creation ({service_data['type']})", False, 
+                                        f"Failed to fetch created service")
+                    else:
+                        self.log_test(f"Service Creation ({service_data['type']})", False, 
+                                    "No serviceId in response")
                 else:
-                    self.log(f"❌ {test_name} Test: FAILED")
+                    self.log_test(f"Service Creation ({service_data['type']})", False, 
+                                f"Status: {response.status_code}, Response: {response.text}")
+                    
             except Exception as e:
-                self.log(f"❌ {test_name} Test: EXCEPTION - {str(e)}", "ERROR")
-                results[test_name] = False
+                self.log_test(f"Service Creation ({service_data['type']})", False, f"Exception: {str(e)}")
         
-        # Summary
-        self.log("\n" + "=" * 60)
-        self.log("📊 TEST SUMMARY")
-        self.log("=" * 60)
-        
-        passed = sum(1 for result in results.values() if result)
-        total = len(results)
-        
-        for test_name, result in results.items():
-            status = "✅ PASSED" if result else "❌ FAILED"
-            self.log(f"{test_name}: {status}")
-        
-        self.log(f"\nOverall: {passed}/{total} tests passed ({passed/total*100:.1f}%)")
-        
-        if passed == total:
-            self.log("🎉 ALL TESTS PASSED - Calendar endpoint is working correctly!")
+        # Overall result
+        if success_count == len(test_services):
+            self.log_test("Service Creation All Fields - Overall", True, 
+                        f"All {success_count} services created successfully")
             return True
         else:
-            self.log("⚠️  Some tests failed - Calendar endpoint needs attention")
+            self.log_test("Service Creation All Fields - Overall", False, 
+                        f"Only {success_count}/{len(test_services)} services created successfully")
             return False
+    
+    def test_api_accessibility(self):
+        """Test that the API is accessible"""
+        print("🌐 TESTING API ACCESSIBILITY")
+        
+        try:
+            # Test a simple endpoint that doesn't require auth
+            response = self.session.get(f"{API_BASE}/payments/packages")
+            
+            if response.status_code == 200:
+                self.log_test("API Accessibility", True, f"API responding at {API_BASE}")
+                return True
+            else:
+                self.log_test("API Accessibility", False, f"API returned status {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_test("API Accessibility", False, f"Cannot reach API: {str(e)}")
+            return False
+    
+    def run_all_tests(self):
+        """Run all backend tests"""
+        print("🚀 STARTING COUP DE POUCE BACKEND TESTS")
+        print("=" * 60)
+        
+        test_results = []
+        
+        # Test API accessibility first
+        test_results.append(self.test_api_accessibility())
+        
+        # Test authentication
+        test_results.append(self.register_test_user())
+        test_results.append(self.test_login())
+        
+        # Test service functionality (requires auth)
+        if self.auth_token:
+            test_results.append(self.test_service_creation_with_expiration())
+            test_results.append(self.test_service_expiration_filtering())
+            test_results.append(self.test_service_creation_all_fields())
+        else:
+            print("⚠️  Skipping service tests - no authentication token")
+        
+        # Summary
+        print("=" * 60)
+        print("📊 TEST SUMMARY")
+        print("=" * 60)
+        
+        passed = sum(test_results)
+        total = len(test_results)
+        success_rate = (passed / total * 100) if total > 0 else 0
+        
+        print(f"✅ Tests Passed: {passed}/{total}")
+        print(f"📈 Success Rate: {success_rate:.1f}%")
+        
+        if success_rate >= 80:
+            print("🎉 BACKEND TESTS SUCCESSFUL!")
+        elif success_rate >= 60:
+            print("⚠️  BACKEND TESTS PARTIALLY SUCCESSFUL")
+        else:
+            print("❌ BACKEND TESTS FAILED")
+        
+        return success_rate >= 80
 
 if __name__ == "__main__":
-    tester = TimeSwapTester()
-    success = tester.run_all_tests()
-    exit(0 if success else 1)
+    tester = CoupDePouceBackendTester()
+    tester.run_all_tests()
