@@ -20,17 +20,68 @@ function FloatingAddButton() {
   
   const lastOffset = useRef({ x: SCREEN_WIDTH / 2 - BUTTON_SIZE / 2, y: SCREEN_HEIGHT - 130 });
 
+  const onGestureEvent = Animated.event(
+    [
+      {
+        nativeEvent: {
+          translationX: translateX,
+          translationY: translateY,
+        },
+      },
+    ],
+    { useNativeDriver: false }
+  );
+
+  const onHandlerStateChange = (event: any) => {
+    if (event.nativeEvent.oldState === 4) {
+      // Gesture ended
+      let finalX = lastOffset.current.x + event.nativeEvent.translationX;
+      let finalY = lastOffset.current.y + event.nativeEvent.translationY;
+
+      // Contraintes pour rester dans l'écran
+      finalX = Math.max(0, Math.min(finalX, SCREEN_WIDTH - BUTTON_SIZE));
+      finalY = Math.max(50, Math.min(finalY, SCREEN_HEIGHT - BUTTON_SIZE - 50));
+
+      lastOffset.current = { x: finalX, y: finalY };
+
+      // Animer vers la position finale
+      Animated.spring(translateX, {
+        toValue: finalX,
+        useNativeDriver: false,
+      }).start();
+
+      Animated.spring(translateY, {
+        toValue: finalY,
+        useNativeDriver: false,
+      }).start();
+    }
+  };
+
   return (
     <>
-      <TouchableOpacity
-        style={styles.floatingButton}
-        onPress={() => setShowModal(true)}
-        activeOpacity={0.8}
+      <PanGestureHandler
+        onGestureEvent={onGestureEvent}
+        onHandlerStateChange={onHandlerStateChange}
       >
-        <View style={styles.floatingButtonInner}>
-          <Ionicons name="add" size={32} color="#FFFFFF" />
-        </View>
-      </TouchableOpacity>
+        <Animated.View
+          style={[
+            styles.floatingButton,
+            {
+              transform: [{ translateX }, { translateY }],
+            },
+          ]}
+        >
+          <TouchableOpacity
+            onPress={() => setShowModal(true)}
+            activeOpacity={0.8}
+            style={styles.floatingButtonTouchable}
+          >
+            <View style={styles.floatingButtonInner}>
+              <Ionicons name="add" size={32} color="#FFFFFF" />
+            </View>
+          </TouchableOpacity>
+        </Animated.View>
+      </PanGestureHandler>
 
       <Modal
         visible={showModal}
