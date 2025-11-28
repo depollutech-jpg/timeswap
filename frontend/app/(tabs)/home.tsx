@@ -102,6 +102,11 @@ export default function HomeScreen() {
       }
       
       const response = await api.get(url);
+      console.log('Services chargés:', response.data.length);
+      if (response.data.length > 0) {
+        console.log('Premier service expiresAt:', response.data[0].expiresAt);
+        console.log('Premier service createdAt:', response.data[0].createdAt);
+      }
       setServices(response.data);
     } catch (error) {
       console.error('Failed to load services:', error);
