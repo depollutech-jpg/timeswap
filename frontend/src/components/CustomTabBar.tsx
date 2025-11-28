@@ -13,6 +13,7 @@ const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export default function CustomTabBar({ state, descriptors, navigation }: BottomTabBarProps) {
   const insets = useSafeAreaInsets();
   const { unreadCount } = useNotificationStore();
+  const { colors } = useThemeStore();
   const scrollViewRef = useRef<ScrollView>(null);
   const scrollX = useRef(0);
   const [contentWidth, setContentWidth] = useState(0);
