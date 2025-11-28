@@ -180,7 +180,7 @@ export default function CalendrierScreen() {
               </Text>
             </View>
 
-            <Text style={styles.dateText}>
+            <Text style={[styles.dateText, { color: colors.textSecondary }]}>
               {formatDate(exchange.completedAt || exchange.createdAt)}
             </Text>
           </View>
