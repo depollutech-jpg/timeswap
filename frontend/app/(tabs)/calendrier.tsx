@@ -121,7 +121,7 @@ export default function CalendrierScreen() {
     return (
       <TouchableOpacity
         key={exchange._id}
-        style={styles.exchangeCard}
+        style={[styles.exchangeCard, { backgroundColor: colors.surface }]}
         onPress={() => handleExchangePress(exchange)}
         activeOpacity={0.7}
       >
