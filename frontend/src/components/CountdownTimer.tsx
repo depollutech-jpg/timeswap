@@ -86,7 +86,7 @@ export default function CountdownTimer({ expiresAt, createdAt, compact = false }
     } else {
       pulseAnim.setValue(1);
     }
-  }, [timerState]);
+  }, [timerState, pulseAnim]);
 
   const getTimerStyles = () => {
     switch (timerState) {
