@@ -148,7 +148,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
     // Navigation
     tabBarBackground: 'rgba(20, 21, 24, 0.98)',
     tabBarBorder: '#1F2125',
-    tabIconInactive: '#D6D7DA',
+    tabIconInactive: '#FFFFFF', // Blanc pur pour contraste maximum en mode nuit
     
     // Dégradés
     gradientPrimary: ['#2F6AF0', '#4A6FD9'], // Plus sombre
