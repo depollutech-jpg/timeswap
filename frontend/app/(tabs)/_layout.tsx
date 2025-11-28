@@ -148,7 +148,7 @@ export default function TabsLayout() {
   const insets = useSafeAreaInsets();
 
   return (
-    <>
+    <GestureHandlerRootView style={{ flex: 1 }}>
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
