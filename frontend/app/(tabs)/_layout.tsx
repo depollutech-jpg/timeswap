@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Tabs, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
-import { TouchableOpacity, View, StyleSheet, Modal, Text } from 'react-native';
+import { TouchableOpacity, View, StyleSheet, Modal, Text, Animated, Dimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 import CustomTabBar from '../../src/components/CustomTabBar';
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const BUTTON_SIZE = 64;
 
 function FloatingAddButton() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  
+  // Position initiale au centre en bas
+  const translateX = useRef(new Animated.Value(SCREEN_WIDTH / 2 - BUTTON_SIZE / 2)).current;
+  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT - 130)).current;
+  
+  const lastOffset = useRef({ x: SCREEN_WIDTH / 2 - BUTTON_SIZE / 2, y: SCREEN_HEIGHT - 130 });
 
   return (
     <>
