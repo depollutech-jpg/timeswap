@@ -65,6 +65,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
     inputBackground: '#374151',
     tabBarBackground: 'rgba(31, 41, 55, 0.95)',
     tabBarBorder: '#374151',
+    tabIconInactive: '#E5E7EB', // Gris très clair pour contraster avec le fond sombre
   },
   night: {
     background: '#000000',
