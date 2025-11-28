@@ -12,6 +12,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
 import api from '../../src/utils/api';
 import { useAuthStore } from '../../src/store/authStore';
@@ -26,6 +27,7 @@ export default function RegisterScreen() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [acceptedCGU, setAcceptedCGU] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async () => {
