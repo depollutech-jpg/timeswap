@@ -181,7 +181,7 @@ export default function SoldeScreen() {
             <View style={styles.goalIcon}>
               <Ionicons name="calendar" size={20} color="#A855F7" />
             </View>
-            <Text style={styles.goalTitle}>Objectif mensuel</Text>
+            <Text style={[styles.goalTitle, { color: colors.text }]}>Objectif mensuel</Text>
             <View style={styles.goalBadge}>
               <Text style={styles.goalBadgeText}>
                 {new Date().toLocaleDateString('fr-FR', { month: 'long' })}
