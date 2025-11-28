@@ -22,14 +22,14 @@ print(f"🔗 Testing backend at: {API_BASE}")
 
 HEADERS = {"Content-Type": "application/json"}
 
-class TimeSwapTester:
+class CoupDePouceBackendTester:
     def __init__(self):
-        self.base_url = BASE_URL
+        self.base_url = API_BASE
         self.headers = HEADERS.copy()
-        self.test_users = []
-        self.test_services = []
-        self.test_exchanges = []
-        self.tokens = {}
+        self.session = requests.Session()
+        self.auth_token = None
+        self.test_user_id = None
+        self.test_service_id = None
         
     def log(self, message, level="INFO"):
         timestamp = datetime.now().strftime("%H:%M:%S")
