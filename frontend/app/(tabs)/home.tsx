@@ -90,7 +90,7 @@ export default function HomeScreen() {
     }
   };
 
-  const loadServices = async (category?: string) => {
+  const loadServices = async (category?: string, sort?: string) => {
     try {
       let url = '/services?limit=20';
       
@@ -104,13 +104,30 @@ export default function HomeScreen() {
         url += `&category=${encodeURIComponent(category)}`;
       }
       
+      // Add sort parameter
+      const currentSort = sort || sortBy;
+      if (currentSort && currentSort !== 'default') {
+        url += `&sort=${currentSort}`;
+      }
+      
       const response = await api.get(url);
       console.log('Services chargés:', response.data.length);
-      if (response.data.length > 0) {
-        console.log('Premier service expiresAt:', response.data[0].expiresAt);
-        console.log('Premier service createdAt:', response.data[0].createdAt);
+      
+      // Client-side sorting for personalized
+      let sortedServices = response.data;
+      if (currentSort === 'personalized' && user?.profile?.interests && user.profile.interests.length > 0) {
+        // Tri personnalisé basé sur les centres d'intérêt
+        const userInterests = user.profile.interests.map((i: string) => i.toLowerCase());
+        sortedServices = [...response.data].sort((a: any, b: any) => {
+          const aMatch = userInterests.includes(a.category?.toLowerCase());
+          const bMatch = userInterests.includes(b.category?.toLowerCase());
+          if (aMatch && !bMatch) return -1;
+          if (!aMatch && bMatch) return 1;
+          return 0;
+        });
       }
-      setServices(response.data);
+      
+      setServices(sortedServices);
     } catch (error) {
       console.error('Failed to load services:', error);
     } finally {
