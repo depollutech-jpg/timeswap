@@ -124,7 +124,7 @@ export default function SoldeScreen() {
           ]}
         >
           <LinearGradient
-            colors={['#FF6B9D', '#FF4777']}
+            colors={colors.gradientPrimary}
             style={styles.balanceGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
