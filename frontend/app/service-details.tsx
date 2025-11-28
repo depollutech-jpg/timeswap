@@ -282,11 +282,12 @@ export default function ServiceDetailsScreen() {
       )}
 
       {/* Delete Button for Owner */}
-      {service.userId === user?._id && service.status === 'active' && (
+      {service && user && service.userId === user._id && service.status === 'active' && (
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => {
+              console.log('Delete button pressed - User ID:', user._id, 'Service User ID:', service.userId);
               Alert.alert(
                 'Supprimer l\'annonce',
                 'Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.',
@@ -297,10 +298,13 @@ export default function ServiceDetailsScreen() {
                     style: 'destructive',
                     onPress: async () => {
                       try {
-                        await api.delete(`/services/${service._id}`);
+                        console.log('Deleting service:', service._id);
+                        const response = await api.delete(`/services/${service._id}`);
+                        console.log('Delete response:', response);
                         Alert.alert('Succès', 'Annonce supprimée avec succès');
                         router.replace('/(tabs)/home');
                       } catch (error: any) {
+                        console.error('Delete error:', error);
                         Alert.alert(
                           'Erreur',
                           error.response?.data?.detail || 'Impossible de supprimer l\'annonce'
