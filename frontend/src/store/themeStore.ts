@@ -83,6 +83,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
     inputBackground: '#2A2A2A',
     tabBarBackground: 'rgba(26, 26, 26, 0.98)',
     tabBarBorder: '#2A2A2A',
+    tabIconInactive: '#F5F5F5', // Blanc cassé pour contraster avec le noir
   },
   colorblind: {
     // Palette adaptée pour le daltonisme (deutéranopie/protanopie)
