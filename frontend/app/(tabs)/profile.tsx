@@ -87,7 +87,7 @@ export default function ProfileScreen() {
     }
   };
 
-  const toggleInterest = (categoryId: string) => {
+  const toggleInterest = (categoryId) => {
     if (interests.includes(categoryId)) {
       setInterests(interests.filter((id) => id !== categoryId));
     } else {
