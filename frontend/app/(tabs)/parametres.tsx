@@ -152,7 +152,6 @@ export default function ParametresScreen() {
           <Text style={[styles.infoText, { color: colors.text }]}>
             Mode actuel : <Text style={{ fontWeight: 'bold' }}>
               {mode === 'light' && '☀️ Clair'}
-              {mode === 'dark' && '🌙 Sombre'}
               {mode === 'night' && '🌑 Nuit'}
               {mode === 'colorblind' && '👁️ Daltonien'}
             </Text>
