@@ -123,6 +123,11 @@ export default function CreateServiceScreen() {
       return;
     }
 
+    // Empêcher les multi-clics
+    if (loading) {
+      return;
+    }
+
     setLoading(true);
     try {
       await api.post('/services', {
@@ -136,25 +141,23 @@ export default function CreateServiceScreen() {
         photos: photos,
       });
 
+      // Redirection automatique immédiate avec message de succès
       Alert.alert(
         'Succès !',
         isOffer
           ? 'Votre offre de service a été publiée avec succès'
-          : 'Votre demande d\'aide a été publiée avec succès',
-        [
-          {
-            text: 'OK',
-            onPress: () => router.replace('/(tabs)/home'),
-          },
-        ]
+          : 'Votre demande a été publiée avec succès'
       );
+      
+      // Redirection immédiate sans attendre le clic sur OK
+      router.replace('/(tabs)/home');
     } catch (error: any) {
+      // Réactiver le bouton en cas d'erreur
+      setLoading(false);
       Alert.alert(
         'Erreur',
         error.response?.data?.detail || 'Impossible de créer le service'
       );
-    } finally {
-      setLoading(false);
     }
   };
 
