@@ -584,19 +584,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
   },
-  debugContainer: {
-    backgroundColor: '#FEF3C7',
-    padding: 12,
-    margin: 16,
-    borderRadius: 8,
-    borderWidth: 2,
-    borderColor: '#F59E0B',
-  },
-  debugText: {
-    fontSize: 12,
-    color: '#92400E',
-    fontFamily: 'monospace',
-  },
   statusBanner: {
     flexDirection: 'row',
     alignItems: 'center',
