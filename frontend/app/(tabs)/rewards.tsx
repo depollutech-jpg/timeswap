@@ -117,7 +117,7 @@ export default function RewardsScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView
         contentContainerStyle={styles.scrollContent}
         refreshControl={
@@ -126,7 +126,7 @@ export default function RewardsScreen() {
       >
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Récompenses</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Récompenses</Text>
         </View>
 
         {/* Level Card avec Gradient */}
