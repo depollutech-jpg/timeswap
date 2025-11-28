@@ -334,7 +334,83 @@ test_plan:
           BACKEND VINTED EXCHANGE SYSTEM IS PRODUCTION READY!
           All core functionality works correctly. Minor issues are non-critical.
 
+  - task: "Compte à rebours 3 jours - Intégration CountdownTimer"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/home.tsx, app/service-details.tsx, src/components/CountdownTimer.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Intégration complète du CountdownTimer dans l'application:
+          1. Composant CountdownTimer créé avec mise à jour en temps réel (chaque seconde)
+          2. Affichage compact dans home.tsx (format court: Xj Yh Zm)
+          3. Affichage complet dans service-details.tsx (format détaillé: J:H:M:S)
+          4. Changement de couleur en rouge quand < 2 heures restantes
+          5. Backend déjà configuré avec expiresAt et filtrage automatique des services expirés
+
+  - task: "Message informatif durée 72h"
+    implemented: true
+    working: "NA"
+    file: "app/create-service.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Ajout d'un bandeau informatif sur la page de création de service:
+          - Carte jaune/orange avec icône horloge
+          - Message clair: "Votre annonce sera automatiquement supprimée après 72 heures (3 jours)"
+          - Affiché avant le formulaire pour que l'utilisateur soit informé
+
+  - task: "Bouton + déplaçable"
+    implemented: true
+    working: "NA"
+    file: "app/(tabs)/_layout.tsx"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Implémentation du bouton flottant "+" déplaçable:
+          1. Utilisation de PanGestureHandler pour détecter les gestes
+          2. Utilisation d'Animated.View pour animer le mouvement
+          3. Contraintes pour rester dans les limites de l'écran (padding 50px)
+          4. Animation spring pour un effet fluide lors du relâchement
+          5. Position initiale au centre en bas de l'écran
+          6. Le bouton peut être déplacé partout sur l'écran par glissement
+
 agent_communication:
+  - agent: "main"
+    message: |
+      ✅ NOUVELLES FONCTIONNALITÉS IMPLÉMENTÉES:
+      
+      1. COMPTE À REBOURS 3 JOURS:
+         - Intégration du composant CountdownTimer dans home.tsx (format compact)
+         - Intégration dans service-details.tsx (format complet)
+         - Mise à jour en temps réel chaque seconde
+         - Alerte rouge quand < 2 heures restantes
+         - Backend déjà configuré pour filtrer les services expirés
+      
+      2. MESSAGE INFORMATIF 72H:
+         - Bandeau jaune sur create-service.tsx
+         - Informe que l'annonce expire après 72 heures
+      
+      3. BOUTON + DÉPLAÇABLE:
+         - Bouton flottant maintenant draggable avec PanGestureHandler
+         - Animation fluide avec spring effect
+         - Reste dans les limites de l'écran
+         - Position initiale centrée en bas
+      
+      Prêt pour les tests backend et frontend.
+  
   - agent: "main"
     message: |
       ✅ PAGE CALENDRIER - LISTE DES ÉCHANGES IMPLÉMENTÉE:
