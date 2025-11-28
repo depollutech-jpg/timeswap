@@ -143,7 +143,7 @@ export default function CalendrierScreen() {
         {/* Contenu */}
         <View style={styles.exchangeContent}>
           {/* Titre du service */}
-          <Text style={styles.exchangeTitle} numberOfLines={2}>
+          <Text style={[styles.exchangeTitle, { color: colors.text }]} numberOfLines={2}>
             {exchange.service.title}
           </Text>
 
