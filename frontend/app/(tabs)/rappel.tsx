@@ -62,7 +62,7 @@ export default function RappelScreen() {
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>Nouvelles annonces</Text>
                 <Text style={styles.settingDescription}>
-                  Notifications basées sur vos centres d'intérêt
+                  Notifications basées sur vos centres d&apos;intérêt
                 </Text>
               </View>
             </View>
