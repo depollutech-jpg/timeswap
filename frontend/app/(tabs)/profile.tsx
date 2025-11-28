@@ -116,7 +116,7 @@ export default function ProfileScreen() {
       setUser(response.data);
       setIsEditing(false);
       Alert.alert('Succès', 'Profil mis à jour');
-    } catch (error: any) {
+    } catch (error) {
       Alert.alert('Erreur', error.response?.data?.detail || 'Impossible de mettre à jour le profil');
     } finally {
       setSaving(false);
