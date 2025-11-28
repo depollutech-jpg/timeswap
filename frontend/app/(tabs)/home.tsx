@@ -752,6 +752,10 @@ const styles = StyleSheet.create({
     elevation: 5,
     zIndex: 10,
   },
+  deleteButtonDisabledAbsolute: {
+    backgroundColor: '#9CA3AF',
+    opacity: 0.5,
+  },
   distanceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
