@@ -5,6 +5,7 @@ import { Colors } from '../constants/colors';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useNotificationStore } from '../store/notificationStore';
+import { useThemeStore } from '../store/themeStore';
 import { BlurView } from 'expo-blur';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
