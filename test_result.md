@@ -103,12 +103,24 @@
 #====================================================================================================
 
 user_problem_statement: |
-  Développement de l'application TimeSwap - Tâches complétées:
-  1. Correction du bouton Admin (ajout du champ 'role' dans authStore)
-  2. Implémentation du système de notifications in-app
-  3. Ajout d'animations bounce et slide
-  4. Finalisation du Dashboard Admin avec graphiques
-  5. Implémentation de la page Calendrier avec liste chronologique des échanges
+  Test des fonctionnalités backend de l'application Coup de Pouce - Plateforme d'échange de services basée sur des heures comme monnaie:
+  
+  FONCTIONNALITÉS À TESTER:
+  1. **Expiration des services (3 jours):**
+     - Vérifier que lors de la création d'un service via POST /api/services, le champ `expiresAt` est bien ajouté (datetime.utcnow() + 3 jours)
+     - Vérifier que GET /api/services filtre automatiquement et n'affiche PAS les services expirés (expiresAt < maintenant)
+     - Vérifier que les services non expirés (expiresAt >= maintenant) sont bien retournés
+
+  2. **Backend général (sanity check):**
+     - Vérifier que l'API est bien accessible
+     - Vérifier que l'authentification fonctionne (login/register)
+     - Vérifier la création de services avec tous les champs (title, description, duration, category, location, type)
+
+  ENDPOINTS PRINCIPAUX:
+  - POST /api/auth/register - Inscription
+  - POST /api/auth/login - Connexion
+  - POST /api/services - Créer un service
+  - GET /api/services - Lister les services (avec filtrage automatique des expirés)
 
 backend:
   - task: "Endpoints Admin Dashboard"
