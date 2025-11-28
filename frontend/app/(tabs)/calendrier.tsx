@@ -207,7 +207,7 @@ export default function CalendrierScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Calendrier</Text>
-        <Text style={styles.headerSubtitle}>
+        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
           {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
         </Text>
       </View>
