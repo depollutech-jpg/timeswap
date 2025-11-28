@@ -169,6 +169,34 @@ export default function RegisterScreen() {
               />
             </View>
 
+            {/* CGU Checkbox */}
+            <TouchableOpacity
+              style={styles.cguContainer}
+              onPress={() => setAcceptedCGU(!acceptedCGU)}
+              activeOpacity={0.7}
+            >
+              <View style={[styles.checkbox, acceptedCGU && styles.checkboxChecked]}>
+                {acceptedCGU && (
+                  <Ionicons name="checkmark" size={16} color="#FFFFFF" />
+                )}
+              </View>
+              <View style={styles.cguTextContainer}>
+                <Text style={styles.cguText}>
+                  J'accepte les{' '}
+                  <Text
+                    style={styles.cguLink}
+                    onPress={(e) => {
+                      e.stopPropagation();
+                      router.push('/legal/cgu');
+                    }}
+                  >
+                    Conditions Générales d'Utilisation
+                  </Text>
+                  {' '}*
+                </Text>
+              </View>
+            </TouchableOpacity>
+
             <TouchableOpacity
               style={[styles.button, loading && styles.buttonDisabled]}
               onPress={handleRegister}
