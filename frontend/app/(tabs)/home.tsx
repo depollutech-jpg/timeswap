@@ -805,4 +805,16 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
   },
+  legacyServiceBadge: {
+    backgroundColor: '#E5E7EB',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 12,
+    alignSelf: 'flex-start',
+  },
+  legacyServiceText: {
+    fontSize: 11,
+    fontWeight: '600',
+    color: '#6B7280',
+  },
 });
