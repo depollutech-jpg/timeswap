@@ -122,7 +122,7 @@ export default function RappelScreen() {
               <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
             </View>
             <View style={styles.notifContent}>
-              <Text style={styles.notifTitle}>Échange complété avec Jean</Text>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Échange complété avec Jean</Text>
               <Text style={styles.notifTime}>Il y a 2 heures</Text>
             </View>
           </View>
