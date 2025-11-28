@@ -133,6 +133,8 @@ export default function ProfileScreen() {
     setIsEditing(false);
   };
 
+  const styles = createStyles(colors);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
