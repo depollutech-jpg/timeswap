@@ -95,7 +95,7 @@ export default function RappelScreen() {
 
         {/* Recent Notifications */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Notifications récentes</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Notifications récentes</Text>
 
           <View style={styles.notificationCard}>
             <View style={[styles.notifIcon, { backgroundColor: Colors.primary + '20' }]}>
