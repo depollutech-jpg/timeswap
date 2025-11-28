@@ -21,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
+import CountdownTimer from '../../src/components/CountdownTimer';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
