@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../src/constants/colors';
+import { useThemeStore } from '../../src/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RappelScreen() {
