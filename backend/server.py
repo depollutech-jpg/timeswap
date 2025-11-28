@@ -552,8 +552,16 @@ async def get_services(
         }
         enriched_services.append(enriched_service)
     
-    # Sort by combined score (descending)
-    enriched_services.sort(key=lambda x: x["score"], reverse=True)
+    # Sort based on sort parameter
+    if sort == "recent":
+        # Tri par date de création (plus récent d'abord)
+        enriched_services.sort(key=lambda x: x.get("createdAt", datetime.min), reverse=True)
+    elif sort == "oldest":
+        # Tri par date de création (plus ancien d'abord)
+        enriched_services.sort(key=lambda x: x.get("createdAt", datetime.min), reverse=False)
+    else:
+        # Par défaut: tri par score combiné (pertinence)
+        enriched_services.sort(key=lambda x: x["score"], reverse=True)
     
     # Apply pagination
     return enriched_services[skip:skip + limit]
