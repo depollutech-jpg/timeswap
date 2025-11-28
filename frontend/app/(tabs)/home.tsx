@@ -874,69 +874,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
   },
-  sortButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFF1F2',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 12,
-    gap: 8,
-    marginTop: 12,
+  sortChip: {
+    backgroundColor: '#E0F2FE',
     borderWidth: 1,
-    borderColor: Colors.primary + '30',
+    borderColor: '#0284C7',
   },
-  sortButtonText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: Colors.primary,
-    flex: 1,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'flex-end',
-  },
-  sortModal: {
-    backgroundColor: '#FFFFFF',
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 24,
-    paddingBottom: 32,
-    paddingHorizontal: 16,
-  },
-  sortModalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginBottom: 16,
-    textAlign: 'center',
-  },
-  sortOption: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
-    gap: 16,
-  },
-  sortOptionActive: {
-    backgroundColor: Colors.primary + '10',
-  },
-  sortOptionContent: {
-    flex: 1,
-  },
-  sortOptionTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: Colors.text,
-    marginBottom: 2,
-  },
-  sortOptionTitleActive: {
-    color: Colors.primary,
-  },
-  sortOptionDesc: {
-    fontSize: 13,
-    color: Colors.textSecondary,
+  filterSeparator: {
+    width: 2,
+    height: 28,
+    backgroundColor: '#E5E7EB',
+    marginHorizontal: 8,
+    alignSelf: 'center',
   },
 });
