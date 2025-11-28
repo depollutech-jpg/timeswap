@@ -285,17 +285,6 @@ export default function HomeScreen() {
               placeholderTextColor="#9CA3AF"
             />
           </View>
-          
-          {/* Bouton de tri */}
-          <TouchableOpacity 
-            style={styles.sortButton}
-            onPress={() => setShowSortModal(true)}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="funnel-outline" size={18} color={Colors.primary} />
-            <Text style={styles.sortButtonText}>{getSortLabel()}</Text>
-            <Ionicons name="chevron-down" size={16} color={Colors.primary} />
-          </TouchableOpacity>
         </View>
 
         {/* Filtres de catégories avec animation Slide */}
