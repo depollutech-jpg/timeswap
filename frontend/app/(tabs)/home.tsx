@@ -416,8 +416,8 @@ export default function HomeScreen() {
                     </View>
                   </View>
 
-                  <Text style={styles.serviceTitle}>{service.title}</Text>
-                  <Text style={styles.serviceDescription} numberOfLines={2}>
+                  <Text style={[styles.serviceTitle, { color: colors.text }]}>{service.title}</Text>
+                  <Text style={[styles.serviceDescription, { color: colors.textSecondary }]} numberOfLines={2}>
                     {service.description}
                   </Text>
 
