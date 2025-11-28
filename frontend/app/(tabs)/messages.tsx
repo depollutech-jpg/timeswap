@@ -64,8 +64,8 @@ export default function MessagesScreen() {
       </View>
 
       {/* Barre de recherche */}
-      <View style={styles.searchSection}>
-        <View style={styles.searchBar}>
+      <View style={[styles.searchSection, { backgroundColor: colors.surface }]}>
+        <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
           <Ionicons name="search" size={20} color="#6B7280" />
           <TextInput
             style={styles.searchInput}
