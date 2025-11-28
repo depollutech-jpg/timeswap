@@ -33,6 +33,7 @@ interface User {
     idDocument_base64?: string;
     verifiedAt?: string;
   };
+  interests?: string[];
 }
 
 interface AuthState {
