@@ -372,7 +372,7 @@ export default function HomeScreen() {
           ) : (
             services.map((service: any) => {
               const isOffer = service.type === 'offer';
-              const cardColor = isOffer ? '#FFF1F2' : '#F3E8FF';
+              const cardColor = colors.cardBackground;
               const borderColor = isOffer ? colors.primary : colors.secondary;
               const buttonColor = isOffer ? colors.primary : colors.secondary;
 
@@ -381,11 +381,7 @@ export default function HomeScreen() {
                   <TouchableOpacity 
                     style={[
                       styles.serviceCard,
-                      { 
-                        backgroundColor: cardColor,
-                        borderLeftWidth: 4,
-                        borderLeftColor: borderColor,
-                      }
+                      { backgroundColor: cardColor, borderColor: borderColor, borderWidth: 2 },
                     ]}
                     onPress={() => router.push(`/service-details?id=${service._id}`)}
                     activeOpacity={0.7}
