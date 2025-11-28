@@ -257,12 +257,12 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
           {IconComponent && (
             <View style={styles.iconContainer}>
               {IconComponent({
-                color: isFocused ? Colors.primary : Colors.textSecondary,
+                color: isFocused ? themeColors.primary : themeColors.textSecondary,
                 size: 22,
                 focused: isFocused,
               })}
               {showBadge && (
-                <View style={styles.badge}>
+                <View style={[styles.badge, { backgroundColor: themeColors.primary }]}>
                   <Text style={styles.badgeText}>
                     {unreadCount > 99 ? '99+' : unreadCount}
                   </Text>
@@ -273,7 +273,8 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
           <Text
             style={[
               styles.tabLabel,
-              isFocused && styles.tabLabelActive,
+              { color: themeColors.textSecondary },
+              isFocused && [styles.tabLabelActive, { color: themeColors.primary }],
             ]}
           >
             {typeof label === 'string' ? label : ''}
