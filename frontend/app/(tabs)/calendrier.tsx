@@ -223,10 +223,10 @@ export default function CalendrierScreen() {
         }
       >
         {exchanges.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Ionicons name="calendar-outline" size={64} color={Colors.textSecondary} />
-            <Text style={styles.emptyText}>Aucun échange</Text>
-            <Text style={styles.emptySubtext}>
+          <View style={[styles.emptyState, { backgroundColor: colors.surface }]}>
+            <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
+            <Text style={[styles.emptyText, { color: colors.text }]}>Aucun échange</Text>
+            <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
               Vos échanges apparaîtront ici
             </Text>
           </View>
