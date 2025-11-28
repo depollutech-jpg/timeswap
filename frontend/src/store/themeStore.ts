@@ -19,6 +19,7 @@ interface ThemeColors {
   inputBackground: string;
   tabBarBackground: string;
   tabBarBorder: string;
+  tabIconInactive: string; // Couleur pour les icônes inactives dans la TabBar
 }
 
 interface ThemeState {
