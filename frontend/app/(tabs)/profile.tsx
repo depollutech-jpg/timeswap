@@ -657,6 +657,6 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   menuItemText: {
     fontSize: 16,
-    color: Colors.text,
+    color: colors.text,
   },
 });
