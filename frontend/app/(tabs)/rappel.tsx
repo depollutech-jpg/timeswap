@@ -13,6 +13,7 @@ import { useThemeStore } from '../../src/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 
 export default function RappelScreen() {
+  const { colors } = useThemeStore();
   const [notifMessages, setNotifMessages] = useState(true);
   const [notifAnnonces, setNotifAnnonces] = useState(true);
   const [notifEchanges, setNotifEchanges] = useState(true);
