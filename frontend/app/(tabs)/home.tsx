@@ -321,19 +321,19 @@ export default function HomeScreen() {
               const buttonColor = isOffer ? Colors.primary : Colors.secondary;
 
               return (
-                <TouchableOpacity 
-                  key={service._id} 
-                  style={[
-                    styles.serviceCard,
-                    { 
-                      backgroundColor: cardColor,
-                      borderLeftWidth: 4,
-                      borderLeftColor: borderColor,
-                    }
-                  ]}
-                  onPress={() => router.push(`/service-details?id=${service._id}`)}
-                  activeOpacity={0.7}
-                >
+                <View key={service._id} style={styles.serviceCardWrapper}>
+                  <TouchableOpacity 
+                    style={[
+                      styles.serviceCard,
+                      { 
+                        backgroundColor: cardColor,
+                        borderLeftWidth: 4,
+                        borderLeftColor: borderColor,
+                      }
+                    ]}
+                    onPress={() => router.push(`/service-details?id=${service._id}`)}
+                    activeOpacity={0.7}
+                  >
                   <View style={styles.serviceHeader}>
                     <View style={styles.userInfo}>
                       <View style={[styles.userAvatar, { backgroundColor: borderColor }]}>
