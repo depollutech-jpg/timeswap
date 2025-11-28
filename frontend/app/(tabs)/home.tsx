@@ -208,7 +208,7 @@ export default function HomeScreen() {
       >
         {/* Header avec gradient rose */}
         <LinearGradient
-          colors={['#FF6B9D', '#FF4777']}
+          colors={[colors.primary, colors.secondary]}
           style={styles.header}
         >
           <View style={styles.headerTop}>
