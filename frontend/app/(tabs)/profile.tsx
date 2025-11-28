@@ -142,7 +142,7 @@ export default function ProfileScreen() {
         <View style={styles.header}>
           <Text style={styles.title}>Profil</Text>
           <TouchableOpacity onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color={colors.error} />
+            <Ionicons name="log-out-outline" size={24} color={colors.danger} />
           </TouchableOpacity>
         </View>
 
