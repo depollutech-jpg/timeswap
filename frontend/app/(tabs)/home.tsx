@@ -368,6 +368,25 @@ export default function HomeScreen() {
                     {service.description}
                   </Text>
 
+                  {/* Photos miniatures */}
+                  {service.photos && service.photos.length > 0 && (
+                    <View style={styles.photosContainer}>
+                      {service.photos.slice(0, 3).map((photo: string, index: number) => (
+                        <Image
+                          key={index}
+                          source={{ uri: photo }}
+                          style={styles.photoThumbnail}
+                          resizeMode="cover"
+                        />
+                      ))}
+                      {service.photos.length > 3 && (
+                        <View style={styles.morePhotos}>
+                          <Text style={styles.morePhotosText}>+{service.photos.length - 3}</Text>
+                        </View>
+                      )}
+                    </View>
+                  )}
+
                   <View style={styles.serviceFooter}>
                     <View style={styles.serviceInfo}>
                       <Ionicons name="time-outline" size={16} color="#6B7280" />
