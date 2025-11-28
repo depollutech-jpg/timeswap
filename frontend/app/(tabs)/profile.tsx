@@ -153,7 +153,7 @@ export default function ProfileScreen() {
               <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatar} />
             ) : (
               <View style={styles.avatar}>
-                <Ionicons name="person" size={40} color={Colors.textSecondary} />
+                <Ionicons name="person" size={40} color={colors.textSecondary} />
               </View>
             )}
             <View style={styles.editBadge}>
@@ -161,7 +161,7 @@ export default function ProfileScreen() {
             </View>
             {user?.verification.isVerified && (
               <View style={styles.verifiedBadge}>
-                <Ionicons name="checkmark-circle" size={24} color={Colors.success} />
+                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
               </View>
             )}
           </TouchableOpacity>
@@ -176,7 +176,7 @@ export default function ProfileScreen() {
                 style={styles.editButton}
                 onPress={() => setIsEditing(true)}
               >
-                <Ionicons name="create-outline" size={20} color={Colors.primary} />
+                <Ionicons name="create-outline" size={20} color={colors.primary} />
                 <Text style={styles.editButtonText}>Éditer le profil</Text>
               </TouchableOpacity>
             </>
@@ -334,18 +334,18 @@ export default function ProfileScreen() {
             <View style={styles.menuSection}>
               <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.menuItemLeft}>
-                  <Ionicons name="list-outline" size={24} color={Colors.text} />
+                  <Ionicons name="list-outline" size={24} color={colors.text} />
                   <Text style={styles.menuItemText}>Mes services</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.menuItemLeft}>
-                  <Ionicons name="swap-horizontal-outline" size={24} color={Colors.text} />
+                  <Ionicons name="swap-horizontal-outline" size={24} color={colors.text} />
                   <Text style={styles.menuItemText}>Mes échanges</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -353,23 +353,23 @@ export default function ProfileScreen() {
                 onPress={() => router.push('/buy-hours')}
               >
                 <View style={styles.menuItemLeft}>
-                  <Ionicons name="cart-outline" size={24} color={Colors.primary} />
-                  <Text style={[styles.menuItemText, { color: Colors.primary }]}>
+                  <Ionicons name="cart-outline" size={24} color={colors.primary} />
+                  <Text style={[styles.menuItemText, { color: colors.primary }]}>
                     Acheter des heures
                   </Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.primary} />
+                <Ionicons name="chevron-forward" size={20} color={colors.primary} />
               </TouchableOpacity>
 
               {!user?.verification.isVerified && (
                 <TouchableOpacity style={styles.menuItem}>
                   <View style={styles.menuItemLeft}>
-                    <Ionicons name="shield-checkmark-outline" size={24} color={Colors.success} />
-                    <Text style={[styles.menuItemText, { color: Colors.success }]}>
+                    <Ionicons name="shield-checkmark-outline" size={24} color={colors.success} />
+                    <Text style={[styles.menuItemText, { color: colors.success }]}>
                       Vérifier mon profil
                     </Text>
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={Colors.success} />
+                  <Ionicons name="chevron-forward" size={20} color={colors.success} />
                 </TouchableOpacity>
               )}
             </View>
@@ -392,18 +392,18 @@ export default function ProfileScreen() {
 
               <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.menuItemLeft}>
-                  <Ionicons name="settings-outline" size={24} color={Colors.text} />
+                  <Ionicons name="settings-outline" size={24} color={colors.text} />
                   <Text style={styles.menuItemText}>Paramètres</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity style={styles.menuItem}>
                 <View style={styles.menuItemLeft}>
-                  <Ionicons name="help-circle-outline" size={24} color={Colors.text} />
+                  <Ionicons name="help-circle-outline" size={24} color={colors.text} />
                   <Text style={styles.menuItemText}>Aide</Text>
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={Colors.textSecondary} />
+                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </>
@@ -416,7 +416,7 @@ export default function ProfileScreen() {
 const createStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: colors.background,
   },
   scrollContent: {
     paddingBottom: 100,
@@ -430,12 +430,12 @@ const createStyles = (colors: any) => StyleSheet.create({
   title: {
     fontSize: 28,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: colors.text,
   },
   profileCard: {
     alignItems: 'center',
     paddingVertical: 24,
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     marginHorizontal: 16,
     marginBottom: 16,
     borderRadius: 12,
@@ -448,7 +448,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: Colors.border,
+    backgroundColor: colors.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -456,32 +456,32 @@ const createStyles = (colors: any) => StyleSheet.create({
     position: 'absolute',
     bottom: 0,
     right: 0,
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
     borderRadius: 16,
     width: 32,
     height: 32,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 3,
-    borderColor: Colors.surface,
+    borderColor: colors.surface,
   },
   verifiedBadge: {
     position: 'absolute',
     top: 0,
     right: 0,
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     padding: 2,
   },
   name: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   email: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: colors.textSecondary,
     marginBottom: 16,
   },
   editButton: {
@@ -490,13 +490,13 @@ const createStyles = (colors: any) => StyleSheet.create({
     gap: 6,
     paddingHorizontal: 16,
     paddingVertical: 8,
-    backgroundColor: Colors.primary + '20',
+    backgroundColor: colors.primary + '20',
     borderRadius: 20,
   },
   editButtonText: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.primary,
+    color: colors.primary,
   },
   editSection: {
     paddingHorizontal: 16,
@@ -504,7 +504,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: colors.text,
     marginBottom: 16,
   },
   inputGroup: {
@@ -513,13 +513,13 @@ const createStyles = (colors: any) => StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.text,
+    color: colors.text,
     marginBottom: 8,
   },
   input: {
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: colors.border,
     borderRadius: 12,
     padding: 12,
     fontSize: 16,
@@ -537,21 +537,21 @@ const createStyles = (colors: any) => StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 8,
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: colors.border,
     alignItems: 'center',
   },
   availabilityChipActive: {
-    backgroundColor: Colors.primary + '20',
-    borderColor: Colors.primary,
+    backgroundColor: colors.primary + '20',
+    borderColor: colors.primary,
   },
   availabilityText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: colors.textSecondary,
   },
   availabilityTextActive: {
-    color: Colors.primary,
+    color: colors.primary,
     fontWeight: '600',
   },
   interestsGrid: {
@@ -565,24 +565,24 @@ const createStyles = (colors: any) => StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: colors.border,
     gap: 6,
   },
   interestChipActive: {
-    backgroundColor: Colors.primary + '20',
-    borderColor: Colors.primary,
+    backgroundColor: colors.primary + '20',
+    borderColor: colors.primary,
   },
   interestIcon: {
     fontSize: 16,
   },
   interestText: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: colors.textSecondary,
   },
   interestTextActive: {
-    color: Colors.primary,
+    color: colors.primary,
     fontWeight: '600',
   },
   buttonRow: {
@@ -597,17 +597,17 @@ const createStyles = (colors: any) => StyleSheet.create({
     alignItems: 'center',
   },
   cancelButton: {
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: colors.border,
   },
   cancelButtonText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
+    color: colors.text,
   },
   saveButton: {
-    backgroundColor: Colors.primary,
+    backgroundColor: colors.primary,
   },
   saveButtonText: {
     fontSize: 16,
@@ -616,7 +616,7 @@ const createStyles = (colors: any) => StyleSheet.create({
   },
   statsContainer: {
     flexDirection: 'row',
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginHorizontal: 16,
     padding: 16,
@@ -629,15 +629,15 @@ const createStyles = (colors: any) => StyleSheet.create({
   statValue: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: colors.text,
     marginBottom: 4,
   },
   statLabel: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: colors.textSecondary,
   },
   menuSection: {
-    backgroundColor: Colors.surface,
+    backgroundColor: colors.surface,
     borderRadius: 12,
     marginHorizontal: 16,
     marginBottom: 16,
@@ -648,7 +648,7 @@ const createStyles = (colors: any) => StyleSheet.create({
     justifyContent: 'space-between',
     padding: 16,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.border,
+    borderBottomColor: colors.border,
   },
   menuItemLeft: {
     flexDirection: 'row',
