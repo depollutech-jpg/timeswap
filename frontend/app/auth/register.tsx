@@ -46,6 +46,11 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (!acceptedCGU) {
+      Alert.alert('Erreur', 'Vous devez accepter les Conditions Générales d\'Utilisation pour créer un compte');
+      return;
+    }
+
     setLoading(true);
     try {
       const response = await api.post('/auth/register', {
