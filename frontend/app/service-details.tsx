@@ -281,8 +281,16 @@ export default function ServiceDetailsScreen() {
         </View>
       )}
 
-      {/* Delete Button for Owner */}
-      {service && user && service.userId === user._id && service.status === 'active' && (
+      {/* Delete Button for Owner - DEBUG MODE */}
+      {service && user && (
+        <View style={styles.debugContainer}>
+          <Text style={styles.debugText}>
+            Debug: User ID = {user._id?.substring(0, 8)}... | Service User ID = {service.userId?.substring(0, 8)}... | Match: {service.userId === user._id ? 'OUI ✅' : 'NON ❌'}
+          </Text>
+        </View>
+      )}
+      
+      {service && user && service.userId === user._id && (
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.deleteButton}
