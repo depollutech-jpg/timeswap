@@ -205,7 +205,7 @@ export default function CalendrierScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.surface }]}>
         <Text style={[styles.headerTitle, { color: colors.text }]}>Calendrier</Text>
         <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
           {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
