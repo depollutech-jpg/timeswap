@@ -146,8 +146,8 @@ const themes: Record<ThemeMode, ThemeColors> = {
     info: TimeAccentBlueNight,
     
     // Navigation
-    tabBarBackground: 'rgba(20, 21, 24, 0.98)',
-    tabBarBorder: '#1F2125',
+    tabBarBackground: 'rgba(40, 40, 40, 0.98)', // Plus clair pour meilleur contraste
+    tabBarBorder: '#3A3A3A', // Bordure plus claire et visible
     tabIconInactive: '#FFFFFF', // Blanc pur pour contraste maximum en mode nuit
     
     // Dégradés
