@@ -366,7 +366,7 @@ export default function HomeScreen() {
         >
           {services.length === 0 ? (
             <View style={styles.emptyState}>
-              <Ionicons name="leaf-outline" size={48} color={Colors.textSecondary} />
+              <Ionicons name="leaf-outline" size={48} color={colors.textSecondary} />
               <Text style={styles.emptyText}>Aucun service disponible</Text>
             </View>
           ) : (
