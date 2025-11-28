@@ -157,7 +157,7 @@ export default function CalendrierScreen() {
                 />
               ) : (
                 <View style={[styles.userAvatar, styles.avatarPlaceholder]}>
-                  <Ionicons name="person" size={16} color={Colors.textSecondary} />
+                  <Ionicons name="person" size={16} color={colors.textSecondary} />
                 </View>
               )}
               <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
