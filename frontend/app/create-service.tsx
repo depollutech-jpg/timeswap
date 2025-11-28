@@ -45,57 +45,49 @@ export default function CreateServiceScreen() {
       return;
     }
 
-    // Request permission
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission requise', 'Nous avons besoin de la permission pour acceder a vos photos');
-      return;
-    }
-
-    // Pick image
-    const result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 0.8,
-    });
-
-    if (!result.canceled && result.assets[0]) {
-      await processImage(result.assets[0].uri);
-    }
-  };
-
-  const processImage = async (uri: string) => {
     try {
-      // Compress and resize image
-      const manipResult = await manipulateAsync(
-        uri,
-        [{ resize: { width: 1200 } }], // Resize to max 1200px width
-        { compress: 0.7, format: SaveFormat.JPEG }
-      );
+      // Request permission
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission requise', 'Nous avons besoin de la permission pour acceder a vos photos');
+        return;
+      }
 
-      // Convert to base64
-      const response = await fetch(manipResult.uri);
-      const blob = await response.blob();
-      const reader = new FileReader();
+      // Pick image with base64 option
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.7,
+        base64: true, // Get base64 directly
+      });
 
-      reader.onloadend = () => {
-        const base64String = reader.result as string;
+      if (!result.canceled && result.assets[0]) {
+        const asset = result.assets[0];
         
-        // Check size (approx 5MB)
-        const sizeInMB = (base64String.length * 0.75) / (1024 * 1024);
-        if (sizeInMB > 5) {
-          Alert.alert('Photo trop volumineuse', 'La photo ne doit pas depasser 5MB apres compression');
-          return;
+        // Compress and resize if needed
+        const manipResult = await manipulateAsync(
+          asset.uri,
+          [{ resize: { width: 1200 } }],
+          { compress: 0.7, format: SaveFormat.JPEG, base64: true }
+        );
+
+        if (manipResult.base64) {
+          const base64String = `data:image/jpeg;base64,${manipResult.base64}`;
+          
+          // Check size (approx 5MB)
+          const sizeInMB = (base64String.length * 0.75) / (1024 * 1024);
+          if (sizeInMB > 5) {
+            Alert.alert('Photo trop volumineuse', 'La photo ne doit pas depasser 5MB apres compression');
+            return;
+          }
+
+          setPhotos([...photos, base64String]);
         }
-
-        setPhotos([...photos, base64String]);
-      };
-
-      reader.readAsDataURL(blob);
+      }
     } catch (error) {
       console.error('Error processing image:', error);
-      Alert.alert('Erreur', 'Impossible de traiter l image');
+      Alert.alert('Erreur', 'Impossible de traiter l\'image');
     }
   };
 
