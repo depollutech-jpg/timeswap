@@ -20,6 +20,7 @@ import { useExchangeStore } from '../src/store/exchangeStore';
 import UserProfileCard from '../src/components/UserProfileCard';
 import ReportModal from '../src/components/ReportModal';
 import ConfirmationModal from '../src/components/ConfirmationModal';
+import CountdownTimer from '../src/components/CountdownTimer';
 
 const { width } = Dimensions.get('window');
 
