@@ -266,7 +266,7 @@ export default function ProfileScreen() {
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Centres d'intérêt</Text>
+              <Text style={styles.label}>Centres d&apos;intérêt</Text>
               <View style={styles.interestsGrid}>
                 {CATEGORIES.slice(0, 12).map((category) => (
                   <TouchableOpacity
