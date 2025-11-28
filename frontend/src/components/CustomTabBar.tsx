@@ -257,7 +257,7 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
           {IconComponent && (
             <View style={styles.iconContainer}>
               {IconComponent({
-                color: isFocused ? themeColors.primary : themeColors.textSecondary,
+                color: isFocused ? themeColors.primary : themeColors.tabIconInactive,
                 size: 22,
                 focused: isFocused,
               })}
@@ -273,7 +273,7 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
           <Text
             style={[
               styles.tabLabel,
-              { color: themeColors.textSecondary },
+              { color: themeColors.tabIconInactive },
               isFocused && [styles.tabLabelActive, { color: themeColors.primary }],
             ]}
           >
