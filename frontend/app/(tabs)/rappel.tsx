@@ -102,7 +102,7 @@ export default function RappelScreen() {
               <Ionicons name="chatbubble" size={20} color={Colors.primary} />
             </View>
             <View style={styles.notifContent}>
-              <Text style={styles.notifTitle}>Nouveau message de Marie</Text>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Nouveau message de Marie</Text>
               <Text style={styles.notifTime}>Il y a 5 minutes</Text>
             </View>
           </View>
