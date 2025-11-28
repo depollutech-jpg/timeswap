@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../src/store/authStore';
+import { useThemeStore } from '../../src/store/themeStore';
 import { Colors } from '../../src/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -19,6 +20,7 @@ import api from '../../src/utils/api';
 
 export default function SoldeScreen() {
   const { user, setUser } = useAuthStore();
+  const { colors } = useThemeStore();
   const router = useRouter();
   const [exchanges, setExchanges] = useState([]);
   const [loading, setLoading] = useState(true);
