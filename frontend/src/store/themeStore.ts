@@ -118,44 +118,6 @@ const themes: Record<ThemeMode, ThemeColors> = {
     gradientNeutral: TimeGradients.neutral, // ['#FFFFFF', '#F4F5F7']
   },
   
-  // 🌚 MODE SOMBRE (Dark Mode)
-  dark: {
-    // Backgrounds
-    background: '#101114', // Background général très sombre
-    surface: TimeNeutralColors.dark, // #1C1D21 (cartes)
-    cardBackground: TimeNeutralColors.dark, // #1C1D21
-    inputBackground: '#2A2C30',
-    
-    // Textes
-    text: '#F4F5F7', // Texte clair
-    textSecondary: '#D6D7DA',
-    textTertiary: '#9CA3AF',
-    
-    // Accents
-    primary: TimeAccentBlue, // #3A7AFE (identique)
-    secondary: '#6E93FF',
-    
-    // Bordures
-    border: '#2A2C30',
-    borderLight: '#3A3C40',
-    
-    // Système
-    success: SystemColors.successGreen,
-    warning: SystemColors.warningOrange,
-    danger: SystemColors.dangerRed,
-    info: TimeAccentBlue,
-    
-    // Navigation
-    tabBarBackground: 'rgba(28, 29, 33, 0.95)',
-    tabBarBorder: '#2A2C30',
-    tabIconInactive: '#D6D7DA', // Gris clair pour contraste
-    
-    // Dégradés
-    gradientPrimary: TimeGradients.primaryDark, // ['#2F6AF0', '#5A7FE6'] (-20% luminosité)
-    gradientDanger: TimeGradients.danger,
-    gradientNeutral: TimeGradients.neutralDark, // ['#1C1D21', '#2A2C30']
-  },
-  
   // 🌑 MODE NUIT (Night Mode) - Ultra sombre
   night: {
     // Backgrounds
