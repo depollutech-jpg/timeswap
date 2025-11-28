@@ -281,6 +281,43 @@ export default function ServiceDetailsScreen() {
         </View>
       )}
 
+      {/* Delete Button for Owner */}
+      {service.userId === user?._id && service.status === 'active' && (
+        <View style={styles.footer}>
+          <TouchableOpacity
+            style={styles.deleteButton}
+            onPress={() => {
+              Alert.alert(
+                'Supprimer l\'annonce',
+                'Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.',
+                [
+                  { text: 'Annuler', style: 'cancel' },
+                  {
+                    text: 'Supprimer',
+                    style: 'destructive',
+                    onPress: async () => {
+                      try {
+                        await api.delete(`/services/${service._id}`);
+                        Alert.alert('Succès', 'Annonce supprimée avec succès');
+                        router.replace('/(tabs)/home');
+                      } catch (error: any) {
+                        Alert.alert(
+                          'Erreur',
+                          error.response?.data?.detail || 'Impossible de supprimer l\'annonce'
+                        );
+                      }
+                    },
+                  },
+                ]
+              );
+            }}
+          >
+            <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
+            <Text style={styles.deleteButtonText}>Supprimer mon annonce</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Modals */}
       <ReportModal
         visible={showReportModal}
