@@ -47,6 +47,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
     inputBackground: '#F3F4F6',
     tabBarBackground: 'rgba(255, 255, 255, 0.95)',
     tabBarBorder: '#E5E7EB',
+    tabIconInactive: '#9CA3AF', // Gris moyen bien visible sur fond clair
   },
   dark: {
     background: '#111827',
