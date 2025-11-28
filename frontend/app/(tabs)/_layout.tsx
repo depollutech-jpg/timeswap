@@ -240,7 +240,7 @@ export default function TabsLayout() {
         />
       </Tabs>
       <FloatingAddButton />
-    </>
+    </GestureHandlerRootView>
   );
 }
 
