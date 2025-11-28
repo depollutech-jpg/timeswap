@@ -729,4 +729,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 8,
   },
+  photosContainer: {
+    flexDirection: 'row',
+    gap: 8,
+    marginVertical: 12,
+  },
+  photoThumbnail: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+  },
+  morePhotos: {
+    width: 80,
+    height: 80,
+    borderRadius: 8,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  morePhotosText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
 });
