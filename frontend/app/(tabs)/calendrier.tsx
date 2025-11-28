@@ -38,6 +38,7 @@ interface Exchange {
 
 export default function CalendrierScreen() {
   const { token } = useAuthStore();
+  const { colors } = useThemeStore();
   const [exchanges, setExchanges] = useState<Exchange[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
