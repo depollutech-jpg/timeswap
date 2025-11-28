@@ -76,7 +76,7 @@ class CoupDePouceBackendTester:
         
         # First register a user to login with
         timestamp = int(time.time())
-        test_email = f"logintest_{timestamp}@coupdepouce.test"
+        test_email = f"logintest_{timestamp}@example.com"
         
         # Register
         register_data = {
