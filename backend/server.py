@@ -489,12 +489,18 @@ async def get_services(
     if location:
         query["location"] = {"$regex": location, "$options": "i"}
     
+    # Filtre les annonces expirées (plus de 3 jours)
+    current_time = datetime.utcnow()
+    query["$or"] = [
+        {"expiresAt": {"$exists": False}},  # Anciennes annonces sans expiresAt
+        {"expiresAt": {"$gte": current_time}}  # Annonces non expirées
+    ]
+    
     # Fetch all active services
     services = await db.services.find(query).to_list(length=None)
     
     # Enrich with user data and calculate scores
     enriched_services = []
-    current_time = datetime.utcnow()
     
     for service in services:
         user = await db.users.find_one({"_id": service["userId"]})
