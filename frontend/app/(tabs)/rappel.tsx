@@ -19,11 +19,11 @@ export default function RappelScreen() {
   const [notifEchanges, setNotifEchanges] = useState(true);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>Rappels & Notifications</Text>
+          <Text style={[styles.title, { color: colors.text }]}>Rappels & Notifications</Text>
         </View>
 
         {/* Info Card */}
