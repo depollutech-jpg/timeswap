@@ -80,7 +80,7 @@ export default function RappelScreen() {
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>Échanges</Text>
                 <Text style={styles.settingDescription}>
-                  Notifications sur l'état de vos échanges
+                  Notifications sur l&apos;état de vos échanges
                 </Text>
               </View>
             </View>
