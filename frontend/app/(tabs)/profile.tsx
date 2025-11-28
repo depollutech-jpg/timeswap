@@ -33,7 +33,7 @@ export default function ProfileScreen() {
   const [bio, setBio] = useState(user?.profile.bio || '');
   const [phone, setPhone] = useState(user?.profile.phone || '');
   const [location, setLocation] = useState(user?.profile.location || '');
-  const [interests, setInterests] = useState<string[]>(user?.interests || []);
+  const [interests, setInterests] = useState(user?.interests || []);
   const [availability, setAvailability] = useState('Disponible');
 
   const handleLogout = () => {
