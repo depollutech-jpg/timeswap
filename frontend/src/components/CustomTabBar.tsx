@@ -164,6 +164,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
         options={options}
         navigation={navigation}
         unreadCount={unreadCount}
+        themeColors={colors}
       />
     );
   };
