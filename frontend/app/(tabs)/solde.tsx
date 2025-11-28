@@ -206,7 +206,7 @@ export default function SoldeScreen() {
             <View style={styles.sectionIconHeader}>
               <Ionicons name="time" size={20} color="#3B82F6" />
             </View>
-            <Text style={styles.sectionTitle}>Historique des échanges</Text>
+            <Text style={[styles.sectionTitle, { color: colors.text }]}>Historique des échanges</Text>
           </View>
 
           {exchanges.length === 0 ? (
