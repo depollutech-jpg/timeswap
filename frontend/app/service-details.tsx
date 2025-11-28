@@ -217,6 +217,17 @@ export default function ServiceDetailsScreen() {
           </View>
         </View>
 
+        {/* Countdown Timer */}
+        {service.expiresAt && service.status === 'active' && (
+          <View style={styles.section}>
+            <CountdownTimer 
+              expiresAt={service.expiresAt}
+              createdAt={service.createdAt}
+              compact={false}
+            />
+          </View>
+        )}
+
         {/* Description */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Description</Text>
