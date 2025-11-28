@@ -29,6 +29,7 @@ export default function BuyHoursScreen() {
   const router = useRouter();
   const { session_id } = useLocalSearchParams();
   const { user, setUser } = useAuthStore();
+  const { colors } = useThemeStore();
   const [packages, setPackages] = useState<Packages | null>(null);
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
