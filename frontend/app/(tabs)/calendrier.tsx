@@ -135,7 +135,7 @@ export default function CalendrierScreen() {
             />
           ) : (
             <View style={[styles.exchangeImage, styles.placeholderImage]}>
-              <Ionicons name="image-outline" size={32} color={Colors.textSecondary} />
+              <Ionicons name="image-outline" size={32} color={colors.textSecondary} />
             </View>
           )}
         </View>
