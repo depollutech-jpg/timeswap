@@ -444,7 +444,8 @@ async def create_service(service_data: ServiceCreate, current_user: dict = Depen
         "lockedBy": None,  # User ID who locked the service
         "boostedScore": boost_score,
         "createdAt": datetime.utcnow(),
-        "updatedAt": datetime.utcnow()
+        "updatedAt": datetime.utcnow(),
+        "expiresAt": datetime.utcnow() + timedelta(days=3)  # Expire après 3 jours
     }
     
     await db.services.insert_one(service)
