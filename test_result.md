@@ -162,6 +162,83 @@ backend:
           
           L'ENDPOINT /api/exchanges/my/all FONCTIONNE PARFAITEMENT POUR LA FONCTIONNALITÉ CALENDRIER!
 
+  - task: "Service Expiration (3 days) - Creation"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ SERVICE EXPIRATION CREATION TESTÉ AVEC SUCCÈS
+          
+          Test effectué selon la review request Coup de Pouce:
+          - Vérifié que lors de la création d'un service via POST /api/services, le champ `expiresAt` est bien ajouté
+          - Le champ `expiresAt` est correctement défini à datetime.utcnow() + 3 jours
+          - Service créé avec expiresAt: 2025-12-01T13:39:39.654000 (3 jours après création)
+          - Fonctionnalité d'expiration automatique opérationnelle
+
+  - task: "Service Expiration (3 days) - Filtering"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ SERVICE EXPIRATION FILTERING TESTÉ AVEC SUCCÈS
+          
+          Test effectué selon la review request Coup de Pouce:
+          - Vérifié que GET /api/services filtre automatiquement et n'affiche PAS les services expirés
+          - Services non expirés (expiresAt >= maintenant) sont bien retournés
+          - Aucun service avec expiresAt < now() n'apparaît dans GET /api/services
+          - Filtrage automatique et transparent fonctionnel (22 services actifs retournés)
+
+  - task: "Authentication System - Register/Login"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ SYSTÈME D'AUTHENTIFICATION TESTÉ AVEC SUCCÈS
+          
+          Tests effectués selon la review request Coup de Pouce:
+          - POST /api/auth/register fonctionne correctement (inscription)
+          - POST /api/auth/login fonctionne correctement (connexion)
+          - Tokens JWT générés et validés correctement
+          - Système d'authentification opérationnel pour l'application Coup de Pouce
+
+  - task: "Service Creation - All Fields"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ CRÉATION DE SERVICES COMPLÈTE TESTÉE AVEC SUCCÈS
+          
+          Tests effectués selon la review request Coup de Pouce:
+          - POST /api/services fonctionne avec tous les champs requis
+          - Champs testés: title, description, duration, category, location, type
+          - Types "offer" et "request" fonctionnels
+          - Services créés: "Aide au déménagement" (offer) et "Recherche prof de guitare" (request)
+          - Tous les champs présents dans les services créés, y compris expiresAt
+
 frontend:
   - task: "Fix Admin Role Field"
     implemented: true
