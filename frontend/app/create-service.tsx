@@ -198,6 +198,14 @@ export default function CreateServiceScreen() {
             </Text>
           </View>
 
+          {/* Expiration Notice */}
+          <View style={styles.expirationCard}>
+            <Ionicons name="time-outline" size={20} color="#F59E0B" />
+            <Text style={styles.expirationText}>
+              ⏰ Votre annonce sera automatiquement supprimée après <Text style={styles.expirationBold}>72 heures (3 jours)</Text>
+            </Text>
+          </View>
+
           {/* Form */}
           <View style={styles.form}>
             <View style={styles.inputGroup}>
