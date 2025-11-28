@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useAuthStore } from '../src/store/authStore';
+import { useThemeStore } from '../src/store/themeStore';
 import { useNotificationPolling } from '../src/hooks/useNotificationPolling';
 import api from '../src/utils/api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -9,12 +10,14 @@ import { ActivityIndicator, View } from 'react-native';
 
 export default function RootLayout() {
   const { setUser, setToken, isLoading } = useAuthStore();
+  const { colors, mode, loadTheme } = useThemeStore();
   const [initializing, setInitializing] = useState(true);
 
   // Enable notification polling
   useNotificationPolling();
 
   useEffect(() => {
+    loadTheme();
     loadUser();
   }, []);
 
