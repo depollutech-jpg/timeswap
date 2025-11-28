@@ -112,7 +112,7 @@ export default function RappelScreen() {
               <Ionicons name="megaphone" size={20} color={Colors.secondary} />
             </View>
             <View style={styles.notifContent}>
-              <Text style={styles.notifTitle}>Nouvelle annonce : Cours de cuisine</Text>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Nouvelle annonce : Cours de cuisine</Text>
               <Text style={styles.notifTime}>Il y a 1 heure</Text>
             </View>
           </View>
