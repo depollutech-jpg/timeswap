@@ -409,7 +409,7 @@ export default function HomeScreen() {
                   </View>
 
                   <View style={styles.actionsRow}>
-                    {service.userId === user?._id && (
+                    {user && service.userId && String(service.userId) === String(user._id) && (
                       <TouchableOpacity 
                         style={styles.deleteButton}
                         onPress={() => handleDeleteService(service._id)}
