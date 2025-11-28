@@ -408,36 +408,22 @@ export default function HomeScreen() {
                     </View>
                   </View>
 
-                  <View style={styles.actionsRow}>
-                    {/* DEBUG: Afficher toujours les infos */}
-                    <View style={styles.debugInfo}>
-                      <Text style={styles.debugText}>
-                        {user && service.userId ? 
-                          (String(service.userId) === String(user._id) ? '✅ MATCH' : '❌ NO MATCH') : 
-                          '⚠️ Missing data'}
-                      </Text>
-                    </View>
-                    
-                    {/* Bouton DELETE toujours visible pour debug */}
+                  </TouchableOpacity>
+                  
+                  {/* Bouton DELETE en position absolue - HORS du TouchableOpacity */}
+                  {user && service.userId && String(service.userId) === String(user._id) && (
                     <TouchableOpacity 
-                      style={[styles.deleteButton, !(user && service.userId && String(service.userId) === String(user._id)) && styles.deleteButtonDisabled]}
-                      onPress={() => {
-                        console.log('DELETE CLICKED');
-                        console.log('User ID:', user?._id);
-                        console.log('Service User ID:', service.userId);
-                        console.log('Match:', String(service.userId) === String(user?._id));
-                        
-                        if (user && service.userId && String(service.userId) === String(user._id)) {
-                          handleDeleteService(service._id);
-                        } else {
-                          Alert.alert('Debug', `User: ${user?._id?.substring(0,8)}\nService: ${service.userId?.substring(0,8)}\nMatch: ${String(service.userId) === String(user?._id)}`);
-                        }
+                      style={styles.deleteButtonAbsolute}
+                      onPress={(e) => {
+                        console.log('DELETE CLICKED - SHOULD WORK NOW!');
+                        handleDeleteService(service._id);
                       }}
+                      activeOpacity={0.7}
                     >
-                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                      <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
                     </TouchableOpacity>
-                  </View>
-                </TouchableOpacity>
+                  )}
+                </View>
               );
             })
           )}
