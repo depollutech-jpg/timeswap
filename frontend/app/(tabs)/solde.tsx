@@ -176,7 +176,7 @@ export default function SoldeScreen() {
         </Animated.View>
 
         {/* Objectif mensuel */}
-        <View style={styles.goalCard}>
+        <View style={[styles.goalCard, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.goalHeader}>
             <View style={styles.goalIcon}>
               <Ionicons name="calendar" size={20} color="#A855F7" />
