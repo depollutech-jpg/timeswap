@@ -3,23 +3,72 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type ThemeMode = 'light' | 'dark' | 'night' | 'colorblind';
 
+// Palette TimeNeutral
+export const TimeNeutralColors = {
+  dark: '#1C1D21',
+  grey: '#6E727A',
+  lightGrey: '#E7E8EB',
+  white: '#FFFFFF',
+};
+
+// Couleur d'accent
+export const TimeAccentBlue = '#3A7AFE';
+export const TimeAccentBlueNight = '#2F6AF0';
+
+// Couleurs système
+export const SystemColors = {
+  successGreen: '#2ECC71',
+  successGreenCB: '#4DAF4A', // Colorblind safe
+  warningOrange: '#F39C12',
+  warningOrangeCB: '#DDAA00', // Colorblind safe
+  dangerRed: '#E74C3C',
+  dangerRedCB: '#BB1F2F', // Colorblind safe
+};
+
+// Dégradés officiels
+export const TimeGradients = {
+  primary: ['#3A7AFE', '#6E93FF'], // TimeGradient principal
+  primaryDark: ['#2F6AF0', '#5A7FE6'], // Version sombre (-20% luminosité)
+  danger: ['#E74C3C', '#F88A7D'], // Expiration <2h
+  neutral: ['#FFFFFF', '#F4F5F7'], // Background neutre
+  neutralDark: ['#1C1D21', '#2A2C30'], // Background sombre
+};
+
 interface ThemeColors {
+  // Backgrounds
   background: string;
   surface: string;
-  primary: string;
-  secondary: string;
-  text: string;
-  textSecondary: string;
-  border: string;
-  error: string;
-  success: string;
-  warning: string;
-  info: string;
   cardBackground: string;
   inputBackground: string;
+  
+  // Textes
+  text: string;
+  textSecondary: string;
+  textTertiary: string;
+  
+  // Accents
+  primary: string;
+  secondary: string;
+  
+  // Bordures
+  border: string;
+  borderLight: string;
+  
+  // Système
+  success: string;
+  warning: string;
+  danger: string;
+  info: string;
+  
+  // Navigation
   tabBarBackground: string;
   tabBarBorder: string;
-  tabIconInactive: string; // Couleur pour les icônes inactives dans la TabBar
+  tabIconInactive: string;
+  
+  // Dégradés (arrays de couleurs)
+  gradientPrimary: string[];
+  gradientDanger: string[];
+  gradientNeutral: string[];
 }
 
 interface ThemeState {
