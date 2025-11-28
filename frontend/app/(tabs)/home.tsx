@@ -482,6 +482,114 @@ export default function HomeScreen() {
           )}
         </Animated.View>
       </ScrollView>
+
+      {/* Modal de tri */}
+      <Modal
+        visible={showSortModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowSortModal(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setShowSortModal(false)}
+        >
+          <View style={styles.sortModal}>
+            <Text style={styles.sortModalTitle}>Trier les annonces</Text>
+            
+            <TouchableOpacity
+              style={[styles.sortOption, sortBy === 'default' && styles.sortOptionActive]}
+              onPress={() => handleSortChange('default')}
+            >
+              <Ionicons 
+                name="trending-up" 
+                size={22} 
+                color={sortBy === 'default' ? Colors.primary : Colors.text} 
+              />
+              <View style={styles.sortOptionContent}>
+                <Text style={[styles.sortOptionTitle, sortBy === 'default' && styles.sortOptionTitleActive]}>
+                  Par défaut
+                </Text>
+                <Text style={styles.sortOptionDesc}>Pertinence et popularité</Text>
+              </View>
+              {sortBy === 'default' && (
+                <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.sortOption, sortBy === 'recent' && styles.sortOptionActive]}
+              onPress={() => handleSortChange('recent')}
+            >
+              <Ionicons 
+                name="time-outline" 
+                size={22} 
+                color={sortBy === 'recent' ? Colors.primary : Colors.text} 
+              />
+              <View style={styles.sortOptionContent}>
+                <Text style={[styles.sortOptionTitle, sortBy === 'recent' && styles.sortOptionTitleActive]}>
+                  Plus récent
+                </Text>
+                <Text style={styles.sortOptionDesc}>Annonces les plus récentes d'abord</Text>
+              </View>
+              {sortBy === 'recent' && (
+                <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.sortOption, sortBy === 'oldest' && styles.sortOptionActive]}
+              onPress={() => handleSortChange('oldest')}
+            >
+              <Ionicons 
+                name="calendar-outline" 
+                size={22} 
+                color={sortBy === 'oldest' ? Colors.primary : Colors.text} 
+              />
+              <View style={styles.sortOptionContent}>
+                <Text style={[styles.sortOptionTitle, sortBy === 'oldest' && styles.sortOptionTitleActive]}>
+                  Plus ancien
+                </Text>
+                <Text style={styles.sortOptionDesc}>Annonces les plus anciennes d'abord</Text>
+              </View>
+              {sortBy === 'oldest' && (
+                <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.sortOption, sortBy === 'personalized' && styles.sortOptionActive]}
+              onPress={() => handleSortChange('personalized')}
+            >
+              <Ionicons 
+                name="star" 
+                size={22} 
+                color={sortBy === 'personalized' ? Colors.primary : Colors.text} 
+              />
+              <View style={styles.sortOptionContent}>
+                <Text style={[styles.sortOptionTitle, sortBy === 'personalized' && styles.sortOptionTitleActive]}>
+                  Personnalisé
+                </Text>
+                <Text style={styles.sortOptionDesc}>Basé sur vos centres d'intérêt</Text>
+              </View>
+              {sortBy === 'personalized' && (
+                <Ionicons name="checkmark-circle" size={24} color={Colors.primary} />
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.sortOption, { borderBottomWidth: 0 }]}
+              onPress={() => setShowSortModal(false)}
+            >
+              <Ionicons name="close-circle" size={22} color={Colors.textSecondary} />
+              <View style={styles.sortOptionContent}>
+                <Text style={styles.sortOptionTitle}>Annuler</Text>
+              </View>
+            </TouchableOpacity>
+          </View>
+        </TouchableOpacity>
+      </Modal>
     </SafeAreaView>
   );
 }
