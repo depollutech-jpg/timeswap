@@ -1,85 +1,83 @@
 <analysis>
-The user's primary language is French; all future responses must be in French.
+The trajectory documents an intensely iterative and feature-driven development process for a full-stack mobile application, initially named TimeSwap and later Coup de Pouce. The user, whose primary language is French, provided a continuous stream of detailed requests, ranging from core architecture to minute UI/UX refinements. The development was marked by rapid feature implementation followed by intensive, often frustrating, debugging cycles.
 
-The trajectory documents the iterative development of a full-stack React Native (Expo) and FastAPI application named TimeSwap. The process was highly interactive, beginning with a product concept and evolving through a series of detailed user requests.
+Key features implemented include a Vinted-style service exchange system, user authentication with roles, photo uploads, an admin dashboard, Stripe integration, and legal pages.
 
-Development followed a clear pattern:
-1.  **Backend First:** The AI engineer typically started by implementing or modifying FastAPI endpoints in .
-2.  **Frontend Implementation:** Frontend screens and logic were then built in the  directory, using  for navigation and Zustand for state management.
-3.  **Iterative Debugging:** Several features, particularly the Admin Dashboard access, required multiple rounds of debugging. This involved fixing issues on both the frontend (e.g., missing  in the auth store, incorrect component rendering logic) and backend (e.g., login endpoint not returning the user's role).
+Several critical bugs were encountered. The most persistent was the inability to delete service posts, which consumed a significant portion of the trajectory. This was finally resolved (seemingly as a side effect of other backend changes) after multiple failed attempts involving debugging  nesting, ID type mismatches, and cache clearing. Another major issue involved a draggable floating button that broke the entire tab layout, requiring a rollback and a cache-clearing fix suggested by the .
 
-Key features implemented include a sophisticated authentication system with role-based access, a password reset flow, a feature-rich home feed with intelligent sorting (geolocation and recency) and user-specific actions (delete post), a complete private messaging system (from ad details to a private chat room), and a complex admin dashboard.
+The AI engineer's workflow typically involved implementing backend logic in  first, followed by the corresponding frontend changes in the Expo/React Native application. The final user requests focused on implementing a 3-day expiration countdown for service posts, which was the task in progress when the trajectory ended.
 
-The most recent work involves building a real-time notification system for new messages, starting with backend modifications. The previous attempt to integrate the full admin dashboard into a single tab file proved too complex and was reverted to a simpler, more stable version.
+**Instruction for the next agent:** The user's primary language is French. All subsequent responses and interactions must be in French.
 </analysis>
-
 <product_requirements>
-The project, TimeSwap, is a mobile app for a service and time exchange community, designed to operate without monetary transactions. It features gamification elements like XP and levels to encourage user engagement.
+The application, Coup de Pouce, is a community-based mobile platform for service exchange, functioning on a time-based currency (hours) rather than money.
 
-**Core Functional Requirements:**
-- **User Management:** Secure user registration, login, and password reset via email.
-- **Role-Based Access:** A two-tiered system for user and admin roles, with specific accounts (, ) designated as administrators.
-- **Service Marketplace:** A main feed where users can post and browse service offers and requests. This feed supports intelligent sorting by recency and the user's geographical proximity. Users have the ability to delete their own posts.
-- **Private Messaging:** A complete chat system allowing users to initiate conversations directly from a service details page. The flow is: Ad on Home Feed -> Detailed Ad Page -> Contact button -> Private Chat Room.
-- **Admin Dashboard:** A secure, dedicated section for administrators to view application statistics (e.g., user activity, financial flows via charts) and perform management tasks. Access is provided through a dedicated, secured Admin tab in the main navigation.
-- **Dynamic UI:** The application features a horizontally scrollable bottom navigation bar to accommodate future expansion and subtle animations (bounce, slide) on the home page to enhance user experience.
+**Core User-Facing Features:**
+*   **Service Marketplace:** Users can post service ads with titles, descriptions, photos, and a price in hours. A homepage displays these ads, which can be filtered by categories (e.g., Jardinage, Bricolage).
+*   **Post Lifecycle:** Service posts automatically expire and are removed after 3 days (72 hours). A real-time countdown timer () must be visible on each post, turning red when less than 2 hours remain.
+*   **Exchange Flow:** A Vinted-like system where users can accept an exchange, locking the ad. The exchange is completed upon mutual confirmation (Tâche réalisée), triggering an automatic transfer of hours.
+*   **User Management & Reputation:** Secure registration (with mandatory CGU acceptance via a checkbox), login, and profiles displaying ratings and exchange history.
+*   **Admin Dashboard:** A private dashboard for administrators to view app statistics.
+*   **Legal Compliance:** Static pages for Mentions Légales, CGU, and Politique de Confidentialité, accessible from the footer.
+*   **UI/UX:** A modern, intuitive interface featuring an auto-scrolling footer menu with a glassmorphism effect, which pauses on manual interaction.
 </product_requirements>
-
 <key_technical_concepts>
-- **Frontend:** React Native (Expo) with TypeScript.
-- **Routing:** File-based routing using .
-- **State Management:** Zustand for global client-side state (user authentication, profile, role).
-- **UI/Navigation:** , custom scrollable tab bar component,  for animations,  for admin dashboard charts.
-- **Backend:** Python with FastAPI, serving a RESTful API.
+- **Backend:** Monolithic API built with Python and FastAPI.
+- **Frontend:** Mobile application built with React Native, Expo, and TypeScript.
 - **Database:** MongoDB for data persistence.
-- **Authentication:** JWT-based token system with a custom role (, ) verification mechanism.
-- **Geolocation:** Using  to fetch user coordinates for proximity-based sorting.
+- **Routing:** File-based routing using .
+- **State Management:** Zustand for global client-side state.
+- **Authentication:** JWT-based system with  and  roles.
+- **Image Handling:**  with Base64 encoding for image uploads.
+- **Asynchronous Tasks:** Background tasks for cleaning up expired services.
 </key_technical_concepts>
-
 <code_architecture>
-The project is a monorepo containing a  and .
+The project is a monorepo with a  (Expo) and  (FastAPI) structure.
 
+- **backend/server.py**:
+    - **Importance**: The single source of truth for all backend logic, including user auth, services, exchanges, and database interactions.
+    - **Summary of changes**: A field  was added to the  model upon creation. The  endpoint was modified to filter out services where  is in the past, effectively implementing the 3-day post-expiration rule. The  endpoint was confirmed to be functional.
 
+- **frontend/app/(tabs)/home.tsx**:
+    - **Importance**: The main screen of the app, displaying the list of all available services (the wall). It is the site of most recent user-facing feature requests and bug fixes.
+    - **Summary of changes**: This file underwent numerous, complex modifications. The most critical was fixing the service deletion bug by restructuring the JSX to remove nested  components, which were preventing the delete button's  event from firing. It was also updated to support filtering services by category. The next step is to integrate the  component here.
 
-- ****: The monolithic FastAPI backend. It's the brain of the application, managing all database interactions and API logic. It was heavily modified to add endpoints for service deletion, geospatial sorting, password reset, and a full chat system (creating chats, sending messages). The latest change was adding schemas and an endpoint for a new  collection.
+- **frontend/app/create-service.tsx**:
+    - **Importance**: The form for creating new service posts.
+    - **Summary of changes**: Fixed a critical bug where image uploads failed by switching from the web-based  API to using 's native Base64 encoding (). Logic was also added to prevent multi-clicks on the Publish button by disabling it and showing a loading state during submission.
 
-- ****: The main screen. It was significantly updated to request the user's location, pass coordinates to the backend for sorting, display a delete button on the user's own posts (with a confirmation alert), and handle the redirection to the new  page upon clicking an ad. The Propose Exchange button was removed in favor of this new flow.
+- **frontend/app/service-details.tsx**:
+    - **Importance**: Displays the details of a single service and is the secondary location for the service deletion functionality.
+    - **Summary of changes**: This file was also a focus of the deletion bug. The fix involved ensuring a strict string comparison () to correctly determine if the current user is the owner of the post and should see the delete button.
 
-- ****: This file is critical due to its troubled history. It was initially complex, attempting to embed the entire dashboard. After causing instability, it was **reverted to a simple, stable version**. It now displays a secure login form for non-admins. Upon successful admin login, it shows a success message and a button linking to the full dashboard at . This separation resolved critical rendering and redirection issues.
+- **frontend/src/components/CountdownTimer.tsx**:
+    - **Importance**: A new, reusable component created to handle the real-time display of the remaining time for a service post.
+    - **Summary of changes**: This file was newly created. It contains the logic to calculate the difference between  and an  prop, and updates the display every second using  and . It also includes logic to change the text color to red when the time remaining is less than two hours. It is ready to be integrated into .
 
-- ****: The separate, full-featured Admin Dashboard page. It contains the  charts and user lists. A bug fix was implemented here to correctly check the user's role from the Zustand store upon focusing the screen, ensuring only authorized admins can view it.
-
-- ****: A new screen created to display the full details of a service/ad when a user taps on it from the home feed. It contains the Contacter pour un échange button which initiates the chat creation process.
-
-- ****: A new screen that functions as the private chat room. It receives a  and fetches/displays messages between two users.
-
-- ****: The central Zustand store. A critical fix was made here to add the  property to the  interface. This was the root cause of early issues where the frontend was unaware of the user's admin status despite the backend sending it.
-
-- ****: Modified to include a Mot de passe oublié ? link, which navigates to the new password reset flow.
+- **frontend/app/auth/register.tsx**:
+    - **Importance**: The user registration screen.
+    - **Summary of changes**: It was updated to include a mandatory checkbox for accepting the Terms of Service (CGU). The registration logic now blocks submission if the checkbox is not ticked.
 </code_architecture>
-
 <pending_tasks>
-- **Complete Frontend Notification System:** Implement the client-side logic for the notification system. This includes:
-  - Creating a Zustand store for notifications.
-  - Implementing polling or a listener to fetch unread notifications.
-  - Displaying a toast/banner for new messages.
-  - Showing a badge counter on the main notification icon and the Messages tab.
-  - Marking notifications/messages as read when a chat is opened.
+- Integrate the newly created  component into the  and  pages to display the remaining time for each service post.
+- Add an informational message on the  page informing users that posts are valid for 72 hours.
+- Implement the abandoned request to make the floating + button draggable, if the user re-prioritizes it.
 </pending_tasks>
-
 <current_work>
-The last task initiated was the implementation of a comprehensive notification system for new private messages, as per the user's detailed request. The work began on the backend.
+The last task was to implement a 3-day (72-hour) expiration countdown for all service posts. This involved several steps:
 
-**Actions Taken:**
-1.  **Backend Schema Creation:** The file  was modified to define Pydantic models for  and . This establishes the data structure for notifications in the database, including fields like , , , and .
-2.  **Backend Endpoint Addition:** New API endpoints were added to :
-    -   : To fetch all notifications for the currently authenticated user.
-    -   : To mark a specific notification as read.
-    -   : To mark all of a user's notifications as read.
+1.  **Backend Update**: The  file was modified.
+    -   When a service is created, an  timestamp (now + 3 days) is added to the database document.
+    -   The main  endpoint, which fetches services for the homepage, was updated to automatically filter out and exclude any services where the  date is in the past.
 
-The immediate next step planned was to integrate notification creation into the existing message-sending logic.
+2.  **Frontend Component Creation**: A new reusable React component was created at .
+    -   This component accepts an  as a prop.
+    -   It uses  and  to calculate and display the remaining time in a Jours, Heures, Minutes, Secondes format, updating every second.
+    -   It also includes logic to turn the countdown text red when less than two hours remain.
+
+A major breakthrough occurred during this work: the persistent service deletion bug was finally resolved. Logs confirmed that  requests were successfully reaching the backend and returning a  status, indicating the feature is now functional.
+The next step was to integrate this new  component into the UI.
 </current_work>
-
 <optional_next_step>
-Modify the  endpoint in  to automatically create a new document in the  collection for the message recipient.
+I will now integrate the  component into the service card display on the homepage ().
 </optional_next_step>
