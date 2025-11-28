@@ -251,7 +251,7 @@ export default function HomeScreen() {
             }}
           >
             <TouchableOpacity 
-              style={styles.greetingCard}
+              style={[styles.greetingCard, { backgroundColor: colors.cardBackground }]}
               onPress={() => router.push('/(tabs)/solde')}
               activeOpacity={0.8}
             >
