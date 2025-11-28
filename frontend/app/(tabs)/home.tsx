@@ -165,13 +165,28 @@ export default function HomeScreen() {
 
   const onRefresh = async () => {
     setRefreshing(true);
-    await loadServices(selectedCategory);
+    await loadServices(selectedCategory, sortBy);
     setRefreshing(false);
   };
 
   const handleCategoryPress = (category: string) => {
     setSelectedCategory(category);
-    loadServices(category);
+    loadServices(category, sortBy);
+  };
+
+  const handleSortChange = (newSort: string) => {
+    setSortBy(newSort);
+    setShowSortModal(false);
+    loadServices(selectedCategory, newSort);
+  };
+
+  const getSortLabel = () => {
+    switch (sortBy) {
+      case 'recent': return '🕐 Plus récent';
+      case 'oldest': return '📅 Plus ancien';
+      case 'personalized': return '⭐ Personnalisé';
+      default: return '🔄 Par défaut';
+    }
   };
 
   // Reload when location changes
