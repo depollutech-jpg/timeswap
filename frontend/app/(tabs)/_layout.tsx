@@ -15,10 +15,14 @@ function FloatingAddButton() {
   const [showModal, setShowModal] = useState(false);
   
   // Position initiale au centre en bas
-  const translateX = useRef(new Animated.Value(SCREEN_WIDTH / 2 - BUTTON_SIZE / 2)).current;
-  const translateY = useRef(new Animated.Value(SCREEN_HEIGHT - 130)).current;
+  const initialX = SCREEN_WIDTH / 2 - BUTTON_SIZE / 2;
+  const initialY = SCREEN_HEIGHT - 130;
   
-  const lastOffset = useRef({ x: SCREEN_WIDTH / 2 - BUTTON_SIZE / 2, y: SCREEN_HEIGHT - 130 });
+  const translateX = useRef(new Animated.Value(initialX)).current;
+  const translateY = useRef(new Animated.Value(initialY)).current;
+  
+  const lastOffset = useRef({ x: initialX, y: initialY });
+  const dragOffset = useRef({ x: 0, y: 0 });
 
   const onGestureEvent = Animated.event(
     [
@@ -29,12 +33,26 @@ function FloatingAddButton() {
         },
       },
     ],
-    { useNativeDriver: false }
+    {
+      useNativeDriver: false,
+      listener: (event: any) => {
+        // Mettre à jour la position en temps réel pendant le drag
+        const newX = lastOffset.current.x + event.nativeEvent.translationX;
+        const newY = lastOffset.current.y + event.nativeEvent.translationY;
+        
+        // Appliquer les contraintes
+        const constrainedX = Math.max(0, Math.min(newX, SCREEN_WIDTH - BUTTON_SIZE));
+        const constrainedY = Math.max(50, Math.min(newY, SCREEN_HEIGHT - BUTTON_SIZE - 50));
+        
+        translateX.setValue(constrainedX);
+        translateY.setValue(constrainedY);
+      }
+    }
   );
 
   const onHandlerStateChange = (event: any) => {
-    if (event.nativeEvent.oldState === 4) {
-      // Gesture ended
+    if (event.nativeEvent.state === 5) {
+      // Gesture ended (state 5 = END)
       let finalX = lastOffset.current.x + event.nativeEvent.translationX;
       let finalY = lastOffset.current.y + event.nativeEvent.translationY;
 
@@ -43,17 +61,13 @@ function FloatingAddButton() {
       finalY = Math.max(50, Math.min(finalY, SCREEN_HEIGHT - BUTTON_SIZE - 50));
 
       lastOffset.current = { x: finalX, y: finalY };
-
-      // Animer vers la position finale
-      Animated.spring(translateX, {
-        toValue: finalX,
-        useNativeDriver: false,
-      }).start();
-
-      Animated.spring(translateY, {
-        toValue: finalY,
-        useNativeDriver: false,
-      }).start();
+      
+      // Mettre les valeurs finales
+      translateX.setValue(finalX);
+      translateY.setValue(finalY);
+    } else if (event.nativeEvent.state === 2) {
+      // Gesture started (state 2 = BEGAN)
+      dragOffset.current = { x: 0, y: 0 };
     }
   };
 
