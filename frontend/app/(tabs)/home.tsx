@@ -176,17 +176,7 @@ export default function HomeScreen() {
 
   const handleSortChange = (newSort: string) => {
     setSortBy(newSort);
-    setShowSortModal(false);
     loadServices(selectedCategory, newSort);
-  };
-
-  const getSortLabel = () => {
-    switch (sortBy) {
-      case 'recent': return '🕐 Plus récent';
-      case 'oldest': return '📅 Plus ancien';
-      case 'personalized': return '⭐ Personnalisé';
-      default: return '🔄 Par défaut';
-    }
   };
 
   // Reload when location changes
