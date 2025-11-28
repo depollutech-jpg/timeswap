@@ -1,17 +1,25 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for TimeSwap Calendar Feature
-Testing GET /api/exchanges/my/all endpoint
+Backend Testing for Coup de Pouce Application
+Tests service expiration functionality and general backend operations
 """
 
 import requests
 import json
-import uuid
-from datetime import datetime, timedelta
 import time
+from datetime import datetime, timedelta
+import os
+from dotenv import load_dotenv
 
-# Configuration
-BASE_URL = "https://task-trade.preview.emergentagent.com/api"
+# Load environment variables
+load_dotenv('/app/frontend/.env')
+
+# Get backend URL from environment
+BACKEND_URL = os.getenv('EXPO_PUBLIC_BACKEND_URL', 'http://localhost:8001')
+API_BASE = f"{BACKEND_URL}/api"
+
+print(f"🔗 Testing backend at: {API_BASE}")
+
 HEADERS = {"Content-Type": "application/json"}
 
 class TimeSwapTester:
