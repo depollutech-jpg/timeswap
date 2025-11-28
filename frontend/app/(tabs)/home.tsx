@@ -716,6 +716,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  deleteButtonDisabled: {
+    opacity: 0.3,
+  },
+  debugInfo: {
+    backgroundColor: '#FEF3C7',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  debugText: {
+    fontSize: 10,
+    fontWeight: 'bold',
+    color: '#92400E',
+  },
   distanceBadge: {
     flexDirection: 'row',
     alignItems: 'center',
