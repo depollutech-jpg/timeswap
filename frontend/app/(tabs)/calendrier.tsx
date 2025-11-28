@@ -191,9 +191,9 @@ export default function CalendrierScreen() {
 
   if (loading) {
     return (
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Calendrier</Text>
+          <Text style={[styles.headerTitle, { color: colors.text }]}>Calendrier</Text>
         </View>
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={Colors.primary} />
