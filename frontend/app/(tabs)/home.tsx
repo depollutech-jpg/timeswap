@@ -420,23 +420,30 @@ export default function HomeScreen() {
                         styles.deleteButtonAbsolute,
                         !(user && service.userId && String(service.userId) === String(user._id)) && styles.deleteButtonDisabledAbsolute
                       ]}
-                      onPress={(e) => {
-                        e?.stopPropagation?.();
-                        console.log('=== DELETE BUTTON CLICKED ===');
-                        console.log('User exists:', !!user);
-                        console.log('User ID:', user?._id);
-                        console.log('Service User ID:', service.userId);
-                        console.log('Match:', user && service.userId && String(service.userId) === String(user._id));
-                        
-                        if (user && service.userId && String(service.userId) === String(user._id)) {
-                          console.log('Calling handleDeleteService...');
-                          handleDeleteService(service._id);
-                        } else {
-                          Alert.alert(
-                            'Debug Info', 
-                            `Vous n'êtes pas le propriétaire\n\nVotre ID: ${user?._id?.substring(0,10)}...\nService ID: ${service.userId?.substring(0,10)}...`
-                          );
-                        }
+                      onPress={() => {
+                        // ALERT IMMÉDIAT pour confirmer que le clic fonctionne
+                        Alert.alert('TEST', 'Le bouton DELETE a été cliqué !', [
+                          {
+                            text: 'OK',
+                            onPress: () => {
+                              console.log('=== DELETE BUTTON CLICKED ===');
+                              console.log('User exists:', !!user);
+                              console.log('User ID:', user?._id);
+                              console.log('Service User ID:', service.userId);
+                              console.log('Match:', user && service.userId && String(service.userId) === String(user._id));
+                              
+                              if (user && service.userId && String(service.userId) === String(user._id)) {
+                                console.log('Calling handleDeleteService...');
+                                handleDeleteService(service._id);
+                              } else {
+                                Alert.alert(
+                                  'Debug Info', 
+                                  `Vous n'êtes pas le propriétaire\n\nVotre ID: ${user?._id?.substring(0,10)}...\nService ID: ${service.userId?.substring(0,10)}...`
+                                );
+                              }
+                            }
+                          }
+                        ]);
                       }}
                       activeOpacity={0.7}
                       pointerEvents="auto"
