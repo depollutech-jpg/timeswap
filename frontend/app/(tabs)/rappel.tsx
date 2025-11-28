@@ -42,7 +42,7 @@ export default function RappelScreen() {
             <View style={styles.settingInfo}>
               <Ionicons name="chatbubbles" size={24} color={Colors.primary} />
               <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>Messages privés</Text>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Messages privés</Text>
                 <Text style={styles.settingDescription}>
                   Recevoir une notification pour les nouveaux messages
                 </Text>
