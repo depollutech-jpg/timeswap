@@ -201,7 +201,7 @@ export default function SoldeScreen() {
         </View>
 
         {/* Historique des échanges */}
-        <View style={styles.historySection}>
+        <View style={[styles.historySection, { backgroundColor: colors.cardBackground }]}>
           <View style={styles.sectionHeader}>
             <View style={styles.sectionIconHeader}>
               <Ionicons name="time" size={20} color="#3B82F6" />
