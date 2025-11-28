@@ -60,7 +60,7 @@ export default function RappelScreen() {
             <View style={styles.settingInfo}>
               <Ionicons name="megaphone" size={24} color={Colors.secondary} />
               <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>Nouvelles annonces</Text>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Nouvelles annonces</Text>
                 <Text style={styles.settingDescription}>
                   Notifications basées sur vos centres d'intérêt
                 </Text>
