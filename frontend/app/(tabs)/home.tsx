@@ -16,6 +16,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../src/store/authStore';
 import { useNotificationStore } from '../../src/store/notificationStore';
+import { useThemeStore } from '../../src/store/themeStore';
 import { Colors } from '../../src/constants/colors';
 import { CATEGORIES } from '../../src/constants/categories';
 import api from '../../src/utils/api';
