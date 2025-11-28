@@ -70,8 +70,11 @@ const LOCAL_PARTNERS = [
   },
 ];
 
+import { useThemeStore } from '../../src/store/themeStore';
+
 export default function RewardsScreen() {
   const { user } = useAuthStore();
+  const { colors } = useThemeStore();
   const [leaderboard, setLeaderboard] = useState([]);
   const [badges, setBadges] = useState([]);
   const [loading, setLoading] = useState(true);
