@@ -409,14 +409,33 @@ export default function HomeScreen() {
                   </View>
 
                   <View style={styles.actionsRow}>
-                    {user && service.userId && String(service.userId) === String(user._id) && (
-                      <TouchableOpacity 
-                        style={styles.deleteButton}
-                        onPress={() => handleDeleteService(service._id)}
-                      >
-                        <Ionicons name="trash-outline" size={20} color="#EF4444" />
-                      </TouchableOpacity>
-                    )}
+                    {/* DEBUG: Afficher toujours les infos */}
+                    <View style={styles.debugInfo}>
+                      <Text style={styles.debugText}>
+                        {user && service.userId ? 
+                          (String(service.userId) === String(user._id) ? '✅ MATCH' : '❌ NO MATCH') : 
+                          '⚠️ Missing data'}
+                      </Text>
+                    </View>
+                    
+                    {/* Bouton DELETE toujours visible pour debug */}
+                    <TouchableOpacity 
+                      style={[styles.deleteButton, !(user && service.userId && String(service.userId) === String(user._id)) && styles.deleteButtonDisabled]}
+                      onPress={() => {
+                        console.log('DELETE CLICKED');
+                        console.log('User ID:', user?._id);
+                        console.log('Service User ID:', service.userId);
+                        console.log('Match:', String(service.userId) === String(user?._id));
+                        
+                        if (user && service.userId && String(service.userId) === String(user._id)) {
+                          handleDeleteService(service._id);
+                        } else {
+                          Alert.alert('Debug', `User: ${user?._id?.substring(0,8)}\nService: ${service.userId?.substring(0,8)}\nMatch: ${String(service.userId) === String(user?._id)}`);
+                        }
+                      }}
+                    >
+                      <Ionicons name="trash-outline" size={20} color="#EF4444" />
+                    </TouchableOpacity>
                   </View>
                 </TouchableOpacity>
               );
