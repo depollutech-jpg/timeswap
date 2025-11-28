@@ -477,6 +477,7 @@ async def get_services(
     location: Optional[str] = None,
     lat: Optional[float] = None,
     lon: Optional[float] = None,
+    sort: Optional[str] = None,  # default, recent, oldest, personalized
     skip: int = 0,
     limit: int = 50  # Fetch more for better sorting
 ):
