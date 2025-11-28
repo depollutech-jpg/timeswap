@@ -33,6 +33,8 @@ export default function HomeScreen() {
   const [location, setLocation] = useState<{ latitude: number; longitude: number } | null>(null);
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tous');
+  const [sortBy, setSortBy] = useState<string>('default'); // default, recent, oldest, personalized
+  const [showSortModal, setShowSortModal] = useState(false);
 
   // Animations
   const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
