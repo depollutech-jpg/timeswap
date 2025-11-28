@@ -196,7 +196,7 @@ export default function CustomTabBar({ state, descriptors, navigation }: BottomT
 }
 
 // Composant TabItem avec animation de scaling
-function TabItem({ route, label, isFocused, options, navigation, unreadCount }: any) {
+function TabItem({ route, label, isFocused, options, navigation, unreadCount, themeColors }: any) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   const onPress = () => {
