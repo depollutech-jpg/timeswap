@@ -247,11 +247,15 @@ export default function TabsLayout() {
 const styles = StyleSheet.create({
   floatingButton: {
     position: 'absolute',
-    bottom: 50,
-    left: '50%',
-    marginLeft: -32,
-    width: 64,
-    height: 64,
+    top: 0,
+    left: 0,
+    width: BUTTON_SIZE,
+    height: BUTTON_SIZE,
+    zIndex: 999,
+  },
+  floatingButtonTouchable: {
+    width: '100%',
+    height: '100%',
     borderRadius: 32,
     backgroundColor: Colors.primary,
     justifyContent: 'center',
@@ -261,7 +265,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
-    zIndex: 999,
   },
   floatingButtonInner: {
     width: 56,
