@@ -78,7 +78,7 @@ export default function RappelScreen() {
             <View style={styles.settingInfo}>
               <Ionicons name="swap-horizontal" size={24} color={Colors.success} />
               <View style={styles.settingText}>
-                <Text style={styles.settingTitle}>Échanges</Text>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Échanges</Text>
                 <Text style={styles.settingDescription}>
                   Notifications sur l'état de vos échanges
                 </Text>
