@@ -29,6 +29,7 @@ import CountdownTimer from '../../src/components/CountdownTimer';
 export default function HomeScreen() {
   const { user } = useAuthStore();
   const { unreadCount } = useNotificationStore();
+  const { colors } = useThemeStore();
   const router = useRouter();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
