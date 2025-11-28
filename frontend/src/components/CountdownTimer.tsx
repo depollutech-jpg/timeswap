@@ -1,180 +1,163 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Colors } from '../constants/colors';
+import { View, Text, StyleSheet, Animated } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useThemeStore } from '../store/themeStore';
+import { Typography, BorderRadius } from '../constants/typography';
 
 interface CountdownTimerProps {
-  expiresAt: string | Date;
-  createdAt: string | Date;
+  expiresAt: string;
+  createdAt: string;
   compact?: boolean;
 }
 
+type TimerState = 'normal' | 'warning' | 'danger' | 'expired';
+
 export default function CountdownTimer({ expiresAt, createdAt, compact = false }: CountdownTimerProps) {
-  const [timeLeft, setTimeLeft] = useState(calculateTimeLeft());
-
-  function calculateTimeLeft() {
-    const now = new Date();
-    const expiry = new Date(expiresAt);
-    const diff = expiry.getTime() - now.getTime();
-
-    if (diff <= 0) {
-      return { expired: true, days: 0, hours: 0, minutes: 0, seconds: 0, totalHours: 0 };
-    }
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
-    const totalHours = diff / (1000 * 60 * 60);
-
-    return { expired: false, days, hours, minutes, seconds, totalHours };
-  }
+  const { colors, mode } = useThemeStore();
+  const [timeRemaining, setTimeRemaining] = useState('');
+  const [timerState, setTimerState] = useState<TimerState>('normal');
+  const [pulseAnim] = useState(new Animated.Value(1));
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(calculateTimeLeft());
-    }, 1000);
+    const calculateTimeRemaining = () => {
+      const now = new Date().getTime();
+      const expiryDate = new Date(expiresAt).getTime();
+      const difference = expiryDate - now;
 
-    return () => clearInterval(timer);
-  }, [expiresAt]);
+      if (difference <= 0) {
+        setTimeRemaining('Expiré');
+        setTimerState('expired');
+        return;
+      }
 
-  if (timeLeft.expired) {
-    return (
-      <View style={[styles.container, styles.containerExpired]}>
-        <Text style={styles.expiredText}>⏰ Annonce expirée</Text>
-      </View>
-    );
-  }
+      const days = Math.floor(difference / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((difference % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((difference % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((difference % (1000 * 60)) / 1000);
 
-  // Alerte rouge si moins de 2 heures
-  const isUrgent = timeLeft.totalHours < 2;
+      // Déterminer l'état du timer selon TimeSwap specs
+      const totalHours = days * 24 + hours;
+      if (totalHours < 2) {
+        setTimerState('danger'); // <2h : rouge + pulsation
+      } else if (totalHours < 24) {
+        setTimerState('warning'); // 2h-24h : orange
+      } else {
+        setTimerState('normal'); // >24h : bleu
+      }
 
-  if (compact) {
-    return (
-      <View style={[styles.compactContainer, isUrgent && styles.compactUrgent]}>
-        <Text style={[styles.compactText, isUrgent && styles.urgentText]}>
-          ⏱️ {timeLeft.days > 0 && `${timeLeft.days}j `}
-          {timeLeft.hours}h {timeLeft.minutes}m
-        </Text>
-      </View>
-    );
-  }
+      if (compact) {
+        // Format compact: "2j 5h 30m"
+        if (days > 0) {
+          setTimeRemaining(`${days}j ${hours}h ${minutes}m`);
+        } else if (hours > 0) {
+          setTimeRemaining(`${hours}h ${minutes}m`);
+        } else {
+          setTimeRemaining(`${minutes}m ${seconds}s`);
+        }
+      } else {
+        // Format complet: "Expire dans : 2j 5h 30m 15s"
+        setTimeRemaining(`${days}j ${hours}h ${minutes}m ${seconds}s`);
+      }
+    };
+
+    calculateTimeRemaining();
+    const interval = setInterval(calculateTimeRemaining, 1000);
+
+    return () => clearInterval(interval);
+  }, [expiresAt, compact]);
+
+  // Animation pulsation pour danger
+  useEffect(() => {
+    if (timerState === 'danger') {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulseAnim, {
+            toValue: 1.1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulseAnim, {
+            toValue: 1,
+            duration: 500,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      pulseAnim.setValue(1);
+    }
+  }, [timerState]);
+
+  const getTimerStyles = () => {
+    switch (timerState) {
+      case 'expired':
+        return {
+          backgroundColor: colors.border,
+          textColor: colors.textSecondary,
+          icon: 'close-circle' as keyof typeof Ionicons.glyphMap,
+        };
+      case 'danger':
+        return {
+          backgroundColor: colors.danger + '20',
+          textColor: colors.danger,
+          icon: 'warning' as keyof typeof Ionicons.glyphMap,
+        };
+      case 'warning':
+        return {
+          backgroundColor: colors.warning + '20',
+          textColor: colors.warning,
+          icon: 'time' as keyof typeof Ionicons.glyphMap,
+        };
+      default:
+        return {
+          backgroundColor: colors.primary + '20',
+          textColor: colors.primary,
+          icon: 'time-outline' as keyof typeof Ionicons.glyphMap,
+        };
+    }
+  };
+
+  const timerStyles = getTimerStyles();
+
+  // Mode daltonien : ajouter motif diagonal
+  const isDaltonien = mode === 'colorblind';
 
   return (
-    <View style={[styles.container, isUrgent && styles.containerUrgent]}>
-      <Text style={[styles.label, isUrgent && styles.urgentLabel]}>⏰ Expire dans :</Text>
-      <View style={styles.timeDisplay}>
-        {timeLeft.days > 0 && (
-          <View style={styles.timeUnit}>
-            <Text style={[styles.timeValue, isUrgent && styles.urgentValue]}>{timeLeft.days}</Text>
-            <Text style={[styles.timeLabel, isUrgent && styles.urgentLabel]}>j</Text>
-          </View>
-        )}
-        <View style={styles.timeUnit}>
-          <Text style={[styles.timeValue, isUrgent && styles.urgentValue]}>{timeLeft.hours}</Text>
-          <Text style={[styles.timeLabel, isUrgent && styles.urgentLabel]}>h</Text>
-        </View>
-        <Text style={[styles.separator, isUrgent && styles.urgentValue]}>:</Text>
-        <View style={styles.timeUnit}>
-          <Text style={[styles.timeValue, isUrgent && styles.urgentValue]}>{timeLeft.minutes}</Text>
-          <Text style={[styles.timeLabel, isUrgent && styles.urgentLabel]}>m</Text>
-        </View>
-        <Text style={[styles.separator, isUrgent && styles.urgentValue]}>:</Text>
-        <View style={styles.timeUnit}>
-          <Text style={[styles.timeValue, isUrgent && styles.urgentValue]}>{timeLeft.seconds}</Text>
-          <Text style={[styles.timeLabel, isUrgent && styles.urgentLabel]}>s</Text>
-        </View>
-      </View>
-      {isUrgent && (
-        <Text style={styles.urgentWarning}>🔴 Publication bientôt expirée !</Text>
-      )}
-    </View>
+    <Animated.View
+      style={[
+        styles.container,
+        {
+          backgroundColor: timerStyles.backgroundColor,
+          transform: timerState === 'danger' ? [{ scale: pulseAnim }] : [],
+        },
+        isDaltonien && timerState === 'danger' && styles.daltonienPattern,
+      ]}
+    >
+      <Ionicons name={timerStyles.icon} size={compact ? 12 : 16} color={timerStyles.textColor} />
+      <Text
+        style={[
+          compact ? Typography.small : Typography.label,
+          { color: timerStyles.textColor, fontWeight: '600' },
+        ]}
+      >
+        {compact ? timeRemaining : `Expire dans : ${timeRemaining}`}
+      </Text>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#F3F4F6',
-    padding: 12,
-    borderRadius: 8,
-    marginVertical: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    borderRadius: BorderRadius.md,
+    alignSelf: 'flex-start',
   },
-  containerUrgent: {
-    backgroundColor: '#FEE2E2',
+  daltonienPattern: {
     borderWidth: 2,
-    borderColor: '#EF4444',
-  },
-  containerExpired: {
-    backgroundColor: '#E5E7EB',
-    padding: 8,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: Colors.textSecondary,
-    marginBottom: 8,
-  },
-  urgentLabel: {
-    color: '#DC2626',
-  },
-  timeDisplay: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  timeUnit: {
-    alignItems: 'center',
-  },
-  timeValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
-  timeLabel: {
-    fontSize: 10,
-    color: Colors.textSecondary,
-    marginTop: -4,
-  },
-  separator: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: Colors.text,
-    marginHorizontal: 4,
-  },
-  urgentValue: {
-    color: '#DC2626',
-  },
-  urgentWarning: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: '#DC2626',
-    textAlign: 'center',
-    marginTop: 8,
-  },
-  expiredText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  compactContainer: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  compactUrgent: {
-    backgroundColor: '#FEE2E2',
-    borderWidth: 1,
-    borderColor: '#EF4444',
-  },
-  compactText: {
-    fontSize: 11,
-    fontWeight: '600',
-    color: Colors.text,
-  },
-  urgentText: {
-    color: '#DC2626',
+    borderStyle: 'dashed',
   },
 });
