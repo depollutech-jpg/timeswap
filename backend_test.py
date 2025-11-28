@@ -31,11 +31,14 @@ class CoupDePouceBackendTester:
         self.test_user_id = None
         self.test_service_id = None
         
-    def log(self, message, level="INFO"):
-        timestamp = datetime.now().strftime("%H:%M:%S")
-        print(f"[{timestamp}] {level}: {message}")
+    def log_test(self, test_name, success, details=""):
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}")
+        if details:
+            print(f"   📝 {details}")
+        print()
         
-    def register_test_user(self, email_suffix):
+    def register_test_user(self):
         """Register a test user and return token"""
         user_data = {
             "email": f"testuser_{email_suffix}@example.com",
