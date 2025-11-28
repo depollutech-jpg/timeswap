@@ -23,7 +23,6 @@ export default function ParametresScreen() {
   };
 
   const isLightMode = mode === 'light';
-  const isDarkMode = mode === 'dark';
   const isNightMode = mode === 'night';
   const isColorblindMode = mode === 'colorblind';
 
