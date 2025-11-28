@@ -160,7 +160,7 @@ export default function CalendrierScreen() {
                   <Ionicons name="person" size={16} color={Colors.textSecondary} />
                 </View>
               )}
-              <Text style={styles.userName} numberOfLines={1}>
+              <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
                 {exchange.otherUser.name}
               </Text>
             </View>
