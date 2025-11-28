@@ -78,81 +78,158 @@ interface ThemeState {
   loadTheme: () => Promise<void>;
 }
 
-// Définition des palettes de couleurs pour chaque mode
+// Définition des palettes TimeNeutral pour chaque mode
 const themes: Record<ThemeMode, ThemeColors> = {
+  // 🌞 MODE CLAIR (Light Mode)
   light: {
-    background: '#F9FAFB',
-    surface: '#FFFFFF',
-    primary: '#FF6B9D',
-    secondary: '#A855F7',
-    text: '#1F2937',
-    textSecondary: '#6B7280',
-    border: '#E5E7EB',
-    error: '#EF4444',
-    success: '#10B981',
-    warning: '#F59E0B',
-    info: '#3B82F6',
-    cardBackground: '#FFFFFF',
-    inputBackground: '#F3F4F6',
+    // Backgrounds
+    background: TimeNeutralColors.white, // #FFFFFF
+    surface: TimeNeutralColors.lightGrey, // #E7E8EB (gris très pâle)
+    cardBackground: TimeNeutralColors.lightGrey, // #E7E8EB
+    inputBackground: '#F4F5F7', // Gris ultra pâle
+    
+    // Textes
+    text: TimeNeutralColors.dark, // #1C1D21 (noir neutre)
+    textSecondary: TimeNeutralColors.grey, // #6E727A
+    textTertiary: '#9CA3AF',
+    
+    // Accents
+    primary: TimeAccentBlue, // #3A7AFE
+    secondary: '#6E93FF', // Bleu plus clair
+    
+    // Bordures
+    border: TimeNeutralColors.lightGrey, // #E7E8EB
+    borderLight: '#F4F5F7',
+    
+    // Système
+    success: SystemColors.successGreen, // #2ECC71
+    warning: SystemColors.warningOrange, // #F39C12
+    danger: SystemColors.dangerRed, // #E74C3C
+    info: TimeAccentBlue,
+    
+    // Navigation
     tabBarBackground: 'rgba(255, 255, 255, 0.95)',
-    tabBarBorder: '#E5E7EB',
-    tabIconInactive: '#9CA3AF', // Gris moyen bien visible sur fond clair
+    tabBarBorder: TimeNeutralColors.lightGrey,
+    tabIconInactive: TimeNeutralColors.grey, // #6E727A
+    
+    // Dégradés
+    gradientPrimary: TimeGradients.primary, // ['#3A7AFE', '#6E93FF']
+    gradientDanger: TimeGradients.danger, // ['#E74C3C', '#F88A7D']
+    gradientNeutral: TimeGradients.neutral, // ['#FFFFFF', '#F4F5F7']
   },
+  
+  // 🌚 MODE SOMBRE (Dark Mode)
   dark: {
-    background: '#111827',
-    surface: '#1F2937',
-    primary: '#FF6B9D',
-    secondary: '#A855F7',
-    text: '#F9FAFB',
-    textSecondary: '#D1D5DB',
-    border: '#374151',
-    error: '#EF4444',
-    success: '#10B981',
-    warning: '#F59E0B',
-    info: '#3B82F6',
-    cardBackground: '#1F2937',
-    inputBackground: '#374151',
-    tabBarBackground: 'rgba(31, 41, 55, 0.95)',
-    tabBarBorder: '#374151',
-    tabIconInactive: '#E5E7EB', // Gris très clair pour contraster avec le fond sombre
+    // Backgrounds
+    background: '#101114', // Background général très sombre
+    surface: TimeNeutralColors.dark, // #1C1D21 (cartes)
+    cardBackground: TimeNeutralColors.dark, // #1C1D21
+    inputBackground: '#2A2C30',
+    
+    // Textes
+    text: '#F4F5F7', // Texte clair
+    textSecondary: '#D6D7DA',
+    textTertiary: '#9CA3AF',
+    
+    // Accents
+    primary: TimeAccentBlue, // #3A7AFE (identique)
+    secondary: '#6E93FF',
+    
+    // Bordures
+    border: '#2A2C30',
+    borderLight: '#3A3C40',
+    
+    // Système
+    success: SystemColors.successGreen,
+    warning: SystemColors.warningOrange,
+    danger: SystemColors.dangerRed,
+    info: TimeAccentBlue,
+    
+    // Navigation
+    tabBarBackground: 'rgba(28, 29, 33, 0.95)',
+    tabBarBorder: '#2A2C30',
+    tabIconInactive: '#D6D7DA', // Gris clair pour contraste
+    
+    // Dégradés
+    gradientPrimary: TimeGradients.primaryDark, // ['#2F6AF0', '#5A7FE6'] (-20% luminosité)
+    gradientDanger: TimeGradients.danger,
+    gradientNeutral: TimeGradients.neutralDark, // ['#1C1D21', '#2A2C30']
   },
+  
+  // 🌑 MODE NUIT (Night Mode) - Ultra sombre
   night: {
-    background: '#000000',
-    surface: '#1A1A1A',
-    primary: '#FF4D7D',
-    secondary: '#9333EA',
-    text: '#E5E5E5',
-    textSecondary: '#A3A3A3',
-    border: '#2A2A2A',
-    error: '#DC2626',
-    success: '#059669',
-    warning: '#D97706',
-    info: '#2563EB',
-    cardBackground: '#1A1A1A',
-    inputBackground: '#2A2A2A',
-    tabBarBackground: 'rgba(26, 26, 26, 0.98)',
-    tabBarBorder: '#2A2A2A',
-    tabIconInactive: '#F5F5F5', // Blanc cassé pour contraster avec le noir
+    // Backgrounds
+    background: '#0B0C0E', // Background ultra sombre
+    surface: '#141518', // Surfaces
+    cardBackground: '#181A1E', // Cartes
+    inputBackground: '#1F2125',
+    
+    // Textes
+    text: '#D6D7DA', // Gris clair adouci
+    textSecondary: '#9CA3AF',
+    textTertiary: '#6E727A',
+    
+    // Accents
+    primary: TimeAccentBlueNight, // #2F6AF0 (légèrement adouci)
+    secondary: '#5A7FE6',
+    
+    // Bordures
+    border: '#1F2125',
+    borderLight: '#2A2C30',
+    
+    // Système
+    success: '#27A85F', // Vert adouci
+    warning: '#D98A10', // Orange adouci
+    danger: '#D14437', // Rouge adouci
+    info: TimeAccentBlueNight,
+    
+    // Navigation
+    tabBarBackground: 'rgba(20, 21, 24, 0.98)',
+    tabBarBorder: '#1F2125',
+    tabIconInactive: '#D6D7DA',
+    
+    // Dégradés
+    gradientPrimary: ['#2F6AF0', '#4A6FD9'], // Plus sombre
+    gradientDanger: ['#D14437', '#E06C5F'], // Adouci
+    gradientNeutral: ['#141518', '#1F2125'],
   },
+  
+  // 👁 MODE DALTONIEN (Colorblind Safe)
   colorblind: {
-    // Palette adaptée pour le daltonisme (deutéranopie/protanopie)
-    // Utilise du bleu et du jaune au lieu du rouge et du vert
-    background: '#F9FAFB',
-    surface: '#FFFFFF',
-    primary: '#0284C7', // Bleu au lieu du rose
-    secondary: '#7C3AED', // Violet maintenu
-    text: '#1F2937',
-    textSecondary: '#6B7280',
-    border: '#E5E7EB',
-    error: '#DC2626', // Rouge maintenu (visible pour la plupart)
-    success: '#0891B2', // Cyan au lieu du vert
-    warning: '#F59E0B', // Jaune/orange (bien visible)
-    info: '#1D4ED8', // Bleu foncé
-    cardBackground: '#FFFFFF',
-    inputBackground: '#F3F4F6',
+    // Backgrounds (identiques au mode clair)
+    background: TimeNeutralColors.white,
+    surface: TimeNeutralColors.lightGrey,
+    cardBackground: TimeNeutralColors.lightGrey,
+    inputBackground: '#F4F5F7',
+    
+    // Textes (contraste augmenté +20%)
+    text: '#0A0B0D', // Noir plus foncé
+    textSecondary: '#5A5E66', // Gris plus foncé
+    textTertiary: '#848892',
+    
+    // Accents
+    primary: TimeAccentBlue, // #3A7AFE (garder)
+    secondary: '#6E93FF',
+    
+    // Bordures
+    border: TimeNeutralColors.lightGrey,
+    borderLight: '#F4F5F7',
+    
+    // Système (colorblind safe)
+    success: SystemColors.successGreenCB, // #4DAF4A
+    warning: SystemColors.warningOrangeCB, // #DDAA00 (jaune safe)
+    danger: SystemColors.dangerRedCB, // #BB1F2F
+    info: TimeAccentBlue,
+    
+    // Navigation
     tabBarBackground: 'rgba(255, 255, 255, 0.95)',
-    tabBarBorder: '#E5E7EB',
-    tabIconInactive: '#9CA3AF', // Gris moyen bien visible sur fond clair
+    tabBarBorder: TimeNeutralColors.lightGrey,
+    tabIconInactive: '#5A5E66', // Plus foncé pour contraste
+    
+    // Dégradés
+    gradientPrimary: TimeGradients.primary,
+    gradientDanger: ['#BB1F2F', '#D84855'], // Rouge CB safe
+    gradientNeutral: TimeGradients.neutral,
   },
 };
 
