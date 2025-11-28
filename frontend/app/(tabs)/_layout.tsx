@@ -235,6 +235,15 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
+          name="parametres"
+          options={{
+            title: 'Paramètres',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="settings" size={22} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="legal"
           options={{
             title: 'Mentions',
