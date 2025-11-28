@@ -40,7 +40,7 @@ class CoupDePouceBackendTester:
         
         # Generate unique email for this test run
         timestamp = int(time.time())
-        test_email = f"testuser_{timestamp}@coupdepouce.test"
+        test_email = f"testuser_{timestamp}@example.com"
         
         user_data = {
             "email": test_email,
