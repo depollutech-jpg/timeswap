@@ -36,7 +36,7 @@ export default function RappelScreen() {
 
         {/* Notifications Settings */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Paramètres de notifications</Text>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Paramètres de notifications</Text>
 
           <View style={styles.settingCard}>
             <View style={styles.settingInfo}>
