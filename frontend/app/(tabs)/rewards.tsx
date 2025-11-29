@@ -125,14 +125,11 @@ export default function RewardsScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Récompenses</Text>
-        </View>
-
-        {/* Level Card avec Header Animé */}
-        <View style={styles.levelCardContainer}>
-          <AnimatedHeader height={240}>
+        {/* Titre de la page */}
+        <PageTitle title="Récompenses" subtitle={`Niveau ${user?.gamification.level} - ${user?.gamification.xp} XP`} />
+        
+        {/* Level Card */}
+        <View style={[styles.levelCardContainer, { backgroundColor: colors.surface }]}>
             <View style={styles.levelCardContent}>
               <View style={styles.levelHeader}>
                 <View>
