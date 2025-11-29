@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
   searchSection: {
     paddingHorizontal: 16,
     paddingVertical: 8,
-    marginTop: -8,
+    marginTop: 4,
   },
   searchBar: {
     flexDirection: 'row',
