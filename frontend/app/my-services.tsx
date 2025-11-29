@@ -330,7 +330,7 @@ export default function MyServicesScreen() {
 
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => handleDeleteService(service.id, service.title)}
+                    onPress={() => handleDeleteService(service._id, service.title)}
                   >
                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
                     <Text style={[styles.actionButtonText, { color: '#EF4444' }]}>
