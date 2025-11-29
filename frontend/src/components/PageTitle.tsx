@@ -41,7 +41,7 @@ export default function PageTitle({ title, subtitle, icon }: PageTitleProps) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 60, // Espace pour le header fixe
+    marginTop: 80, // Espace pour le header fixe
   },
   decorativeBand: {
     height: 4,
