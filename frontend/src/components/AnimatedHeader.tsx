@@ -49,20 +49,20 @@ export default function AnimatedHeader({ children, height = 200 }: AnimatedHeade
     };
   }, []);
 
-  // Interpolation des couleurs pour créer l'ondulation
+  // Interpolation des couleurs pour créer l'ondulation (tons plus foncés pour visibilité du texte blanc)
   const gradientColors1 = wave1.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: ['#DAF2E3', '#7DCFCF', '#2B9F9F'], // Couleurs extraites de l'image
+    outputRange: ['#5DBFBF', '#3EADAD', '#2B9F9F'], // Plus foncé, meilleure visibilité
   });
 
   const gradientColors2 = wave2.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: ['#7DCFCF', '#2B9F9F', '#DAF2E3'],
+    outputRange: ['#3EADAD', '#2B9F9F', '#5DBFBF'],
   });
 
   const gradientColors3 = wave3.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: ['#2B9F9F', '#DAF2E3', '#7DCFCF'],
+    outputRange: ['#2B9F9F', '#5DBFBF', '#3EADAD'],
   });
 
   // Opacité des vagues pour l'effet de superposition
