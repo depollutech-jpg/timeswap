@@ -268,54 +268,49 @@ export default function HomeScreen() {
           ]}
         >
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            {/* Options de tri */}
-            <TouchableOpacity 
-              style={[styles.filterChip, styles.sortChip, sortBy === 'recent' && styles.filterChipActive]}
+            {/* Options de tri avec animation */}
+            <AnimatedFilterChip
+              isActive={sortBy === 'recent'}
               onPress={() => handleSortChange('recent')}
-            >
-              <Text style={styles.filterIcon}>🕐</Text>
-              <Text style={[styles.filterText, sortBy === 'recent' && styles.filterTextActive]}>Plus récent</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.filterChip, styles.sortChip, sortBy === 'oldest' && styles.filterChipActive]}
+              icon="🕐"
+              label="Plus récent"
+            />
+            <AnimatedFilterChip
+              isActive={sortBy === 'oldest'}
               onPress={() => handleSortChange('oldest')}
-            >
-              <Text style={styles.filterIcon}>📅</Text>
-              <Text style={[styles.filterText, sortBy === 'oldest' && styles.filterTextActive]}>Plus ancien</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.filterChip, styles.sortChip, sortBy === 'personalized' && styles.filterChipActive]}
+              icon="📅"
+              label="Plus ancien"
+            />
+            <AnimatedFilterChip
+              isActive={sortBy === 'personalized'}
               onPress={() => handleSortChange('personalized')}
-            >
-              <Text style={styles.filterIcon}>⭐</Text>
-              <Text style={[styles.filterText, sortBy === 'personalized' && styles.filterTextActive]}>Personnalisé</Text>
-            </TouchableOpacity>
+              icon="⭐"
+              label="Personnalisé"
+            />
             
             {/* Séparateur visuel */}
             <View style={styles.filterSeparator} />
             
-            {/* Filtre "Tous" */}
-            <TouchableOpacity 
-              style={[styles.filterChip, selectedCategory === 'Tous' && sortBy === 'default' && styles.filterChipActive]}
+            {/* Filtre "Tous" avec animation */}
+            <AnimatedFilterChip
+              isActive={selectedCategory === 'Tous' && sortBy === 'default'}
               onPress={() => {
                 handleCategoryPress('Tous');
                 setSortBy('default');
               }}
-            >
-              <Text style={styles.filterIcon}>☀️</Text>
-              <Text style={[styles.filterText, selectedCategory === 'Tous' && sortBy === 'default' && styles.filterTextActive]}>Tous</Text>
-            </TouchableOpacity>
+              icon="☀️"
+              label="Tous"
+            />
             
-            {/* Catégories dynamiques */}
+            {/* Catégories dynamiques avec animation */}
             {CATEGORIES.map((cat) => (
-              <TouchableOpacity 
+              <AnimatedFilterChip
                 key={cat.id}
-                style={[styles.filterChip, selectedCategory === cat.label && styles.filterChipActive]}
+                isActive={selectedCategory === cat.label}
                 onPress={() => handleCategoryPress(cat.label)}
-              >
-                <Text style={styles.filterIcon}>{cat.icon}</Text>
-                <Text style={[styles.filterText, selectedCategory === cat.label && styles.filterTextActive]}>{cat.label}</Text>
-              </TouchableOpacity>
+                icon={cat.icon}
+                label={cat.label}
+              />
             ))}
           </ScrollView>
         </Animated.View>
