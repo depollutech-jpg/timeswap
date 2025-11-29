@@ -175,43 +175,18 @@ export default function ProfileScreen() {
           </View>
         </AnimatedHeader>
 
-        {/* Bouton éditer ou formulaire */}
+        {/* Bouton éditer */}
         {!isEditing && (
-        <View style={styles.profileCard}>
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-            {user?.profile.photo_base64 ? (
-              <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatar} />
-            ) : (
-              <View style={styles.avatar}>
-                <Ionicons name="person" size={40} color={colors.textSecondary} />
-              </View>
-            )}
-            <View style={styles.editBadge}>
-              <Ionicons name="camera" size={16} color="#FFFFFF" />
-            </View>
-            {user?.verification.isVerified && (
-              <View style={styles.verifiedBadge}>
-                <Ionicons name="checkmark-circle" size={24} color={colors.success} />
-              </View>
-            )}
-          </TouchableOpacity>
-
-          {!isEditing ? (
-            <>
-              <Text style={styles.name}>
-                {user?.profile.firstName} {user?.profile.lastName}
-              </Text>
-              <Text style={styles.email}>{user?.email}</Text>
-              <TouchableOpacity
-                style={styles.editButton}
-                onPress={() => setIsEditing(true)}
-              >
-                <Ionicons name="create-outline" size={20} color={colors.primary} />
-                <Text style={styles.editButtonText}>Éditer le profil</Text>
-              </TouchableOpacity>
-            </>
-          ) : null}
-        </View>
+          <View style={[styles.editButtonContainer, { backgroundColor: colors.surface }]}>
+            <TouchableOpacity
+              style={styles.editButton}
+              onPress={() => setIsEditing(true)}
+            >
+              <Ionicons name="create-outline" size={20} color={colors.primary} />
+              <Text style={styles.editButtonText}>Éditer le profil</Text>
+            </TouchableOpacity>
+          </View>
+        )}
 
         {isEditing ? (
           <View style={styles.editSection}>
