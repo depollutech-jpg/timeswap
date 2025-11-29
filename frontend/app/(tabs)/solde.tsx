@@ -318,6 +318,11 @@ const styles = StyleSheet.create({
   balanceGradient: {
     padding: 20,
   },
+  balanceContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
   balanceHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
