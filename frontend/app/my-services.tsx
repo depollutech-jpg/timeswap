@@ -35,13 +35,23 @@ export default function MyServicesScreen() {
       setLoading(true);
       const response = await api.get('/services');
       // Filtrer pour avoir uniquement les services de l'utilisateur
+      // Vérifier différentes propriétés possibles pour l'ID utilisateur
       const myServices = response.data.filter(
-        (service) => service.userId === user?.id
+        (service) => 
+          service.userId === user?.id || 
+          service.user_id === user?.id ||
+          service.createdBy === user?.id ||
+          service.created_by === user?.id ||
+          service.author?.id === user?.id ||
+          service.user?.id === user?.id
       );
+      console.log('Total services:', response.data.length);
+      console.log('Mes services:', myServices.length);
+      console.log('User ID:', user?.id);
       setServices(myServices);
     } catch (error) {
       console.error('Erreur chargement services:', error);
-      Alert.alert('Erreur', 'Impossible de charger vos services');
+      Alert.alert('Erreur', 'Impossible de charger vos annonces');
     } finally {
       setLoading(false);
       setRefreshing(false);
