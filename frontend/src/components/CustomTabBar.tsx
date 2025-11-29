@@ -253,17 +253,19 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
       >
         <View style={styles.tabContent}>
           {IconComponent && (
-            <View style={[
-              styles.iconContainer,
-              isFocused && { 
-                backgroundColor: themeColors.primary + '20',
-              },
-            ]}>
-              {IconComponent({
-                color: isFocused ? themeColors.primary : themeColors.tabIconInactive,
-                size: 26,
-                focused: isFocused,
-              })}
+            <View style={styles.iconContainer}>
+              {/* Fond animé pour l'onglet actif */}
+              {isFocused && <AnimatedTabBackground size={40} />}
+              
+              {/* Icône par-dessus */}
+              <View style={{ zIndex: 10 }}>
+                {IconComponent({
+                  color: isFocused ? '#FFFFFF' : themeColors.tabIconInactive,
+                  size: 26,
+                  focused: isFocused,
+                })}
+              </View>
+              
               {showBadge && (
                 <View style={[styles.badge, { backgroundColor: themeColors.primary }]}>
                   <Text style={styles.badgeText}>
