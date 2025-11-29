@@ -15,7 +15,7 @@ import { Colors } from '../../src/constants/colors';
 import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import api from '../../src/utils/api';
-import AnimatedHeader from '../../src/components/AnimatedHeader';
+import PageTitle from '../../src/components/PageTitle';
 
 const { width } = Dimensions.get('window');
 
