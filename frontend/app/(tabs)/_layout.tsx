@@ -244,12 +244,6 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="legal"
-          options={{
-            href: null, // Masquer du footer
-          }}
-        />
-        <Tabs.Screen
           name="admin"
           options={{
             title: 'Admin',
