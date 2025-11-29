@@ -1,246 +1,135 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   Text,
   StyleSheet,
   ScrollView,
   TouchableOpacity,
-  Image,
-  RefreshControl,
-  ActivityIndicator,
+  Switch,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../src/constants/colors';
 import { useThemeStore } from '../../src/store/themeStore';
-import { useAuthStore } from '../../src/store/authStore';
-import { router } from 'expo-router';
-import Constants from 'expo-constants';
+import { Ionicons } from '@expo/vector-icons';
 import AnimatedHeader from '../../src/components/AnimatedHeader';
 
-interface Exchange {
-  _id: string;
-  status: string;
-  duration: number;
-  createdAt: string;
-  completedAt?: string;
-  service: {
-    _id: string;
-    title: string;
-    photos?: string[];
-  };
-  otherUser: {
-    _id: string;
-    name: string;
-    photo?: string;
-  };
-  chatId?: string;
-}
-
 export default function RappelScreen() {
-  const { token } = useAuthStore();
   const { colors } = useThemeStore();
-  const [exchanges, setExchanges] = useState<Exchange[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
-
-  const BACKEND_URL = Constants.expoConfig?.extra?.EXPO_PUBLIC_BACKEND_URL || process.env.EXPO_PUBLIC_BACKEND_URL;
-
-  const fetchExchanges = async () => {
-    try {
-      const response = await fetch(`${BACKEND_URL}/api/exchanges/my/all`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch exchanges');
-      }
-
-      const data = await response.json();
-      setExchanges(data);
-    } catch (error) {
-      console.error('Error fetching exchanges:', error);
-    } finally {
-      setLoading(false);
-      setRefreshing(false);
-    }
-  };
-
-  useEffect(() => {
-    if (token) {
-      fetchExchanges();
-    }
-  }, [token]);
-
-  const onRefresh = useCallback(() => {
-    setRefreshing(true);
-    fetchExchanges();
-  }, []);
-
-  const getStatusInfo = (status: string) => {
-    switch (status) {
-      case 'accepted':
-        return { label: 'En cours', color: '#3EADAD', icon: 'hourglass-outline' };
-      case 'completed':
-        return { label: 'Terminé', color: '#10B981', icon: 'checkmark-circle' };
-      case 'cancelled':
-        return { label: 'Annulé', color: '#EF4444', icon: 'close-circle' };
-      case 'pending':
-        return { label: 'En attente', color: '#F59E0B', icon: 'time-outline' };
-      default:
-        return { label: status, color: colors.textSecondary, icon: 'help-circle-outline' };
-    }
-  };
-
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('fr-FR', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
-  const handleExchangePress = (exchange: Exchange) => {
-    if (exchange.chatId) {
-      router.push({
-        pathname: '/chat',
-        params: {
-          chatId: exchange.chatId,
-          serviceId: exchange.service._id,
-        },
-      });
-    }
-  };
-
-  const renderExchangeCard = (exchange: Exchange) => {
-    const statusInfo = getStatusInfo(exchange.status);
-    const servicePhoto = exchange.service.photos?.[0];
-
-    return (
-      <TouchableOpacity
-        key={exchange._id}
-        style={[styles.exchangeCard, { backgroundColor: colors.surface }]}
-        onPress={() => handleExchangePress(exchange)}
-        activeOpacity={0.7}
-      >
-        {/* Image du service */}
-        <View style={styles.exchangeImageContainer}>
-          {servicePhoto ? (
-            <Image
-              source={{ uri: servicePhoto }}
-              style={styles.exchangeImage}
-              resizeMode="cover"
-            />
-          ) : (
-            <View style={[styles.exchangeImage, styles.placeholderImage]}>
-              <Ionicons name="image-outline" size={32} color={colors.textSecondary} />
-            </View>
-          )}
-        </View>
-
-        {/* Contenu */}
-        <View style={styles.exchangeContent}>
-          {/* Titre du service */}
-          <Text style={[styles.exchangeTitle, { color: colors.text }]} numberOfLines={2}>
-            {exchange.service.title}
-          </Text>
-
-          {/* Utilisateur et durée */}
-          <View style={styles.exchangeInfo}>
-            <View style={styles.userInfo}>
-              {exchange.otherUser.photo ? (
-                <Image
-                  source={{ uri: exchange.otherUser.photo }}
-                  style={styles.userAvatar}
-                />
-              ) : (
-                <View style={[styles.userAvatar, styles.avatarPlaceholder]}>
-                  <Ionicons name="person" size={16} color={colors.textSecondary} />
-                </View>
-              )}
-              <Text style={[styles.userName, { color: colors.text }]} numberOfLines={1}>
-                {exchange.otherUser.name}
-              </Text>
-            </View>
-
-            <View style={styles.durationBadge}>
-              <Ionicons name="time-outline" size={14} color="#3EADAD" />
-              <Text style={styles.durationText}>{exchange.duration}h</Text>
-            </View>
-          </View>
-
-          {/* Statut et date */}
-          <View style={styles.exchangeFooter}>
-            <View style={[styles.statusBadge, { backgroundColor: statusInfo.color + '20' }]}>
-              <Ionicons name={statusInfo.icon as any} size={14} color={statusInfo.color} />
-              <Text style={[styles.statusText, { color: statusInfo.color }]}>
-                {statusInfo.label}
-              </Text>
-            </View>
-
-            <Text style={[styles.dateText, { color: colors.textSecondary }]}>
-              {formatDate(exchange.completedAt || exchange.createdAt)}
-            </Text>
-          </View>
-        </View>
-      </TouchableOpacity>
-    );
-  };
-
-  if (loading) {
-    return (
-      <View style={[styles.container, { backgroundColor: colors.background }]}>
-        <AnimatedHeader height={140}>
-          <View style={styles.headerContent}>
-            <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-            <Text style={styles.headerTitle}>Calendrier</Text>
-          </View>
-        </AnimatedHeader>
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#3EADAD" />
-        </View>
-      </View>
-    );
-  }
+  const [notifMessages, setNotifMessages] = useState(true);
+  const [notifAnnonces, setNotifAnnonces] = useState(true);
+  const [notifEchanges, setNotifEchanges] = useState(true);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header animé */}
-      <AnimatedHeader height={140}>
-        <View style={styles.headerContent}>
-          <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-          <Text style={styles.headerTitle}>Calendrier</Text>
-          <Text style={styles.headerSubtitle}>
-            {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
+      <ScrollView contentContainerStyle={styles.scrollContent}>
+        {/* Header animé */}
+        <AnimatedHeader height={140}>
+          <View style={styles.headerContent}>
+            <Ionicons name="notifications" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
+            <Text style={styles.title}>Rappels & Notifications</Text>
+          </View>
+        </AnimatedHeader>
+
+        {/* Info Card */}
+        <View style={[styles.infoCard, { backgroundColor: colors.info + '20', borderColor: colors.info + '30' }]}>
+          <Ionicons name="information-circle" size={24} color={colors.info} />
+          <Text style={[styles.infoText, { color: colors.info }]}>
+            Gérez vos notifications pour rester informé des messages, nouvelles annonces et échanges.
           </Text>
         </View>
-      </AnimatedHeader>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContent}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor="#3EADAD"
-          />
-        }
-      >
-        {exchanges.length === 0 ? (
-          <View style={[styles.emptyState, { backgroundColor: colors.surface }]}>
-            <Ionicons name="calendar-outline" size={64} color={colors.textSecondary} />
-            <Text style={[styles.emptyText, { color: colors.text }]}>Aucun échange</Text>
-            <Text style={[styles.emptySubtext, { color: colors.textSecondary }]}>
-              Vos échanges apparaîtront ici
-            </Text>
+        {/* Notifications Settings */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Paramètres de notifications</Text>
+
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="chatbubbles" size={24} color="#3EADAD" />
+              <View style={styles.settingText}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Messages privés</Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Recevoir une notification pour les nouveaux messages
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={notifMessages}
+              onValueChange={setNotifMessages}
+              trackColor={{ false: colors.border, true: '#3EADAD' + '80' }}
+              thumbColor={notifMessages ? '#3EADAD' : '#f4f3f4'}
+            />
           </View>
-        ) : (
-          <View style={styles.exchangesList}>
-            {exchanges.map((exchange) => renderExchangeCard(exchange))}
+
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="megaphone" size={24} color="#4CAF9D" />
+              <View style={styles.settingText}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Nouvelles annonces</Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Notifications basées sur vos centres d'intérêt
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={notifAnnonces}
+              onValueChange={setNotifAnnonces}
+              trackColor={{ false: colors.border, true: '#4CAF9D' + '80' }}
+              thumbColor={notifAnnonces ? '#4CAF9D' : '#f4f3f4'}
+            />
           </View>
-        )}
+
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={styles.settingInfo}>
+              <Ionicons name="swap-horizontal" size={24} color="#D4A574" />
+              <View style={styles.settingText}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>Échanges</Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Notifications sur l'état de vos échanges
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={notifEchanges}
+              onValueChange={setNotifEchanges}
+              trackColor={{ false: colors.border, true: '#D4A574' + '80' }}
+              thumbColor={notifEchanges ? '#D4A574' : '#f4f3f4'}
+            />
+          </View>
+        </View>
+
+        {/* Recent Notifications */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>Notifications récentes</Text>
+
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="chatbubble" size={20} color="#3EADAD" />
+            </View>
+            <View style={styles.notifContent}>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Nouveau message de Marie</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 5 minutes</Text>
+            </View>
+          </View>
+
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="megaphone" size={20} color="#4CAF9D" />
+            </View>
+            <View style={styles.notifContent}>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Nouvelle annonce : Cours de cuisine</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 1 heure</Text>
+            </View>
+          </View>
+
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="checkmark-circle" size={20} color="#D4A574" />
+            </View>
+            <View style={styles.notifContent}>
+              <Text style={[styles.notifTitle, { color: colors.text }]}>Échange complété avec Jean</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 2 heures</Text>
+            </View>
+          </View>
+        </View>
       </ScrollView>
     </View>
   );
@@ -250,145 +139,96 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  scrollContent: {
+    paddingBottom: 100,
+  },
   headerContent: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 20,
   },
-  headerTitle: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
     color: '#FFFFFF',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginTop: 4,
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  scrollContent: {
-    padding: 16,
-  },
-  exchangesList: {
-    gap: 16,
-  },
-  exchangeCard: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  exchangeImageContainer: {
-    width: '100%',
-    height: 150,
-    backgroundColor: '#F3F4F6',
-  },
-  exchangeImage: {
-    width: '100%',
-    height: '100%',
-  },
-  placeholderImage: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#E5E7EB',
-  },
-  exchangeContent: {
-    padding: 16,
-  },
-  exchangeTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginBottom: 12,
-  },
-  exchangeInfo: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flex: 1,
-    marginRight: 8,
-  },
-  userAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    marginRight: 8,
-  },
-  avatarPlaceholder: {
-    backgroundColor: '#E5E7EB',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  userName: {
-    fontSize: 14,
-    fontWeight: '500',
-    flex: 1,
-  },
-  durationBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(62, 173, 173, 0.15)',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-    gap: 4,
-  },
-  durationText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#3EADAD',
-  },
-  exchangeFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  statusBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    gap: 4,
-  },
-  statusText: {
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  dateText: {
-    fontSize: 12,
-  },
-  emptyState: {
-    borderRadius: 12,
-    padding: 48,
-    alignItems: 'center',
-    marginTop: 32,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    elevation: 2,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginTop: 16,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    marginTop: 8,
     textAlign: 'center',
+  },
+  infoCard: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginTop: 16,
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 1,
+    gap: 12,
+    marginBottom: 24,
+  },
+  infoText: {
+    flex: 1,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  section: {
+    marginBottom: 24,
+    paddingHorizontal: 16,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  settingCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    borderWidth: 1,
+  },
+  settingInfo: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: 12,
+  },
+  settingText: {
+    flex: 1,
+  },
+  settingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  settingDescription: {
+    fontSize: 12,
+  },
+  notificationCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 12,
+  },
+  notifIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(62, 173, 173, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  notifContent: {
+    flex: 1,
+  },
+  notifTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  notifTime: {
+    fontSize: 12,
   },
 });
