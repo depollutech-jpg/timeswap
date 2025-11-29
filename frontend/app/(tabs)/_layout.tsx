@@ -15,6 +15,7 @@ const BUTTON_SIZE = 64;
 function FloatingAddButton() {
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const { colors } = useThemeStore();
   
   // Position initiale au centre en bas
   const initialX = SCREEN_WIDTH / 2 - BUTTON_SIZE / 2;
@@ -90,11 +91,10 @@ function FloatingAddButton() {
           <TouchableOpacity
             onPress={() => setShowModal(true)}
             activeOpacity={0.8}
-            style={styles.floatingButtonTouchable}
           >
-            <View style={styles.floatingButtonInner}>
+            <AnimatedFloatingButton size={BUTTON_SIZE}>
               <Ionicons name="add" size={32} color="#FFFFFF" />
-            </View>
+            </AnimatedFloatingButton>
           </TouchableOpacity>
         </Animated.View>
       </PanGestureHandler>
