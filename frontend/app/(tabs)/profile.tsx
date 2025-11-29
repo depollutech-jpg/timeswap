@@ -19,6 +19,7 @@ import { useRouter } from 'expo-router';
 import api from '../../src/utils/api';
 import * as ImagePicker from 'expo-image-picker';
 import { CATEGORIES } from '../../src/constants/categories';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 export default function ProfileScreen() {
   const { user, logout, setUser } = useAuthStore();
