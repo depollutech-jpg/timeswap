@@ -139,54 +139,42 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header animé avec profil */}
-        <AnimatedHeader height={220}>
-          <View style={styles.headerAnimated}>
-            <View style={styles.headerTop}>
-              <Text style={styles.headerTitle}>Profil</Text>
-              <TouchableOpacity onPress={handleLogout}>
-                <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
-              </TouchableOpacity>
-            </View>
-            
-            {/* Photo de profil dans le header */}
-            <TouchableOpacity style={styles.avatarContainerHeader} onPress={pickImage}>
-              {user?.profile.photo_base64 ? (
-                <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatarHeader} />
-              ) : (
-                <View style={styles.avatarHeader}>
-                  <Ionicons name="person" size={40} color="#FFFFFF" />
-                </View>
-              )}
-              <View style={styles.editBadgeHeader}>
-                <Ionicons name="camera" size={16} color="#FFFFFF" />
+        {/* Titre de la page */}
+        <PageTitle title="Profil" subtitle={`${user?.profile.firstName} ${user?.profile.lastName}`} />
+        
+        {/* Photo de profil */}
+        <View style={[styles.profileHeader, { backgroundColor: colors.surface }]}>
+          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+            {user?.profile.photo_base64 ? (
+              <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatar} />
+            ) : (
+              <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
+                <Ionicons name="person" size={50} color={colors.primary} />
               </View>
-              {user?.verification.isVerified && (
-                <View style={styles.verifiedBadgeHeader}>
-                  <Ionicons name="checkmark-circle" size={24} color={colors.success} />
-                </View>
-              )}
-            </TouchableOpacity>
-            
-            <Text style={styles.nameHeader}>
-              {user?.profile.firstName} {user?.profile.lastName}
-            </Text>
-            <Text style={styles.emailHeader}>{user?.email}</Text>
-          </View>
-        </AnimatedHeader>
-
-        {/* Bouton éditer */}
-        {!isEditing && (
-          <View style={[styles.editButtonContainer, { backgroundColor: colors.surface }]}>
+            )}
+            <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
+              <Ionicons name="camera" size={16} color="#FFFFFF" />
+            </View>
+            {user?.verification.isVerified && (
+              <View style={styles.verifiedBadge}>
+                <Ionicons name="checkmark-circle" size={28} color={colors.success} />
+              </View>
+            )}
+          </TouchableOpacity>
+          
+          <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email}</Text>
+          
+          {/* Bouton éditer */}
+          {!isEditing && (
             <TouchableOpacity
-              style={styles.editButton}
+              style={[styles.editButton, { backgroundColor: colors.primary }]}
               onPress={() => setIsEditing(true)}
             >
-              <Ionicons name="create-outline" size={20} color={colors.primary} />
+              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
               <Text style={styles.editButtonText}>Éditer le profil</Text>
             </TouchableOpacity>
-          </View>
-        )}
+          )}
+        </View>
 
         {isEditing ? (
           <View style={styles.editSection}>
