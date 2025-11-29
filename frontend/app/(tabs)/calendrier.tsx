@@ -17,6 +17,7 @@ import { useAuthStore } from '../../src/store/authStore';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
 import AnimatedHeader from '../../src/components/AnimatedHeader';
+import PageTitle from '../../src/components/PageTitle';
 
 interface Exchange {
   _id: string;
