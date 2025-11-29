@@ -339,7 +339,7 @@ export default function HomeScreen() {
           ) : (
             services.map((service: any) => {
               const isOffer = service.type === 'offer';
-              const cardColor = colors.cardBackground;
+              const cardColor = '#FFFFFF'; // Fond blanc pour toutes les cartes
               const borderColor = isOffer ? headerOfferColor : headerRequestColor;
               const buttonColor = isOffer ? headerOfferColor : headerRequestColor;
 
