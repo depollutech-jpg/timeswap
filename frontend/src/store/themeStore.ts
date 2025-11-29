@@ -121,7 +121,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
   // 🌑 MODE NUIT (Night Mode) - Ultra sombre
   night: {
     // Backgrounds
-    background: '#0B0C0E', // Background ultra sombre
+    background: 'rgba(62, 173, 173, 0.07)', // Turquoise du header à 7% d'opacité (sur fond sombre)
     surface: '#141518', // Surfaces
     cardBackground: '#181A1E', // Cartes
     inputBackground: '#1F2125',
