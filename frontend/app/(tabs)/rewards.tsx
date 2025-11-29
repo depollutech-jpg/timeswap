@@ -155,19 +155,19 @@ export default function RewardsScreen() {
               {/* Stats RPG */}
               <View style={styles.statsRow}>
                 <View style={styles.stat}>
-                  <Ionicons name="flash" size={20} color="#FFFFFF" />
-                  <Text style={styles.statLabel}>Force</Text>
-                  <Text style={styles.statValue}>{user?.gamification.stats.force}</Text>
+                  <Ionicons name="flash" size={20} color="#3EADAD" />
+                  <Text style={[styles.statLabel, { color: '#3EADAD' }]}>Force</Text>
+                  <Text style={[styles.statValue, { color: '#3EADAD' }]}>{user?.gamification.stats.force}</Text>
                 </View>
                 <View style={styles.stat}>
-                  <Ionicons name="bulb" size={20} color="#FFFFFF" />
-                  <Text style={styles.statLabel}>Sagesse</Text>
-                  <Text style={styles.statValue}>{user?.gamification.stats.sagesse}</Text>
+                  <Ionicons name="bulb" size={20} color="#3EADAD" />
+                  <Text style={[styles.statLabel, { color: '#3EADAD' }]}>Sagesse</Text>
+                  <Text style={[styles.statValue, { color: '#3EADAD' }]}>{user?.gamification.stats.sagesse}</Text>
                 </View>
                 <View style={styles.stat}>
-                  <Ionicons name="hand-right" size={20} color="#FFFFFF" />
-                  <Text style={styles.statLabel}>Dextérité</Text>
-                  <Text style={styles.statValue}>{user?.gamification.stats.dexterite}</Text>
+                  <Ionicons name="hand-right" size={20} color="#3EADAD" />
+                  <Text style={[styles.statLabel, { color: '#3EADAD' }]}>Dextérité</Text>
+                  <Text style={[styles.statValue, { color: '#3EADAD' }]}>{user?.gamification.stats.dexterite}</Text>
                 </View>
               </View>
             </View>
