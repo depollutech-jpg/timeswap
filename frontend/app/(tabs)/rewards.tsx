@@ -353,6 +353,11 @@ const styles = StyleSheet.create({
   levelCard: {
     padding: 20,
   },
+  levelCardContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
   levelHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
