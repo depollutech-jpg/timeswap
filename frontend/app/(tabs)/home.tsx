@@ -848,7 +848,10 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingTop: 8,
+  },
+  greetingWrapper: {
+    marginTop: -8,
   },
   greeting: {
     fontSize: 24,
@@ -881,7 +884,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 16,
     marginHorizontal: 16,
-    marginTop: 16,
+    marginTop: 8,
     gap: 12,
   },
   creditText: {
