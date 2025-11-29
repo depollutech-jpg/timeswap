@@ -204,7 +204,7 @@ export default function MyServicesScreen() {
             <Text style={styles.emptyTitle}>Aucun service</Text>
             <Text style={styles.emptySubtitle}>
               {filter === 'all'
-                ? 'Vous n\'avez pas encore publié de service'
+                ? 'Vous n\'avez pas encore publié d\'annonce'
                 : filter === 'offer'
                 ? 'Vous n\'avez pas d\'offre active'
                 : 'Vous n\'avez pas de demande active'}
@@ -218,7 +218,7 @@ export default function MyServicesScreen() {
                 style={styles.createButtonGradient}
               >
                 <Ionicons name="add" size={20} color="#FFFFFF" />
-                <Text style={styles.createButtonText}>Créer un service</Text>
+                <Text style={styles.createButtonText}>Créer une annonce</Text>
               </LinearGradient>
             </TouchableOpacity>
           </View>
