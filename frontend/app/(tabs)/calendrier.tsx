@@ -238,22 +238,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  headerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-  },
-  headerSubtitle: {
-    fontSize: 14,
-    color: 'rgba(255, 255, 255, 0.9)',
-    marginTop: 4,
-  },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
