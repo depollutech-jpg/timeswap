@@ -209,19 +209,17 @@ export default function HomeScreen() {
       <View style={{ height: 60 }} />
       
       {/* Compteur d'heures cliquable - FIXE sous le header */}
-      {user && (
-        <TouchableOpacity 
-          style={styles.creditCardFixed}
-          onPress={() => router.push('/(tabs)/solde')}
-          activeOpacity={0.8}
-        >
-          <Ionicons name="wallet" size={24} color="#3EADAD" />
-          <Text style={styles.creditTextFixed}>
-            {user?.credits.available.toFixed(0)} heures disponibles
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#3EADAD" />
-        </TouchableOpacity>
-      )}
+      <TouchableOpacity 
+        style={styles.creditCardFixed}
+        onPress={() => router.push('/(tabs)/solde')}
+        activeOpacity={0.8}
+      >
+        <Ionicons name="wallet" size={24} color="#3EADAD" />
+        <Text style={styles.creditTextFixed}>
+          {user ? `${user.credits.available.toFixed(0)} heures disponibles` : '0 heures disponibles'}
+        </Text>
+        <Ionicons name="chevron-forward" size={20} color="#3EADAD" />
+      </TouchableOpacity>
       
       <ScrollView
         contentContainerStyle={styles.scrollContent}
