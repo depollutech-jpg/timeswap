@@ -320,13 +320,11 @@ const styles = StyleSheet.create({
   },
   balanceTitle: {
     fontSize: 16,
-    color: '#FFFFFF',
-    opacity: 0.9,
+    fontWeight: '600',
   },
   balanceAmount: {
     fontSize: 48,
     fontWeight: 'bold',
-    color: '#FFFFFF',
     marginBottom: 16,
   },
   balanceStats: {
