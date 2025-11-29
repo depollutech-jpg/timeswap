@@ -334,14 +334,11 @@ const styles = StyleSheet.create({
   balanceStat: {},
   balanceStatLabel: {
     fontSize: 12,
-    color: '#FFFFFF',
-    opacity: 0.8,
     marginBottom: 4,
   },
   balanceStatValue: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#FFFFFF',
   },
   quickActions: {
     flexDirection: 'row',
