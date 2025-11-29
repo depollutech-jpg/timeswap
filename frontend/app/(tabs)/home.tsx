@@ -48,6 +48,8 @@ export default function HomeScreen() {
   const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
   const slideFiltersAnim = React.useRef(new Animated.Value(50)).current;
   const bounceServicesAnim = React.useRef(new Animated.Value(0)).current;
+  const shimmerAnim = React.useRef(new Animated.Value(0)).current;
+  const pulseAnim = React.useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     requestLocationPermission();
