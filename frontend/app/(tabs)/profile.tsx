@@ -425,21 +425,6 @@ export default function ProfileScreen() {
                 <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
 
-              <TouchableOpacity
-                style={styles.modernMenuItem}
-                activeOpacity={0.7}
-                onPress={() => router.push('/buy-hours')}
-              >
-                <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(251, 191, 36, 0.1)' }]}>
-                  <Ionicons name="cart" size={24} color="#FBBF24" />
-                </View>
-                <View style={styles.menuTextWrapper}>
-                  <Text style={styles.menuTitle}>Acheter des heures</Text>
-                  <Text style={styles.menuSubtitle}>Augmenter mon crédit</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="#FBBF24" />
-              </TouchableOpacity>
-
               {!user?.verification.isVerified && (
                 <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
                   <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
@@ -454,51 +439,8 @@ export default function ProfileScreen() {
               )}
             </View>
 
-            {/* Section paramètres */}
+            {/* Section déconnexion */}
             <View style={styles.menuContainer}>
-              {user?.role === 'admin' && (
-                <TouchableOpacity
-                  style={styles.modernMenuItem}
-                  activeOpacity={0.7}
-                  onPress={() => router.push('/admin')}
-                >
-                  <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
-                    <Ionicons name="shield" size={24} color="#8B5CF6" />
-                  </View>
-                  <View style={styles.menuTextWrapper}>
-                    <Text style={styles.menuTitle}>Dashboard Admin</Text>
-                    <Text style={styles.menuSubtitle}>Gestion plateforme</Text>
-                  </View>
-                  <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
-                </TouchableOpacity>
-              )}
-
-              <TouchableOpacity
-                style={styles.modernMenuItem}
-                activeOpacity={0.7}
-                onPress={() => router.push('/(tabs)/parametres')}
-              >
-                <View style={styles.menuIconWrapper}>
-                  <Ionicons name="settings" size={24} color="#6B7280" />
-                </View>
-                <View style={styles.menuTextWrapper}>
-                  <Text style={styles.menuTitle}>Paramètres</Text>
-                  <Text style={styles.menuSubtitle}>Thème, notifications</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
-                <View style={styles.menuIconWrapper}>
-                  <Ionicons name="help-circle" size={24} color="#6B7280" />
-                </View>
-                <View style={styles.menuTextWrapper}>
-                  <Text style={styles.menuTitle}>Aide & Support</Text>
-                  <Text style={styles.menuSubtitle}>FAQ, contact</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
-
               <TouchableOpacity
                 style={styles.modernMenuItem}
                 activeOpacity={0.7}
