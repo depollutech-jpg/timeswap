@@ -110,7 +110,7 @@ export default function MyServicesScreen() {
         <TouchableOpacity onPress={() => router.back()} style={styles.backButton}>
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Mes Services</Text>
+        <Text style={styles.headerTitle}>Mes Annonces</Text>
         <TouchableOpacity
           onPress={() => router.push('/create-service')}
           style={styles.addButton}
