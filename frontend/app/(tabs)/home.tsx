@@ -211,35 +211,8 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Header animé avec couleurs ondulantes - réduit de 20% */}
-        <AnimatedHeader height={160}>
-          <View style={styles.headerContent}>
-            <View style={styles.greetingWrapper}>
-              <Text style={styles.greeting}>Bonjour {user?.profile?.firstName} 👋</Text>
-            </View>
-            <TouchableOpacity
-              style={styles.notificationButton}
-              onPress={() => router.push('/notifications')}
-            >
-              <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
-              {unreadCount > 0 && (
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
-                </View>
-              )}
-            </TouchableOpacity>
-          </View>
-
-          {/* Credit Card - remonté de 20% */}
-          {user && (
-            <View style={[styles.creditCard, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
-              <Ionicons name="wallet" size={28} color="#FFFFFF" />
-              <Text style={[styles.creditText, { color: '#FFFFFF' }]}>
-                Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
-              </Text>
-            </View>
-          )}
-        </AnimatedHeader>
+        {/* Espace pour le header fixe */}
+        <View style={{ height: 60 }} />
 
         {/* Barre de recherche */}
         <View style={styles.searchSection}>
