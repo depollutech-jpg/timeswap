@@ -592,6 +592,7 @@ const styles = StyleSheet.create({
   },
   servicesSection: {
     paddingHorizontal: 16,
+    marginTop: 12,
   },
   serviceCard: {
     backgroundColor: '#FFFFFF',
