@@ -343,18 +343,18 @@ const styles = StyleSheet.create({
   iconContainer: {
     marginBottom: 2,
     position: 'relative',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   tabLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
-    color: Colors.textSecondary,
-    textAlign: 'center',
-    letterSpacing: 0.3,
+    letterSpacing: 0.2,
   },
-  tabLabelActive: {
-    color: Colors.primary,
-    fontWeight: '700',
-  },
+  tabLabelActive: {},
   badge: {
     position: 'absolute',
     top: -6,
