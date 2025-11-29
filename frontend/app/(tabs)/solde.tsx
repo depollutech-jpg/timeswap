@@ -102,12 +102,10 @@ export default function SoldeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Solde de temps</Text>
-        </View>
-
-        {/* Carte Solde Principal avec header animé */}
+        {/* Titre de la page */}
+        <PageTitle title="Solde de temps" />
+        
+        {/* Carte Solde Principal */}
         <Animated.View
           style={[
             styles.balanceCard,
@@ -124,27 +122,25 @@ export default function SoldeScreen() {
             },
           ]}
         >
-          <AnimatedHeader height={180}>
-            <View style={styles.balanceContent}>
-              <View style={styles.balanceHeader}>
-                <Text style={styles.balanceTitle}>Solde actuel</Text>
-                <TouchableOpacity>
-                  <Ionicons name="time-outline" size={24} color="#FFFFFF" />
-                </TouchableOpacity>
+          <View style={[styles.balanceGradient, { backgroundColor: colors.surface }]}>
+            <View style={styles.balanceHeader}>
+              <Text style={[styles.balanceTitle, { color: colors.text }]}>Solde actuel</Text>
+              <TouchableOpacity>
+                <Ionicons name="time-outline" size={24} color={colors.primary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.balanceAmount, { color: colors.primary }]}>{user?.credits.available.toFixed(1)} heures</Text>
+            <View style={styles.balanceStats}>
+              <View style={styles.balanceStat}>
+                <Text style={[styles.balanceStatLabel, { color: colors.textSecondary }]}>Heures données</Text>
+                <Text style={[styles.balanceStatValue, { color: colors.text }]}>↑ {hoursGiven.toFixed(0)}h</Text>
               </View>
-              <Text style={styles.balanceAmount}>{user?.credits.available.toFixed(1)} heures</Text>
-              <View style={styles.balanceStats}>
-                <View style={styles.balanceStat}>
-                  <Text style={styles.balanceStatLabel}>Heures données</Text>
-                  <Text style={styles.balanceStatValue}>↑ {hoursGiven.toFixed(0)}h</Text>
-                </View>
-                <View style={styles.balanceStat}>
-                  <Text style={styles.balanceStatLabel}>Heures reçues</Text>
-                  <Text style={styles.balanceStatValue}>↓ {hoursReceived.toFixed(0)}h</Text>
-                </View>
+              <View style={styles.balanceStat}>
+                <Text style={[styles.balanceStatLabel, { color: colors.textSecondary }]}>Heures reçues</Text>
+                <Text style={[styles.balanceStatValue, { color: colors.text }]}>↓ {hoursReceived.toFixed(0)}h</Text>
               </View>
             </View>
-          </AnimatedHeader>
+          </View>
         </Animated.View>
 
         {/* Actions Rapides avec animation slide */}
