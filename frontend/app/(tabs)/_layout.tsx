@@ -252,6 +252,12 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="legal"
+          options={{
+            href: null,
+          }}
+        />
       </Tabs>
       <FloatingAddButton />
     </GestureHandlerRootView>
