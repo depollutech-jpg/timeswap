@@ -194,12 +194,7 @@ export default function CalendrierScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <AnimatedHeader height={140}>
-          <View style={styles.headerContent}>
-            <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-            <Text style={styles.headerTitle}>Calendrier</Text>
-          </View>
-        </AnimatedHeader>
+        <PageTitle title="Calendrier" />
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color="#3EADAD" />
         </View>
