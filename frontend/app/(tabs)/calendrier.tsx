@@ -209,16 +209,8 @@ export default function CalendrierScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header animé */}
-      <AnimatedHeader height={140}>
-        <View style={styles.headerContent}>
-          <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-          <Text style={styles.headerTitle}>Calendrier</Text>
-          <Text style={styles.headerSubtitle}>
-            {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
-          </Text>
-        </View>
-      </AnimatedHeader>
+      {/* Titre de la page */}
+      <PageTitle title="Calendrier" subtitle={`${exchanges.length} échange${exchanges.length > 1 ? 's' : ''}`} />
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
