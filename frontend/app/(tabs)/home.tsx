@@ -447,6 +447,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
+    paddingTop: 60, // Espace pour le header fixe
     paddingBottom: 0,
   },
   header: {
