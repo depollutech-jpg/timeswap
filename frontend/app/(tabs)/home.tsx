@@ -208,11 +208,10 @@ export default function HomeScreen() {
         }
       >
         {/* Header animé avec couleurs ondulantes */}
-        <AnimatedHeader height={220}>
+        <AnimatedHeader height={200}>
           <View style={styles.headerContent}>
             <View>
               <Text style={styles.greeting}>Bonjour {user?.profile?.firstName} 👋</Text>
-              <Text style={styles.subGreeting}>Trouvez un service à proximité</Text>
             </View>
             <TouchableOpacity
               style={styles.notificationButton}
