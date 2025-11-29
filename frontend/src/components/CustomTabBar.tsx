@@ -250,15 +250,17 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
         ]}
         activeOpacity={0.7}
       >
-        <View style={[
-          styles.tabContent,
-          isFocused && [styles.tabContentActive, { backgroundColor: themeColors.primary + '15' }],
-        ]}>
+        <View style={styles.tabContent}>
           {IconComponent && (
-            <View style={styles.iconContainer}>
+            <View style={[
+              styles.iconContainer,
+              isFocused && { 
+                backgroundColor: themeColors.primary + '20',
+              },
+            ]}>
               {IconComponent({
                 color: isFocused ? themeColors.primary : themeColors.tabIconInactive,
-                size: 24,
+                size: 26,
                 focused: isFocused,
               })}
               {showBadge && (
@@ -273,8 +275,7 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
           <Text
             style={[
               styles.tabLabel,
-              { color: themeColors.tabIconInactive },
-              isFocused && [styles.tabLabelActive, { color: themeColors.primary }],
+              { color: isFocused ? themeColors.primary : themeColors.tabIconInactive },
             ]}
           >
             {typeof label === 'string' ? label : ''}
