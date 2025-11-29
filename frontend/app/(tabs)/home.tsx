@@ -743,7 +743,7 @@ const styles = StyleSheet.create({
   },
   serviceCardWrapper: {
     position: 'relative',
-    marginBottom: 10,
+    marginBottom: 8,
   },
   deleteButtonAbsolute: {
     position: 'absolute',
