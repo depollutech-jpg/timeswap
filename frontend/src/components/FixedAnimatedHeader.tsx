@@ -76,17 +76,17 @@ export default function FixedAnimatedHeader({
 
   const opacity1 = wave1.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [0.3, 0.6, 0.3],
+    outputRange: [0.4, 0.8, 0.4],
   });
 
   const opacity2 = wave2.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [0.4, 0.7, 0.4],
+    outputRange: [0.5, 0.9, 0.5],
   });
 
   const opacity3 = wave3.interpolate({
     inputRange: [0, 0.5, 1],
-    outputRange: [0.5, 0.8, 0.5],
+    outputRange: [0.6, 1, 0.6],
   });
 
   return (
