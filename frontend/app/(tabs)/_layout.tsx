@@ -246,10 +246,7 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="legal"
           options={{
-            title: 'Mentions',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="document-text" size={22} color={color} />
-            ),
+            href: null, // Masquer du footer
           }}
         />
         <Tabs.Screen
