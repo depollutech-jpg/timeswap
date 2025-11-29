@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -9,17 +9,16 @@ import {
   Alert,
   Image,
   ActivityIndicator,
+  Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuthStore } from '../../src/store/authStore';
-import { Colors } from '../../src/constants/colors';
 import { useThemeStore } from '../../src/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import api from '../../src/utils/api';
 import * as ImagePicker from 'expo-image-picker';
 import { CATEGORIES } from '../../src/constants/categories';
-import PageTitle from '../../src/components/PageTitle';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export default function ProfileScreen() {
   const { user, logout, setUser } = useAuthStore();
@@ -27,6 +26,11 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+
+  // Animation refs
+  const scaleAnim = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnim = useRef(new Animated.Value(1)).current;
 
   // Form state
   const [firstName, setFirstName] = useState(user?.profile.firstName || '');
@@ -36,6 +40,39 @@ export default function ProfileScreen() {
   const [location, setLocation] = useState(user?.profile.location || '');
   const [interests, setInterests] = useState(user?.interests || []);
   const [availability, setAvailability] = useState('Disponible');
+
+  useEffect(() => {
+    // Animation d'entrée
+    Animated.parallel([
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        tension: 40,
+        useNativeDriver: true,
+      }),
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
+    // Animation de pulsation pour le statut
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnim, {
+          toValue: 1.1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+        Animated.timing(pulseAnim, {
+          toValue: 1,
+          duration: 1000,
+          useNativeDriver: true,
+        }),
+      ])
+    ).start();
+  }, []);
 
   const handleLogout = () => {
     Alert.alert(
@@ -139,46 +176,101 @@ export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Titre de la page */}
-        <PageTitle title="Profil" subtitle={`${user?.profile.firstName} ${user?.profile.lastName}`} />
-        
-        {/* Photo de profil */}
-        <View style={[styles.profileHeader, { backgroundColor: colors.surface }]}>
-          <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-            {user?.profile.photo_base64 ? (
-              <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatar} />
-            ) : (
-              <View style={[styles.avatar, { backgroundColor: colors.primary + '20' }]}>
-                <Ionicons name="person" size={50} color={colors.primary} />
+        {/* Header moderne avec dégradé */}
+        <Animated.View style={{ opacity: fadeAnim, transform: [{ scale: scaleAnim }] }}>
+          <LinearGradient
+            colors={['#3EADAD', '#5FCFCF', '#3EADAD']}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={styles.headerGradient}
+          >
+            <View style={styles.headerContent}>
+              {/* Photo de profil grande avec bordure animée */}
+              <TouchableOpacity style={styles.avatarWrapper} onPress={pickImage}>
+                <LinearGradient
+                  colors={['#FFFFFF', 'rgba(255,255,255,0.7)', '#FFFFFF']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={styles.avatarBorder}
+                >
+                  <View style={styles.avatarInner}>
+                    {user?.profile.photo_base64 ? (
+                      <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatarImage} />
+                    ) : (
+                      <View style={styles.avatarPlaceholder}>
+                        <Ionicons name="person" size={60} color="#3EADAD" />
+                      </View>
+                    )}
+                  </View>
+                </LinearGradient>
+                
+                {/* Badge édition */}
+                <View style={styles.editBadgeFloat}>
+                  <Ionicons name="camera" size={18} color="#3EADAD" />
+                </View>
+                
+                {/* Badge vérifié */}
+                {user?.verification.isVerified && (
+                  <Animated.View style={[styles.verifiedBadgeFloat, { transform: [{ scale: pulseAnim }] }]}>
+                    <Ionicons name="checkmark-circle" size={32} color="#10B981" />
+                  </Animated.View>
+                )}
+              </TouchableOpacity>
+
+              {/* Nom et statut */}
+              <Text style={styles.userName}>
+                {user?.profile.firstName} {user?.profile.lastName}
+              </Text>
+              <Text style={styles.userEmail}>{user?.email}</Text>
+
+              {/* Statut disponibilité */}
+              <View style={styles.statusBadge}>
+                <Animated.View style={[styles.statusDot, { transform: [{ scale: pulseAnim }] }]} />
+                <Text style={styles.statusText}>Disponible</Text>
               </View>
-            )}
-            <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
-              <Ionicons name="camera" size={16} color="#FFFFFF" />
             </View>
-            {user?.verification.isVerified && (
-              <View style={styles.verifiedBadge}>
-                <Ionicons name="checkmark-circle" size={28} color={colors.success} />
-              </View>
-            )}
-          </TouchableOpacity>
-          
-          <Text style={[styles.email, { color: colors.textSecondary }]}>{user?.email}</Text>
-          
-          {/* Bouton éditer */}
-          {!isEditing && (
-            <TouchableOpacity
-              style={[styles.editButton, { backgroundColor: colors.primary }]}
-              onPress={() => setIsEditing(true)}
+          </LinearGradient>
+        </Animated.View>
+
+        {/* Stats modernes avec glassmorphism */}
+        <View style={styles.statsSection}>
+          <View style={styles.statCard}>
+            <LinearGradient
+              colors={['rgba(62, 173, 173, 0.1)', 'rgba(95, 207, 207, 0.05)']}
+              style={styles.statGradient}
             >
-              <Ionicons name="create-outline" size={20} color="#FFFFFF" />
-              <Text style={styles.editButtonText}>Éditer le profil</Text>
-            </TouchableOpacity>
-          )}
+              <Ionicons name="time-outline" size={28} color="#3EADAD" />
+              <Text style={styles.statValue}>{user?.credits.available.toFixed(1)}</Text>
+              <Text style={styles.statLabel}>Heures</Text>
+            </LinearGradient>
+          </View>
+
+          <View style={styles.statCard}>
+            <LinearGradient
+              colors={['rgba(251, 191, 36, 0.1)', 'rgba(251, 191, 36, 0.05)']}
+              style={styles.statGradient}
+            >
+              <Ionicons name="trophy-outline" size={28} color="#FBBF24" />
+              <Text style={styles.statValue}>{user?.gamification.level}</Text>
+              <Text style={styles.statLabel}>Niveau</Text>
+            </LinearGradient>
+          </View>
+
+          <View style={styles.statCard}>
+            <LinearGradient
+              colors={['rgba(139, 92, 246, 0.1)', 'rgba(139, 92, 246, 0.05)']}
+              style={styles.statGradient}
+            >
+              <Ionicons name="star-outline" size={28} color="#8B5CF6" />
+              <Text style={styles.statValue}>{user?.gamification.xp}</Text>
+              <Text style={styles.statLabel}>XP</Text>
+            </LinearGradient>
+          </View>
         </View>
 
         {isEditing ? (
           <View style={styles.editSection}>
-            <Text style={styles.sectionTitle}>Informations personnelles</Text>
+            <Text style={styles.sectionTitle}>Modifier le profil</Text>
 
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Prénom *</Text>
@@ -187,6 +279,7 @@ export default function ProfileScreen() {
                 value={firstName}
                 onChangeText={setFirstName}
                 placeholder="Jean"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
 
@@ -197,6 +290,7 @@ export default function ProfileScreen() {
                 value={lastName}
                 onChangeText={setLastName}
                 placeholder="Dupont"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
 
@@ -207,6 +301,7 @@ export default function ProfileScreen() {
                 value={bio}
                 onChangeText={setBio}
                 placeholder="Parlez-nous de vous..."
+                placeholderTextColor={colors.textSecondary}
                 multiline
                 numberOfLines={4}
               />
@@ -219,6 +314,7 @@ export default function ProfileScreen() {
                 value={phone}
                 onChangeText={setPhone}
                 placeholder="06 12 34 56 78"
+                placeholderTextColor={colors.textSecondary}
                 keyboardType="phone-pad"
               />
             </View>
@@ -230,36 +326,12 @@ export default function ProfileScreen() {
                 value={location}
                 onChangeText={setLocation}
                 placeholder="Paris, France"
+                placeholderTextColor={colors.textSecondary}
               />
             </View>
 
             <View style={styles.inputGroup}>
-              <Text style={styles.label}>Disponibilité</Text>
-              <View style={styles.availabilityOptions}>
-                {['Disponible', 'Occupé', 'Absent'].map((option) => (
-                  <TouchableOpacity
-                    key={option}
-                    style={[
-                      styles.availabilityChip,
-                      availability === option && styles.availabilityChipActive,
-                    ]}
-                    onPress={() => setAvailability(option)}
-                  >
-                    <Text
-                      style={[
-                        styles.availabilityText,
-                        availability === option && styles.availabilityTextActive,
-                      ]}
-                    >
-                      {option}
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-
-            <View style={styles.inputGroup}>
-              <Text style={styles.label}>Centres d&apos;intérêt</Text>
+              <Text style={styles.label}>Centres d'intérêt</Text>
               <View style={styles.interestsGrid}>
                 {CATEGORIES.slice(0, 12).map((category) => (
                   <TouchableOpacity
@@ -286,117 +358,160 @@ export default function ProfileScreen() {
 
             <View style={styles.buttonRow}>
               <TouchableOpacity
-                style={[styles.button, styles.cancelButton]}
+                style={styles.cancelButton}
                 onPress={handleCancel}
                 disabled={saving}
               >
                 <Text style={styles.cancelButtonText}>Annuler</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.button, styles.saveButton]}
+                style={styles.saveButton}
                 onPress={handleSave}
                 disabled={saving}
               >
-                {saving ? (
-                  <ActivityIndicator color="#FFFFFF" />
-                ) : (
-                  <Text style={styles.saveButtonText}>Enregistrer</Text>
-                )}
+                <LinearGradient
+                  colors={['#3EADAD', '#5FCFCF']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                  style={styles.saveButtonGradient}
+                >
+                  {saving ? (
+                    <ActivityIndicator color="#FFFFFF" />
+                  ) : (
+                    <Text style={styles.saveButtonText}>Enregistrer</Text>
+                  )}
+                </LinearGradient>
               </TouchableOpacity>
             </View>
           </View>
         ) : (
           <>
-            {/* Stats */}
-            <View style={styles.statsContainer}>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{user?.credits.available.toFixed(1)}h</Text>
-                <Text style={styles.statLabel}>Crédits</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{user?.gamification.level}</Text>
-                <Text style={styles.statLabel}>Niveau</Text>
-              </View>
-              <View style={styles.statItem}>
-                <Text style={styles.statValue}>{user?.gamification.xp}</Text>
-                <Text style={styles.statLabel}>XP</Text>
-              </View>
-            </View>
+            {/* Bouton éditer moderne */}
+            <TouchableOpacity
+              style={styles.editButtonModern}
+              onPress={() => setIsEditing(true)}
+              activeOpacity={0.8}
+            >
+              <LinearGradient
+                colors={['#FFFFFF', '#F9FAFB']}
+                style={styles.editButtonGradient}
+              >
+                <Ionicons name="create-outline" size={20} color="#3EADAD" />
+                <Text style={styles.editButtonTextModern}>Modifier mon profil</Text>
+              </LinearGradient>
+            </TouchableOpacity>
 
-            {/* Menu Items */}
-            <View style={styles.menuSection}>
-              <TouchableOpacity style={styles.menuItem}>
-                <View style={styles.menuItemLeft}>
-                  <Ionicons name="list-outline" size={24} color={colors.text} />
-                  <Text style={styles.menuItemText}>Mes services</Text>
+            {/* Menu Items modernes */}
+            <View style={styles.menuContainer}>
+              <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
+                <View style={styles.menuIconWrapper}>
+                  <Ionicons name="list" size={24} color="#3EADAD" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <View style={styles.menuTextWrapper}>
+                  <Text style={styles.menuTitle}>Mes services</Text>
+                  <Text style={styles.menuSubtitle}>Gérer mes annonces</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem}>
-                <View style={styles.menuItemLeft}>
-                  <Ionicons name="swap-horizontal-outline" size={24} color={colors.text} />
-                  <Text style={styles.menuItemText}>Mes échanges</Text>
+              <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
+                <View style={styles.menuIconWrapper}>
+                  <Ionicons name="swap-horizontal" size={24} color="#8B5CF6" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <View style={styles.menuTextWrapper}>
+                  <Text style={styles.menuTitle}>Mes échanges</Text>
+                  <Text style={styles.menuSubtitle}>Historique des services</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={styles.menuItem}
+                style={styles.modernMenuItem}
+                activeOpacity={0.7}
                 onPress={() => router.push('/buy-hours')}
               >
-                <View style={styles.menuItemLeft}>
-                  <Ionicons name="cart-outline" size={24} color={colors.primary} />
-                  <Text style={[styles.menuItemText, { color: colors.primary }]}>
-                    Acheter des heures
-                  </Text>
+                <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(251, 191, 36, 0.1)' }]}>
+                  <Ionicons name="cart" size={24} color="#FBBF24" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.primary} />
+                <View style={styles.menuTextWrapper}>
+                  <Text style={styles.menuTitle}>Acheter des heures</Text>
+                  <Text style={styles.menuSubtitle}>Augmenter mon crédit</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#FBBF24" />
               </TouchableOpacity>
 
               {!user?.verification.isVerified && (
-                <TouchableOpacity style={styles.menuItem}>
-                  <View style={styles.menuItemLeft}>
-                    <Ionicons name="shield-checkmark-outline" size={24} color={colors.success} />
-                    <Text style={[styles.menuItemText, { color: colors.success }]}>
-                      Vérifier mon profil
-                    </Text>
+                <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
+                  <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(16, 185, 129, 0.1)' }]}>
+                    <Ionicons name="shield-checkmark" size={24} color="#10B981" />
                   </View>
-                  <Ionicons name="chevron-forward" size={20} color={colors.success} />
+                  <View style={styles.menuTextWrapper}>
+                    <Text style={styles.menuTitle}>Vérifier mon profil</Text>
+                    <Text style={styles.menuSubtitle}>Gagner en crédibilité</Text>
+                  </View>
+                  <Ionicons name="chevron-forward" size={20} color="#10B981" />
                 </TouchableOpacity>
               )}
             </View>
 
-            <View style={styles.menuSection}>
+            {/* Section paramètres */}
+            <View style={styles.menuContainer}>
               {user?.role === 'admin' && (
                 <TouchableOpacity
-                  style={styles.menuItem}
+                  style={styles.modernMenuItem}
+                  activeOpacity={0.7}
                   onPress={() => router.push('/admin')}
                 >
-                  <View style={styles.menuItemLeft}>
-                    <Ionicons name="shield-checkmark" size={24} color="#8B5CF6" />
-                    <Text style={[styles.menuItemText, { color: '#8B5CF6' }]}>
-                      Dashboard Admin
-                    </Text>
+                  <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
+                    <Ionicons name="shield" size={24} color="#8B5CF6" />
+                  </View>
+                  <View style={styles.menuTextWrapper}>
+                    <Text style={styles.menuTitle}>Dashboard Admin</Text>
+                    <Text style={styles.menuSubtitle}>Gestion plateforme</Text>
                   </View>
                   <Ionicons name="chevron-forward" size={20} color="#8B5CF6" />
                 </TouchableOpacity>
               )}
 
-              <TouchableOpacity style={styles.menuItem}>
-                <View style={styles.menuItemLeft}>
-                  <Ionicons name="settings-outline" size={24} color={colors.text} />
-                  <Text style={styles.menuItemText}>Paramètres</Text>
+              <TouchableOpacity
+                style={styles.modernMenuItem}
+                activeOpacity={0.7}
+                onPress={() => router.push('/(tabs)/parametres')}
+              >
+                <View style={styles.menuIconWrapper}>
+                  <Ionicons name="settings" size={24} color="#6B7280" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <View style={styles.menuTextWrapper}>
+                  <Text style={styles.menuTitle}>Paramètres</Text>
+                  <Text style={styles.menuSubtitle}>Thème, notifications</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
 
-              <TouchableOpacity style={styles.menuItem}>
-                <View style={styles.menuItemLeft}>
-                  <Ionicons name="help-circle-outline" size={24} color={colors.text} />
-                  <Text style={styles.menuItemText}>Aide</Text>
+              <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
+                <View style={styles.menuIconWrapper}>
+                  <Ionicons name="help-circle" size={24} color="#6B7280" />
                 </View>
-                <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+                <View style={styles.menuTextWrapper}>
+                  <Text style={styles.menuTitle}>Aide & Support</Text>
+                  <Text style={styles.menuSubtitle}>FAQ, contact</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.modernMenuItem}
+                activeOpacity={0.7}
+                onPress={handleLogout}
+              >
+                <View style={[styles.menuIconWrapper, { backgroundColor: 'rgba(239, 68, 68, 0.1)' }]}>
+                  <Ionicons name="log-out" size={24} color="#EF4444" />
+                </View>
+                <View style={styles.menuTextWrapper}>
+                  <Text style={[styles.menuTitle, { color: '#EF4444' }]}>Déconnexion</Text>
+                  <Text style={styles.menuSubtitle}>Se déconnecter du compte</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={20} color="#EF4444" />
               </TouchableOpacity>
             </View>
           </>
@@ -412,170 +527,221 @@ const createStyles = (colors) => StyleSheet.create({
     backgroundColor: colors.background,
   },
   scrollContent: {
+    paddingTop: 20,
     paddingBottom: 100,
   },
-  headerAnimated: {
-    flex: 1,
-    justifyContent: 'center',
+  headerGradient: {
+    marginHorizontal: 16,
+    borderRadius: 24,
+    overflow: 'hidden',
+    shadowColor: '#3EADAD',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  headerContent: {
     alignItems: 'center',
+    paddingVertical: 32,
     paddingHorizontal: 20,
   },
-  headerTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    width: '100%',
+  avatarWrapper: {
+    position: 'relative',
     marginBottom: 16,
   },
-  headerTitle: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
+  avatarBorder: {
+    width: 136,
+    height: 136,
+    borderRadius: 68,
+    padding: 4,
   },
-  avatarContainerHeader: {
-    position: 'relative',
-    marginBottom: 12,
+  avatarInner: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 64,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
   },
-  avatarHeader: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
+  avatarImage: {
+    width: '100%',
+    height: '100%',
+  },
+  avatarPlaceholder: {
+    width: '100%',
+    height: '100%',
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: '#FFFFFF',
+    backgroundColor: '#F0FDFA',
   },
-  editBadgeHeader: {
+  editBadgeFloat: {
     position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    width: 28,
-    height: 28,
+    bottom: 4,
+    right: 4,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  verifiedBadgeHeader: {
+  verifiedBadgeFloat: {
     position: 'absolute',
     top: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 16,
     padding: 2,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  nameHeader: {
-    fontSize: 20,
+  userName: {
+    fontSize: 26,
     fontWeight: 'bold',
     color: '#FFFFFF',
     marginBottom: 4,
   },
-  emailHeader: {
+  userEmail: {
     fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
+    marginBottom: 12,
   },
-  editButtonContainer: {
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    marginTop: -20,
-    borderRadius: 12,
+  statusBadge: {
+    flexDirection: 'row',
     alignItems: 'center',
+    backgroundColor: 'rgba(255, 255, 255, 0.25)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    gap: 6,
+  },
+  statusDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#10B981',
+  },
+  statusText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  statsSection: {
+    flexDirection: 'row',
+    marginHorizontal: 16,
+    marginTop: 20,
+    gap: 12,
+  },
+  statCard: {
+    flex: 1,
+    borderRadius: 16,
+    overflow: 'hidden',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  statGradient: {
     alignItems: 'center',
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    backgroundColor: colors.surface,
   },
-  title: {
-    fontSize: 28,
+  statValue: {
+    fontSize: 22,
     fontWeight: 'bold',
     color: colors.text,
-  },
-  profileCard: {
-    alignItems: 'center',
-    paddingVertical: 24,
-    backgroundColor: colors.surface,
-    marginHorizontal: 16,
-    marginBottom: 16,
-    borderRadius: 12,
-  },
-  avatarContainer: {
-    position: 'relative',
-    marginBottom: 16,
-  },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    backgroundColor: colors.border,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  editBadge: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: colors.primary,
-    borderRadius: 16,
-    width: 32,
-    height: 32,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 3,
-    borderColor: colors.surface,
-  },
-  verifiedBadge: {
-    position: 'absolute',
-    top: 0,
-    right: 0,
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    padding: 2,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.text,
+    marginTop: 8,
     marginBottom: 4,
   },
-  email: {
-    fontSize: 14,
+  statLabel: {
+    fontSize: 12,
     color: colors.textSecondary,
-    marginBottom: 16,
+    fontWeight: '500',
   },
-  editButton: {
+  editButtonModern: {
+    marginHorizontal: 16,
+    marginTop: 20,
+    marginBottom: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  editButtonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 6,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: colors.primary + '20',
-    borderRadius: 20,
+    justifyContent: 'center',
+    paddingVertical: 14,
+    gap: 8,
   },
-  editButtonText: {
-    fontSize: 14,
+  editButtonTextModern: {
+    fontSize: 16,
     fontWeight: '600',
-    color: colors.primary,
+    color: '#3EADAD',
+  },
+  menuContainer: {
+    marginHorizontal: 16,
+    marginBottom: 16,
+    backgroundColor: colors.surface,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  modernMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+    gap: 12,
+  },
+  menuIconWrapper: {
+    width: 48,
+    height: 48,
+    borderRadius: 12,
+    backgroundColor: 'rgba(62, 173, 173, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  menuTextWrapper: {
+    flex: 1,
+  },
+  menuTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text,
+    marginBottom: 2,
+  },
+  menuSubtitle: {
+    fontSize: 12,
+    color: colors.textSecondary,
   },
   editSection: {
     paddingHorizontal: 16,
+    marginTop: 16,
   },
   sectionTitle: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: 'bold',
     color: colors.text,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   inputGroup: {
     marginBottom: 16,
@@ -593,36 +759,11 @@ const createStyles = (colors) => StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     fontSize: 16,
+    color: colors.text,
   },
   textArea: {
     height: 100,
     textAlignVertical: 'top',
-  },
-  availabilityOptions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  availabilityChip: {
-    flex: 1,
-    paddingVertical: 10,
-    paddingHorizontal: 12,
-    borderRadius: 8,
-    backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    alignItems: 'center',
-  },
-  availabilityChipActive: {
-    backgroundColor: colors.primary + '20',
-    borderColor: colors.primary,
-  },
-  availabilityText: {
-    fontSize: 14,
-    color: colors.textSecondary,
-  },
-  availabilityTextActive: {
-    color: colors.primary,
-    fontWeight: '600',
   },
   interestsGrid: {
     flexDirection: 'row',
@@ -641,8 +782,8 @@ const createStyles = (colors) => StyleSheet.create({
     gap: 6,
   },
   interestChipActive: {
-    backgroundColor: colors.primary + '20',
-    borderColor: colors.primary,
+    backgroundColor: 'rgba(62, 173, 173, 0.1)',
+    borderColor: '#3EADAD',
   },
   interestIcon: {
     fontSize: 16,
@@ -652,7 +793,7 @@ const createStyles = (colors) => StyleSheet.create({
     color: colors.textSecondary,
   },
   interestTextActive: {
-    color: colors.primary,
+    color: '#3EADAD',
     fontWeight: '600',
   },
   buttonRow: {
@@ -660,13 +801,11 @@ const createStyles = (colors) => StyleSheet.create({
     gap: 12,
     marginTop: 24,
   },
-  button: {
+  cancelButton: {
     flex: 1,
     paddingVertical: 14,
     borderRadius: 12,
     alignItems: 'center',
-  },
-  cancelButton: {
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
@@ -677,57 +816,22 @@ const createStyles = (colors) => StyleSheet.create({
     color: colors.text,
   },
   saveButton: {
-    backgroundColor: colors.primary,
+    flex: 1,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#3EADAD',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  saveButtonGradient: {
+    paddingVertical: 14,
+    alignItems: 'center',
   },
   saveButtonText: {
     fontSize: 16,
     fontWeight: '600',
     color: '#FFFFFF',
   },
-  statsContainer: {
-    flexDirection: 'row',
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    padding: 16,
-    marginBottom: 16,
-    justifyContent: 'space-around',
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: colors.text,
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 12,
-    color: colors.textSecondary,
-  },
-  menuSection: {
-    backgroundColor: colors.surface,
-    borderRadius: 12,
-    marginHorizontal: 16,
-    marginBottom: 16,
-  },
-  menuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  menuItemLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  menuItemText: {
-    fontSize: 16,
-    color: colors.text,
-  },
 });
-;
