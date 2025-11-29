@@ -83,7 +83,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
   // 🌞 MODE CLAIR (Light Mode)
   light: {
     // Backgrounds
-    background: TimeNeutralColors.white, // #FFFFFF
+    background: 'rgba(62, 173, 173, 0.07)', // Turquoise du header à 7% d'opacité
     surface: TimeNeutralColors.lightGrey, // #E7E8EB (gris très pâle)
     cardBackground: TimeNeutralColors.lightGrey, // #E7E8EB
     inputBackground: '#F4F5F7', // Gris ultra pâle
