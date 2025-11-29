@@ -56,7 +56,7 @@ export default function MessagesScreen() {
   );
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       {/* Header animé avec barre de recherche */}
       <AnimatedHeader height={180}>
         <View style={styles.headerContent}>
