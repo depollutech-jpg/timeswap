@@ -39,6 +39,10 @@ export default function HomeScreen() {
   const [locationEnabled, setLocationEnabled] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('Tous');
   const [sortBy, setSortBy] = useState<string>('default'); // default, recent, oldest, personalized
+  
+  // Couleurs du header pour les badges
+  const headerOfferColor = '#3EADAD'; // Bleu turquoise du header
+  const headerRequestColor = '#4CAF9D'; // Vert dérivé du header
 
   // Animations
   const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
