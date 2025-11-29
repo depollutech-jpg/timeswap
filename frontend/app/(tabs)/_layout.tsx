@@ -6,6 +6,8 @@ import { TouchableOpacity, View, StyleSheet, Modal, Text, Animated, Dimensions }
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-handler';
 import CustomTabBar from '../../src/components/CustomTabBar';
+import AnimatedFloatingButton from '../../src/components/AnimatedFloatingButton';
+import { useThemeStore } from '../../src/store/themeStore';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BUTTON_SIZE = 64;
