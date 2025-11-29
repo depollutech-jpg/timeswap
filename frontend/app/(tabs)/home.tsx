@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
   filtersSection: {
     paddingVertical: 8,
     paddingLeft: 16,
-    marginTop: -8,
+    marginTop: 4,
   },
   filterChip: {
     flexDirection: 'row',
