@@ -274,11 +274,12 @@ export default function MyServicesScreen() {
                   )}
                 </TouchableOpacity>
 
-                {/* Boutons d'action - VERSION SIMPLIFIÉE */}
-                <View style={styles.actionButtons}>
+                {/* Boutons d'action - AVEC POINTER EVENTS */}
+                <View style={[styles.actionButtons, { zIndex: 9999, elevation: 9999 }]} pointerEvents="box-none">
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => Alert.alert('Info', 'Fonctionnalité à venir')}
+                    pointerEvents="auto"
                   >
                     <Ionicons name="create-outline" size={20} color="#3EADAD" />
                     <Text style={styles.actionButtonText}>Modifier</Text>
@@ -287,8 +288,9 @@ export default function MyServicesScreen() {
                   <View style={styles.actionDivider} />
 
                   <TouchableOpacity
-                    style={styles.actionButton}
+                    style={[styles.actionButton, { zIndex: 10000 }]}
                     activeOpacity={0.7}
+                    pointerEvents="auto"
                     onPressIn={() => console.log('🟢 PRESS IN')}
                     onPressOut={() => console.log('🟢 PRESS OUT')}
                     onPress={() => {
