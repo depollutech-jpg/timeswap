@@ -245,18 +245,67 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Compteur d'heures cliquable - dans le scroll */}
-        <TouchableOpacity 
-          style={styles.creditCardFixed}
-          onPress={() => router.push('/(tabs)/solde')}
-          activeOpacity={0.8}
+        {/* Compteur d'heures cliquable ludique - dans le scroll */}
+        <Animated.View
+          style={[
+            {
+              transform: [{ scale: pulseAnim }],
+            },
+          ]}
         >
-          <Ionicons name="wallet" size={24} color="#3EADAD" />
-          <Text style={styles.creditTextFixed}>
-            {user ? `${user.credits.available.toFixed(0)} heures disponibles` : '0 heures disponibles'}
-          </Text>
-          <Ionicons name="chevron-forward" size={20} color="#3EADAD" />
-        </TouchableOpacity>
+          <TouchableOpacity 
+            onPress={() => router.push('/(tabs)/solde')}
+            activeOpacity={0.85}
+            style={{ marginHorizontal: 16, marginTop: 8, marginBottom: 12 }}
+          >
+            <LinearGradient
+              colors={['#3EADAD', '#5FCFCF', '#3EADAD']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.creditCardGradient}
+            >
+              {/* Effet shimmer overlay */}
+              <Animated.View
+                style={[
+                  styles.shimmerOverlay,
+                  {
+                    opacity: shimmerAnim.interpolate({
+                      inputRange: [0, 1],
+                      outputRange: [0, 0.3],
+                    }),
+                  },
+                ]}
+              />
+              
+              <View style={styles.creditCardContent}>
+                <View style={styles.creditIconWrapper}>
+                  <Ionicons name="hourglass" size={32} color="#FFFFFF" />
+                  <View style={styles.sparkleIcon}>
+                    <Text style={styles.sparkleText}>✨</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.creditInfo}>
+                  <Text style={styles.creditLabel}>Vos heures disponibles</Text>
+                  <Text style={styles.creditAmount}>
+                    {user ? user.credits.available.toFixed(0) : '0'}
+                    <Text style={styles.creditUnit}> heures</Text>
+                  </Text>
+                  <View style={styles.creditSubInfo}>
+                    <Ionicons name="trending-up" size={12} color="rgba(255,255,255,0.9)" />
+                    <Text style={styles.creditSubText}>Prêt à échanger !</Text>
+                  </View>
+                </View>
+                
+                <View style={styles.creditAction}>
+                  <View style={styles.actionCircle}>
+                    <Ionicons name="chevron-forward" size={24} color="#3EADAD" />
+                  </View>
+                </View>
+              </View>
+            </LinearGradient>
+          </TouchableOpacity>
+        </Animated.View>
         
         {/* Barre de recherche */}
         <View style={styles.searchSection}>
