@@ -219,7 +219,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: Colors.primary,
+    backgroundColor: '#3EADAD', // Couleur turquoise du header
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
