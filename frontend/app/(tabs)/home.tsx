@@ -40,9 +40,9 @@ export default function HomeScreen() {
   const [selectedCategory, setSelectedCategory] = useState<string>('Tous');
   const [sortBy, setSortBy] = useState<string>('default'); // default, recent, oldest, personalized
   
-  // Couleurs du header pour les badges (ajustées pour meilleure différenciation)
-  const headerOfferColor = '#2F8282'; // Bleu turquoise plus foncé (25% plus foncé)
-  const headerRequestColor = '#79C3B6'; // Vert plus clair (25% plus clair)
+  // Couleurs du header pour les badges (gold pour offres, vert pour demandes)
+  const headerOfferColor = '#D4A574'; // Gold/Or doré (couleur complémentaire)
+  const headerRequestColor = '#79C3B6'; // Vert aqua clair (25% plus clair)
 
   // Animations
   const bounceCardAnim = React.useRef(new Animated.Value(0)).current;
