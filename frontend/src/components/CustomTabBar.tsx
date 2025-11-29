@@ -7,6 +7,7 @@ import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { useNotificationStore } from '../store/notificationStore';
 import { useThemeStore } from '../store/themeStore';
 import { BlurView } from 'expo-blur';
+import AnimatedTabBackground from './AnimatedTabBackground';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
