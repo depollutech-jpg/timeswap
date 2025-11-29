@@ -139,15 +139,44 @@ export default function ProfileScreen() {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>Profil</Text>
-          <TouchableOpacity onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color={colors.danger} />
-          </TouchableOpacity>
-        </View>
+        {/* Header animé avec profil */}
+        <AnimatedHeader height={220}>
+          <View style={styles.headerAnimated}>
+            <View style={styles.headerTop}>
+              <Text style={styles.headerTitle}>Profil</Text>
+              <TouchableOpacity onPress={handleLogout}>
+                <Ionicons name="log-out-outline" size={24} color="#FFFFFF" />
+              </TouchableOpacity>
+            </View>
+            
+            {/* Photo de profil dans le header */}
+            <TouchableOpacity style={styles.avatarContainerHeader} onPress={pickImage}>
+              {user?.profile.photo_base64 ? (
+                <Image source={{ uri: user.profile.photo_base64 }} style={styles.avatarHeader} />
+              ) : (
+                <View style={styles.avatarHeader}>
+                  <Ionicons name="person" size={40} color="#FFFFFF" />
+                </View>
+              )}
+              <View style={styles.editBadgeHeader}>
+                <Ionicons name="camera" size={16} color="#FFFFFF" />
+              </View>
+              {user?.verification.isVerified && (
+                <View style={styles.verifiedBadgeHeader}>
+                  <Ionicons name="checkmark-circle" size={24} color={colors.success} />
+                </View>
+              )}
+            </TouchableOpacity>
+            
+            <Text style={styles.nameHeader}>
+              {user?.profile.firstName} {user?.profile.lastName}
+            </Text>
+            <Text style={styles.emailHeader}>{user?.email}</Text>
+          </View>
+        </AnimatedHeader>
 
-        {/* Photo & Info */}
+        {/* Bouton éditer ou formulaire */}
+        {!isEditing && (
         <View style={styles.profileCard}>
           <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
             {user?.profile.photo_base64 ? (
