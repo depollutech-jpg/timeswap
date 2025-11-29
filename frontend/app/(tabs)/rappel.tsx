@@ -10,7 +10,7 @@ import {
 import { Colors } from '../../src/constants/colors';
 import { useThemeStore } from '../../src/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
-import AnimatedHeader from '../../src/components/AnimatedHeader';
+import PageTitle from '../../src/components/PageTitle';
 
 export default function RappelScreen() {
   const { colors } = useThemeStore();
