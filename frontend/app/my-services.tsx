@@ -272,14 +272,11 @@ export default function MyServicesScreen() {
                   )}
                 </TouchableOpacity>
 
-                {/* Boutons d'action */}
+                {/* Boutons d'action - VERSION SIMPLIFIÉE */}
                 <View style={styles.actionButtons}>
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => {
-                      // TODO: Implémenter l'édition
-                      Alert.alert('Info', 'Fonctionnalité à venir');
-                    }}
+                    onPress={() => Alert.alert('Info', 'Fonctionnalité à venir')}
                   >
                     <Ionicons name="create-outline" size={20} color="#3EADAD" />
                     <Text style={styles.actionButtonText}>Modifier</Text>
@@ -289,41 +286,33 @@ export default function MyServicesScreen() {
 
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={async (e) => {
-                      console.log('🔴🔴🔴 BOUTON CLIQUÉ 🔴🔴🔴');
-                      e?.stopPropagation?.();
-                      e?.preventDefault?.();
+                    activeOpacity={0.7}
+                    onPressIn={() => console.log('🟢 PRESS IN')}
+                    onPressOut={() => console.log('🟢 PRESS OUT')}
+                    onPress={() => {
+                      console.log('🔴🔴🔴 BOUTON CLIQUÉ - SERVICE:', service._id, service.title);
                       
-                      try {
-                        console.log('========== SUPPRESSION DÉMARÉE ==========');
-                        console.log('Service ID:', service._id);
-                        console.log('Service Title:', service.title);
+                      const serviceIdToDelete = service._id;
+                      const serviceTitleToDelete = service.title;
+                      
+                      setTimeout(async () => {
+                        console.log('⏰ TIMEOUT - Début suppression');
                         
-                        const confirmed = window.confirm(`Voulez-vous vraiment supprimer "${service.title}" ?\n\nCette action est irréversible.`);
-                        
-                        if (!confirmed) {
-                          console.log('Suppression annulée par l\'utilisateur');
-                          return;
+                        if (window.confirm(`Supprimer "${serviceTitleToDelete}" ?`)) {
+                          console.log('✅ Confirmé');
+                          
+                          try {
+                            await api.delete(`/services/${serviceIdToDelete}`);
+                            alert('✅ Supprimé !');
+                            loadMyServices();
+                          } catch (error: any) {
+                            console.error('❌ Erreur:', error);
+                            alert('❌ Erreur: ' + (error.response?.data?.detail || 'Échec'));
+                          }
+                        } else {
+                          console.log('❌ Annulé');
                         }
-                        
-                        console.log('Confirmation reçue, appel API...');
-                        
-                        const response = await api.delete(`/services/${service._id}`);
-                        
-                        console.log('Réponse API:', response.data);
-                        console.log('========== SUPPRESSION RÉUSSIE ==========');
-                        
-                        alert('✅ Annonce supprimée avec succès !');
-                        await loadMyServices();
-                      } catch (error: any) {
-                        console.error('========== ERREUR SUPPRESSION ==========');
-                        console.error('Error:', error);
-                        console.error('Response:', error.response);
-                        console.error('Status:', error.response?.status);
-                        console.error('Data:', error.response?.data);
-                        
-                        alert(`❌ Erreur: ${error.response?.data?.detail || error.message || 'Impossible de supprimer'}`);
-                      }
+                      }, 100);
                     }}
                   >
                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
