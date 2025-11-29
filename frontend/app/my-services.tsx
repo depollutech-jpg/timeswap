@@ -289,7 +289,11 @@ export default function MyServicesScreen() {
 
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={async () => {
+                    onPress={async (e) => {
+                      console.log('🔴🔴🔴 BOUTON CLIQUÉ 🔴🔴🔴');
+                      e?.stopPropagation?.();
+                      e?.preventDefault?.();
+                      
                       try {
                         console.log('========== SUPPRESSION DÉMARÉE ==========');
                         console.log('Service ID:', service._id);
