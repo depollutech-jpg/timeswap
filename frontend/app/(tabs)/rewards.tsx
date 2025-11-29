@@ -314,7 +314,7 @@ export default function RewardsScreen() {
           })}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
