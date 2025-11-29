@@ -164,7 +164,7 @@ export default function FixedAnimatedHeader({
 
 const styles = StyleSheet.create({
   container: {
-    height: 60,
+    height: 80,
     width: '100%',
     overflow: 'hidden',
     shadowColor: '#000',
