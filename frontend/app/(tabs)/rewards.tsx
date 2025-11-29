@@ -133,8 +133,8 @@ export default function RewardsScreen() {
             <View style={styles.levelCardContent}>
               <View style={styles.levelHeader}>
                 <View>
-                  <Text style={styles.levelBadge}>Niveau {user?.gamification.level}</Text>
-                  <Text style={styles.levelXP}>{user?.gamification.xp} XP</Text>
+                  <Text style={[styles.levelBadge, { color: colors.text }]}>Niveau {user?.gamification.level}</Text>
+                  <Text style={[styles.levelXP, { color: colors.textSecondary }]}>{user?.gamification.xp} XP</Text>
                 </View>
                 {userRank > 0 && (
                   <View style={styles.rankBadge}>
