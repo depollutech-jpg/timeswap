@@ -10,7 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore, ThemeMode } from '../../src/store/themeStore';
-import AnimatedHeader from '../../src/components/AnimatedHeader';
+import PageTitle from '../../src/components/PageTitle';
 
 export default function ParametresScreen() {
   const { mode, colors, setTheme, loadTheme } = useThemeStore();
