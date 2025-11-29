@@ -403,7 +403,11 @@ export default function ProfileScreen() {
 
             {/* Menu Items modernes */}
             <View style={styles.menuContainer}>
-              <TouchableOpacity style={styles.modernMenuItem} activeOpacity={0.7}>
+              <TouchableOpacity
+                style={styles.modernMenuItem}
+                activeOpacity={0.7}
+                onPress={() => router.push('/my-services')}
+              >
                 <View style={styles.menuIconWrapper}>
                   <Ionicons name="list" size={24} color="#3EADAD" />
                 </View>
