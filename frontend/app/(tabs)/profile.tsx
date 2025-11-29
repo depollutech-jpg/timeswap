@@ -412,8 +412,8 @@ export default function ProfileScreen() {
                   <Ionicons name="list" size={24} color="#3EADAD" />
                 </View>
                 <View style={styles.menuTextWrapper}>
-                  <Text style={styles.menuTitle}>Mes services</Text>
-                  <Text style={styles.menuSubtitle}>Gérer mes annonces</Text>
+                  <Text style={styles.menuTitle}>Mes annonces</Text>
+                  <Text style={styles.menuSubtitle}>Gérer mes publications</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
               </TouchableOpacity>
