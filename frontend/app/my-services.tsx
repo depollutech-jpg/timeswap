@@ -64,46 +64,73 @@ export default function MyServicesScreen() {
     loadMyServices();
   };
 
-  const handleDeleteService = (serviceId: string, title: string) => {
+  // NOUVELLE FONCTION DE SUPPRESSION - Implémentation propre
+  const deleteServiceById = async (serviceId: string) => {
+    try {
+      console.log('🗑️ Tentative de suppression du service:', serviceId);
+      console.log('👤 User ID:', user?._id);
+      
+      // Appel API pour supprimer
+      const response = await api.delete(`/services/${serviceId}`);
+      
+      console.log('✅ Réponse serveur:', response.data);
+      
+      // Rafraîchir la liste
+      await loadMyServices();
+      
+      // Message de succès
+      Alert.alert('✅ Succès', 'Votre annonce a été supprimée avec succès');
+      
+      return true;
+    } catch (error: any) {
+      console.error('❌ Erreur lors de la suppression:', error);
+      
+      // Détails de l'erreur
+      if (error.response) {
+        console.error('Status:', error.response.status);
+        console.error('Data:', error.response.data);
+        
+        // Messages d'erreur spécifiques
+        if (error.response.status === 403) {
+          Alert.alert('❌ Erreur', 'Vous n\'êtes pas autorisé à supprimer cette annonce');
+        } else if (error.response.status === 404) {
+          Alert.alert('❌ Erreur', 'Cette annonce n\'existe plus');
+        } else {
+          const message = error.response.data?.detail || 'Impossible de supprimer l\'annonce';
+          Alert.alert('❌ Erreur', message);
+        }
+      } else {
+        Alert.alert('❌ Erreur', 'Problème de connexion. Veuillez réessayer.');
+      }
+      
+      return false;
+    }
+  };
+
+  // Fonction pour afficher la confirmation
+  const confirmDeleteService = (serviceId: string, title: string) => {
+    console.log('🔔 Affichage de la confirmation de suppression');
+    console.log('Service à supprimer:', { id: serviceId, title });
+    
     Alert.alert(
-      'Supprimer l\'annonce',
-      `Êtes-vous sûr de vouloir supprimer "${title}" ?`,
+      '🗑️ Supprimer l\'annonce',
+      `Voulez-vous vraiment supprimer "${title}" ?\n\nCette action est irréversible.`,
       [
-        { text: 'Annuler', style: 'cancel' },
+        {
+          text: 'Annuler',
+          style: 'cancel',
+          onPress: () => console.log('❌ Suppression annulée'),
+        },
         {
           text: 'Supprimer',
           style: 'destructive',
-          onPress: async () => {
-            try {
-              console.log('=== DÉBUT SUPPRESSION ===');
-              console.log('Service ID:', serviceId);
-              console.log('API URL:', `/services/${serviceId}`);
-              
-              const response = await api.delete(`/services/${serviceId}`);
-              
-              console.log('Réponse suppression:', response);
-              console.log('=== FIN SUPPRESSION ===');
-              
-              Alert.alert('Succès', 'Annonce supprimée');
-              loadMyServices();
-            } catch (error: any) {
-              console.error('=== ERREUR SUPPRESSION ===');
-              console.error('Error object:', error);
-              console.error('Error response:', error.response);
-              console.error('Error message:', error.message);
-              console.error('Error status:', error.response?.status);
-              console.error('Error data:', error.response?.data);
-              
-              const errorMessage = error.response?.data?.detail || 
-                                   error.response?.data?.message || 
-                                   error.message || 
-                                   'Impossible de supprimer l\'annonce';
-              
-              Alert.alert('Erreur', errorMessage);
-            }
+          onPress: () => {
+            console.log('✅ Confirmation reçue, suppression en cours...');
+            deleteServiceById(serviceId);
           },
         },
-      ]
+      ],
+      { cancelable: true }
     );
   };
 
