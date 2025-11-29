@@ -57,26 +57,29 @@ export default function MessagesScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
-        <Text style={[styles.title, { color: colors.text }]}>Messages</Text>
-        <TouchableOpacity style={styles.composeButton}>
-          <Ionicons name="create-outline" size={24} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
-
-      {/* Barre de recherche */}
-      <View style={[styles.searchSection, { backgroundColor: colors.surface }]}>
-        <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
-          <Ionicons name="search" size={20} color="#6B7280" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher une conversation..."
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
+      {/* Header animé avec barre de recherche */}
+      <AnimatedHeader height={180}>
+        <View style={styles.headerContent}>
+          <View style={styles.headerTop}>
+            <Text style={styles.title}>Messages</Text>
+            <TouchableOpacity style={styles.composeButton}>
+              <Ionicons name="create-outline" size={24} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+          
+          {/* Barre de recherche intégrée */}
+          <View style={styles.searchBar}>
+            <Ionicons name="search" size={20} color="#FFFFFF" />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Rechercher une conversation..."
+              placeholderTextColor="rgba(255, 255, 255, 0.7)"
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+            />
+          </View>
         </View>
-      </View>
+      </AnimatedHeader>
 
       <ScrollView 
         style={styles.content}
