@@ -52,7 +52,7 @@ export default function Welcome() {
           </TouchableOpacity>
         </View>
       </View>
-    </LinearGradient>
+    </AnimatedTimeBackground>
   );
 }
 
