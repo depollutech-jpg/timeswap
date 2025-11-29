@@ -57,29 +57,22 @@ export default function MessagesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header animé avec barre de recherche */}
-      <AnimatedHeader height={180}>
-        <View style={styles.headerContent}>
-          <View style={styles.headerTop}>
-            <Text style={styles.title}>Messages</Text>
-            <TouchableOpacity style={styles.composeButton}>
-              <Ionicons name="create-outline" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-          
-          {/* Barre de recherche intégrée */}
-          <View style={styles.searchBar}>
-            <Ionicons name="search" size={20} color="#FFFFFF" />
-            <TextInput
-              style={styles.searchInput}
-              placeholder="Rechercher une conversation..."
-              placeholderTextColor="rgba(255, 255, 255, 0.7)"
-              value={searchQuery}
-              onChangeText={setSearchQuery}
-            />
-          </View>
+      {/* Titre de la page */}
+      <PageTitle title="Messages" />
+      
+      {/* Barre de recherche */}
+      <View style={[styles.searchSection, { backgroundColor: colors.surface }]}>
+        <View style={[styles.searchBar, { backgroundColor: colors.inputBackground }]}>
+          <Ionicons name="search" size={20} color={colors.textSecondary} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Rechercher une conversation..."
+            placeholderTextColor={colors.textSecondary}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+          />
         </View>
-      </AnimatedHeader>
+      </View>
 
       <ScrollView 
         style={styles.content}
