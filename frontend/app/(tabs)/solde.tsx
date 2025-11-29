@@ -290,15 +290,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
+    paddingTop: 60, // Espace pour le header fixe
     paddingBottom: 100,
-  },
-  header: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.text,
   },
   balanceCard: {
     marginHorizontal: 16,
