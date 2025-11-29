@@ -222,6 +222,7 @@ export default function TabsLayout() {
           name="rappel"
           options={{
             title: 'Rappel',
+            href: null,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="notifications" size={22} color={color} />
             ),
