@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuthStore } from '../src/store/authStore';
 import { Colors } from '../src/constants/colors';
-import { LinearGradient } from 'expo-linear-gradient';
+import AnimatedTimeBackground from '../src/components/AnimatedTimeBackground';
 
 export default function Welcome() {
   const router = useRouter();
@@ -16,10 +16,7 @@ export default function Welcome() {
   }, [user]);
 
   return (
-    <LinearGradient
-      colors={[Colors.primary, Colors.secondary]}
-      style={styles.container}
-    >
+    <AnimatedTimeBackground>
       <View style={styles.content}>
         <Text style={styles.logo}>TimeSwap</Text>
         <Text style={styles.tagline}>Échangez du temps, créez des liens</Text>
