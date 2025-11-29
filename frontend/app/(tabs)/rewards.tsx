@@ -130,54 +130,51 @@ export default function RewardsScreen() {
           <Text style={[styles.title, { color: colors.text }]}>Récompenses</Text>
         </View>
 
-        {/* Level Card avec Gradient */}
+        {/* Level Card avec Header Animé */}
         <View style={styles.levelCardContainer}>
-          <LinearGradient
-            colors={[Colors.primary, Colors.secondary]}
-            style={styles.levelCard}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <View style={styles.levelHeader}>
-              <View>
-                <Text style={styles.levelBadge}>Niveau {user?.gamification.level}</Text>
-                <Text style={styles.levelXP}>{user?.gamification.xp} XP</Text>
-              </View>
-              {userRank > 0 && (
-                <View style={styles.rankBadge}>
-                  <Ionicons name="trophy" size={16} color="#F59E0B" />
-                  <Text style={styles.rankText}>#{userRank}</Text>
+          <AnimatedHeader height={240}>
+            <View style={styles.levelCardContent}>
+              <View style={styles.levelHeader}>
+                <View>
+                  <Text style={styles.levelBadge}>Niveau {user?.gamification.level}</Text>
+                  <Text style={styles.levelXP}>{user?.gamification.xp} XP</Text>
                 </View>
-              )}
-            </View>
-            <View style={styles.progressBarContainer}>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: `${progressToNextLevel}%` }]} />
+                {userRank > 0 && (
+                  <View style={styles.rankBadge}>
+                    <Ionicons name="trophy" size={16} color="#F59E0B" />
+                    <Text style={styles.rankText}>#{userRank}</Text>
+                  </View>
+                )}
               </View>
-            </View>
-            <Text style={styles.progressText}>
-              {100 - (user?.gamification.xp % 100)} XP pour le niveau {(user?.gamification.level || 0) + 1}
-            </Text>
+              <View style={styles.progressBarContainer}>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: `${progressToNextLevel}%` }]} />
+                </View>
+              </View>
+              <Text style={styles.progressText}>
+                {100 - (user?.gamification.xp % 100)} XP pour le niveau {(user?.gamification.level || 0) + 1}
+              </Text>
 
-            {/* Stats RPG */}
-            <View style={styles.statsRow}>
-              <View style={styles.stat}>
-                <Ionicons name="flash" size={20} color="#FFFFFF" />
-                <Text style={styles.statLabel}>Force</Text>
-                <Text style={styles.statValue}>{user?.gamification.stats.force}</Text>
-              </View>
-              <View style={styles.stat}>
-                <Ionicons name="bulb" size={20} color="#FFFFFF" />
-                <Text style={styles.statLabel}>Sagesse</Text>
-                <Text style={styles.statValue}>{user?.gamification.stats.sagesse}</Text>
-              </View>
-              <View style={styles.stat}>
-                <Ionicons name="hand-right" size={20} color="#FFFFFF" />
-                <Text style={styles.statLabel}>Dextérité</Text>
-                <Text style={styles.statValue}>{user?.gamification.stats.dexterite}</Text>
+              {/* Stats RPG */}
+              <View style={styles.statsRow}>
+                <View style={styles.stat}>
+                  <Ionicons name="flash" size={20} color="#FFFFFF" />
+                  <Text style={styles.statLabel}>Force</Text>
+                  <Text style={styles.statValue}>{user?.gamification.stats.force}</Text>
+                </View>
+                <View style={styles.stat}>
+                  <Ionicons name="bulb" size={20} color="#FFFFFF" />
+                  <Text style={styles.statLabel}>Sagesse</Text>
+                  <Text style={styles.statValue}>{user?.gamification.stats.sagesse}</Text>
+                </View>
+                <View style={styles.stat}>
+                  <Ionicons name="hand-right" size={20} color="#FFFFFF" />
+                  <Text style={styles.statLabel}>Dextérité</Text>
+                  <Text style={styles.statValue}>{user?.gamification.stats.dexterite}</Text>
+                </View>
               </View>
             </View>
-          </LinearGradient>
+          </AnimatedHeader>
         </View>
 
         {/* Badges Section */}
