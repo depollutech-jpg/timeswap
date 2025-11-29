@@ -357,9 +357,37 @@ export default function MyServicesScreen() {
 
                   <TouchableOpacity
                     style={styles.actionButton}
-                    onPress={() => {
-                      console.log('🖱️ Clic sur le bouton Supprimer');
-                      confirmDeleteService(service._id, service.title);
+                    onPress={async () => {
+                      try {
+                        console.log('========== SUPPRESSION DÉMARÉE ==========');
+                        console.log('Service ID:', service._id);
+                        console.log('Service Title:', service.title);
+                        
+                        const confirmed = window.confirm(`Voulez-vous vraiment supprimer "${service.title}" ?\n\nCette action est irréversible.`);
+                        
+                        if (!confirmed) {
+                          console.log('Suppression annulée par l\'utilisateur');
+                          return;
+                        }
+                        
+                        console.log('Confirmation reçue, appel API...');
+                        
+                        const response = await api.delete(`/services/${service._id}`);
+                        
+                        console.log('Réponse API:', response.data);
+                        console.log('========== SUPPRESSION RÉUSSIE ==========');
+                        
+                        alert('✅ Annonce supprimée avec succès !');
+                        await loadMyServices();
+                      } catch (error: any) {
+                        console.error('========== ERREUR SUPPRESSION ==========');
+                        console.error('Error:', error);
+                        console.error('Response:', error.response);
+                        console.error('Status:', error.response?.status);
+                        console.error('Data:', error.response?.data);
+                        
+                        alert(`❌ Erreur: ${error.response?.data?.detail || error.message || 'Impossible de supprimer'}`);
+                      }
                     }}
                   >
                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
