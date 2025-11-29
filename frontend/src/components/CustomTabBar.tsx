@@ -348,8 +348,13 @@ const styles = StyleSheet.create({
   tabContent: {
     alignItems: 'center',
     gap: 6,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 12,
   },
-  tabContentActive: {},
+  tabContentActive: {
+    // Le fond est appliqué dynamiquement avec backgroundColor
+  },
   iconContainer: {
     marginBottom: 2,
     position: 'relative',
