@@ -111,7 +111,7 @@ function FloatingAddButton() {
           activeOpacity={1}
           onPress={() => setShowModal(false)}
         >
-          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+          <View style={[styles.modalContent, { backgroundColor: colors.surface || '#FFFFFF' }]}>
             <Text style={[styles.modalTitle, { color: colors.text }]}>Nouvelle action</Text>
             <TouchableOpacity
               style={[styles.modalOption, { borderBottomColor: colors.border }]}
