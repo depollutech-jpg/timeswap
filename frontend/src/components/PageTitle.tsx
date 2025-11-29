@@ -41,7 +41,7 @@ export default function PageTitle({ title, subtitle, icon }: PageTitleProps) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    marginTop: 80, // Espace pour le header fixe
+    marginTop: 0, // Pas d'espace supplémentaire
   },
   decorativeBand: {
     height: 4,
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingVertical: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.05,
