@@ -28,16 +28,10 @@ export default function ParametresScreen() {
   const isColorblindMode = mode === 'colorblind';
 
   return (
-    <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView}>
-        {/* Header animé */}
-        <AnimatedHeader height={180}>
-          <View style={styles.headerContent}>
-            <Ionicons name="settings" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-            <Text style={styles.headerTitle}>Paramètres</Text>
-            <Text style={styles.headerSubtitle}>Personnalisez votre expérience</Text>
-          </View>
-        </AnimatedHeader>
+        {/* Titre de la page */}
+        <PageTitle title="Paramètres" subtitle="Personnalisez votre expérience" />
 
         {/* Section Apparence */}
         <View style={styles.section}>
