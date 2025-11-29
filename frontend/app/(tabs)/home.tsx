@@ -25,6 +25,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import * as Location from 'expo-location';
 import CountdownTimer from '../../src/components/CountdownTimer';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 export default function HomeScreen() {
   const { user } = useAuthStore();
