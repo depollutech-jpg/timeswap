@@ -207,68 +207,36 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Header avec gradient rose */}
-        <LinearGradient
-          colors={[colors.primary, colors.secondary]}
-          style={styles.header}
-        >
-          <View style={styles.headerTop}>
-            <Text style={styles.logo}>TimeSwap</Text>
-            <View style={styles.headerIcons}>
-              {user?.role === 'admin' && (
-                <TouchableOpacity
-                  style={styles.adminButton}
-                  onPress={() => router.push('/admin')}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons name="shield-checkmark" size={22} color="#FFFFFF" />
-                </TouchableOpacity>
-              )}
-              <TouchableOpacity 
-                style={styles.iconButton}
-                onPress={() => router.push('/notifications')}
-              >
-                <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
-                {unreadCount > 0 && (
-                  <View style={styles.notificationBadge}>
-                    <Text style={styles.badgeText}>{unreadCount}</Text>
-                  </View>
-                )}
-              </TouchableOpacity>
+        {/* Header animé avec couleurs ondulantes */}
+        <AnimatedHeader height={220}>
+          <View style={styles.headerContent}>
+            <View>
+              <Text style={styles.greeting}>Bonjour {user?.name?.split(' ')[0]} 👋</Text>
+              <Text style={styles.subGreeting}>Trouvez un service à proximité</Text>
             </View>
+            <TouchableOpacity
+              style={styles.notificationButton}
+              onPress={() => router.push('/notifications')}
+            >
+              <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
+              {unreadCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{unreadCount > 99 ? '99+' : unreadCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
           </View>
 
-          <Animated.View
-            style={{
-              transform: [
-                {
-                  scale: bounceCardAnim.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: [0.9, 1],
-                  }),
-                },
-              ],
-              opacity: bounceCardAnim,
-            }}
-          >
-            <TouchableOpacity 
-              style={[styles.greetingCard, { backgroundColor: colors.cardBackground }]}
-              onPress={() => router.push('/(tabs)/solde')}
-              activeOpacity={0.8}
-            >
-              <View style={styles.greetingIcon}>
-                <Ionicons name="hand-right" size={32} color={colors.primary} />
-              </View>
-              <View style={styles.greetingContent}>
-                <Text style={[styles.greetingTitle, { color: colors.text }]}>Bonjour {user?.profile.firstName} ! 👋</Text>
-                <Text style={[styles.greetingSubtitle, { color: colors.text }]}>
-                  Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
-                </Text>
-              </View>
-              <Ionicons name="chevron-forward" size={20} color={colors.primary} />
-            </TouchableOpacity>
-          </Animated.View>
-        </LinearGradient>
+          {/* Credit Card */}
+          {user && (
+            <View style={[styles.creditCard, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
+              <Ionicons name="wallet" size={28} color="#FFFFFF" />
+              <Text style={[styles.creditText, { color: '#FFFFFF' }]}>
+                Vous avez {user?.credits.available.toFixed(0)} heures de crédit disponible
+              </Text>
+            </View>
+          )}
+        </AnimatedHeader>
 
         {/* Barre de recherche */}
         <View style={styles.searchSection}>
