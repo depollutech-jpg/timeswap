@@ -148,7 +148,7 @@ export default function RewardsScreen() {
                   <View style={[styles.progressFill, { width: `${progressToNextLevel}%` }]} />
                 </View>
               </View>
-              <Text style={styles.progressText}>
+              <Text style={[styles.progressText, { color: colors.textSecondary }]}>
                 {100 - (user?.gamification.xp % 100)} XP pour le niveau {(user?.gamification.level || 0) + 1}
               </Text>
 
