@@ -66,7 +66,7 @@ export default function MyServicesScreen() {
 
   const handleDeleteService = (serviceId: string, title: string) => {
     Alert.alert(
-      'Supprimer le service',
+      'Supprimer l\'annonce',
       `Êtes-vous sûr de vouloir supprimer "${title}" ?`,
       [
         { text: 'Annuler', style: 'cancel' },
@@ -75,11 +75,31 @@ export default function MyServicesScreen() {
           style: 'destructive',
           onPress: async () => {
             try {
-              await api.delete(`/services/${serviceId}`);
-              Alert.alert('Succès', 'Service supprimé');
+              console.log('=== DÉBUT SUPPRESSION ===');
+              console.log('Service ID:', serviceId);
+              console.log('API URL:', `/services/${serviceId}`);
+              
+              const response = await api.delete(`/services/${serviceId}`);
+              
+              console.log('Réponse suppression:', response);
+              console.log('=== FIN SUPPRESSION ===');
+              
+              Alert.alert('Succès', 'Annonce supprimée');
               loadMyServices();
-            } catch (error) {
-              Alert.alert('Erreur', 'Impossible de supprimer le service');
+            } catch (error: any) {
+              console.error('=== ERREUR SUPPRESSION ===');
+              console.error('Error object:', error);
+              console.error('Error response:', error.response);
+              console.error('Error message:', error.message);
+              console.error('Error status:', error.response?.status);
+              console.error('Error data:', error.response?.data);
+              
+              const errorMessage = error.response?.data?.detail || 
+                                   error.response?.data?.message || 
+                                   error.message || 
+                                   'Impossible de supprimer l\'annonce';
+              
+              Alert.alert('Erreur', errorMessage);
             }
           },
         },
