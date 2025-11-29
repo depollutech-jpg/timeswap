@@ -345,8 +345,8 @@ export default function HomeScreen() {
             services.map((service: any) => {
               const isOffer = service.type === 'offer';
               const cardColor = colors.cardBackground;
-              const borderColor = isOffer ? colors.primary : colors.secondary;
-              const buttonColor = isOffer ? colors.primary : colors.secondary;
+              const borderColor = isOffer ? headerOfferColor : headerRequestColor;
+              const buttonColor = isOffer ? headerOfferColor : headerRequestColor;
 
               return (
                 <View key={service._id} style={styles.serviceCardWrapper}>
