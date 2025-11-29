@@ -212,11 +212,13 @@ export default function MyServicesScreen() {
               <View
                 key={service._id}
                 style={[styles.serviceCard, { borderLeftColor: borderColor }]}
+                pointerEvents="box-none"
               >
                 <TouchableOpacity
                   style={styles.serviceContent}
                   onPress={() => router.push(`/service-details?id=${service._id}`)}
                   activeOpacity={0.7}
+                  pointerEvents="auto"
                 >
                   {/* Badge type */}
                   <View style={[styles.badge, { backgroundColor: badgeColor }]}>
