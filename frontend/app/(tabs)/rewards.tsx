@@ -171,7 +171,6 @@ export default function RewardsScreen() {
                 </View>
               </View>
             </View>
-          </AnimatedHeader>
         </View>
 
         {/* Badges Section */}
