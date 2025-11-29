@@ -326,11 +326,13 @@ const styles = StyleSheet.create({
   balanceTitle: {
     fontSize: 16,
     fontWeight: '600',
+    color: '#FFFFFF',
   },
   balanceAmount: {
     fontSize: 48,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: '#FFFFFF',
   },
   balanceStats: {
     flexDirection: 'row',
@@ -340,10 +342,12 @@ const styles = StyleSheet.create({
   balanceStatLabel: {
     fontSize: 12,
     marginBottom: 4,
+    color: 'rgba(255, 255, 255, 0.85)',
   },
   balanceStatValue: {
     fontSize: 18,
     fontWeight: '600',
+    color: '#FFFFFF',
   },
   quickActions: {
     flexDirection: 'row',
