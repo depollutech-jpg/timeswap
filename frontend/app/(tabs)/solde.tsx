@@ -17,6 +17,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import api from '../../src/utils/api';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 export default function SoldeScreen() {
   const { user, setUser } = useAuthStore();
