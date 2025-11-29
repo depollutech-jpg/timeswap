@@ -137,7 +137,7 @@ export default function ProfileScreen() {
   const styles = createStyles(colors);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         {/* Header animé avec profil */}
         <AnimatedHeader height={220}>
