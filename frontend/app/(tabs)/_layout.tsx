@@ -110,47 +110,47 @@ function FloatingAddButton() {
           activeOpacity={1}
           onPress={() => setShowModal(false)}
         >
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Nouvelle action</Text>
+          <View style={[styles.modalContent, { backgroundColor: colors.card }]}>
+            <Text style={[styles.modalTitle, { color: colors.text }]}>Nouvelle action</Text>
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, { borderBottomColor: colors.border }]}
               onPress={() => {
                 setShowModal(false);
                 router.push('/create-service?type=offer');
               }}
             >
-              <View style={[styles.optionIcon, { backgroundColor: Colors.primary + '20' }]}>
-                <Ionicons name="gift" size={24} color={Colors.primary} />
+              <View style={[styles.optionIcon, { backgroundColor: colors.primary + '20' }]}>
+                <Ionicons name="gift" size={24} color={colors.primary} />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Proposer un service</Text>
-                <Text style={styles.optionDescription}>Offrez votre aide à la communauté</Text>
+                <Text style={[styles.optionTitle, { color: colors.text }]}>Proposer un service</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>Offrez votre aide à la communauté</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.modalOption}
+              style={[styles.modalOption, { borderBottomColor: colors.border }]}
               onPress={() => {
                 setShowModal(false);
                 router.push('/create-service?type=request');
               }}
             >
-              <View style={[styles.optionIcon, { backgroundColor: Colors.secondary + '20' }]}>
-                <Ionicons name="hand-right" size={24} color={Colors.secondary} />
+              <View style={[styles.optionIcon, { backgroundColor: colors.secondary + '20' }]}>
+                <Ionicons name="hand-right" size={24} color={colors.secondary} />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Demander de l'aide</Text>
-                <Text style={styles.optionDescription}>Trouvez quelqu'un pour vous aider</Text>
+                <Text style={[styles.optionTitle, { color: colors.text }]}>Demander de l'aide</Text>
+                <Text style={[styles.optionDescription, { color: colors.textSecondary }]}>Trouvez quelqu'un pour vous aider</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.modalOption, { borderBottomWidth: 0 }]}
               onPress={() => setShowModal(false)}
             >
-              <View style={[styles.optionIcon, { backgroundColor: Colors.textSecondary + '20' }]}>
-                <Ionicons name="close" size={24} color={Colors.textSecondary} />
+              <View style={[styles.optionIcon, { backgroundColor: colors.textSecondary + '20' }]}>
+                <Ionicons name="close" size={24} color={colors.textSecondary} />
               </View>
               <View style={styles.optionContent}>
-                <Text style={styles.optionTitle}>Annuler</Text>
+                <Text style={[styles.optionTitle, { color: colors.text }]}>Annuler</Text>
               </View>
             </TouchableOpacity>
           </View>
