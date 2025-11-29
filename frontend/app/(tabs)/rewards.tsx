@@ -129,7 +129,7 @@ export default function RewardsScreen() {
         <PageTitle title="Récompenses" subtitle={`Niveau ${user?.gamification.level} - ${user?.gamification.xp} XP`} />
         
         {/* Level Card */}
-        <View style={[styles.levelCardContainer, { backgroundColor: colors.surface }]}>
+        <View style={[styles.levelCardContainer, { backgroundColor: '#FFFFFF' }]}>
             <View style={styles.levelCardContent}>
               <View style={styles.levelHeader}>
                 <View>
