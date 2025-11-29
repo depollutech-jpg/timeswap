@@ -243,7 +243,7 @@ const createStyles = (colors) =>
     },
     header: {
       paddingTop: 50,
-      paddingBottom: 20,
+      paddingBottom: 8,
       paddingHorizontal: 16,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
