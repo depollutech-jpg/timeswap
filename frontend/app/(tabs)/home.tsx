@@ -212,10 +212,10 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        {/* Header animé avec couleurs ondulantes */}
-        <AnimatedHeader height={200}>
+        {/* Header animé avec couleurs ondulantes - réduit de 20% */}
+        <AnimatedHeader height={160}>
           <View style={styles.headerContent}>
-            <View>
+            <View style={styles.greetingWrapper}>
               <Text style={styles.greeting}>Bonjour {user?.profile?.firstName} 👋</Text>
             </View>
             <TouchableOpacity
@@ -231,7 +231,7 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* Credit Card */}
+          {/* Credit Card - remonté de 20% */}
           {user && (
             <View style={[styles.creditCard, { backgroundColor: 'rgba(255, 255, 255, 0.2)' }]}>
               <Ionicons name="wallet" size={28} color="#FFFFFF" />
