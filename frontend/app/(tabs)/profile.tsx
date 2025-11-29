@@ -414,7 +414,7 @@ export default function ProfileScreen() {
           </>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
