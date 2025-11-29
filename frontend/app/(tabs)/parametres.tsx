@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore, ThemeMode } from '../../src/store/themeStore';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 export default function ParametresScreen() {
   const { mode, colors, setTheme, loadTheme } = useThemeStore();
@@ -29,13 +30,14 @@ export default function ParametresScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView style={styles.scrollView}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Paramètres</Text>
-          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            Personnalisez votre expérience
-          </Text>
-        </View>
+        {/* Header animé */}
+        <AnimatedHeader height={180}>
+          <View style={styles.headerContent}>
+            <Ionicons name="settings" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
+            <Text style={styles.headerTitle}>Paramètres</Text>
+            <Text style={styles.headerSubtitle}>Personnalisez votre expérience</Text>
+          </View>
+        </AnimatedHeader>
 
         {/* Section Apparence */}
         <View style={styles.section}>
@@ -158,44 +160,6 @@ export default function ParametresScreen() {
           </Text>
         </View>
 
-        {/* Aperçu des couleurs */}
-        <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.text }]}>
-            🎨 Aperçu des couleurs
-          </Text>
-          
-          <View style={[styles.colorPreview, { backgroundColor: colors.cardBackground, borderColor: colors.border }]}>
-            <View style={styles.colorRow}>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.primary }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Primaire</Text>
-              </View>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.secondary }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Secondaire</Text>
-              </View>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.success }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Succès</Text>
-              </View>
-            </View>
-            <View style={styles.colorRow}>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.warning }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Attention</Text>
-              </View>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.error }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Erreur</Text>
-              </View>
-              <View style={styles.colorItem}>
-                <View style={[styles.colorSwatch, { backgroundColor: colors.info }]} />
-                <Text style={[styles.colorLabel, { color: colors.textSecondary }]}>Info</Text>
-              </View>
-            </View>
-          </View>
-        </View>
-
         {/* Section Notifications */}
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>
@@ -217,56 +181,6 @@ export default function ParametresScreen() {
                 </Text>
                 <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
                   Notifications pour nouveaux messages
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={true}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={'#FFFFFF'}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
-            onPress={() => {}}
-            activeOpacity={0.7}
-          >
-            <View style={styles.settingLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: colors.success + '20' }]}>
-                <Ionicons name="megaphone" size={24} color={colors.success} />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingTitle, { color: colors.text }]}>
-                  Nouvelles annonces
-                </Text>
-                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
-                  Services correspondant à vos intérêts
-                </Text>
-              </View>
-            </View>
-            <Switch
-              value={true}
-              trackColor={{ false: colors.border, true: colors.primary }}
-              thumbColor={'#FFFFFF'}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
-            onPress={() => {}}
-            activeOpacity={0.7}
-          >
-            <View style={styles.settingLeft}>
-              <View style={[styles.iconContainer, { backgroundColor: colors.info + '20' }]}>
-                <Ionicons name="swap-horizontal" size={24} color={colors.info} />
-              </View>
-              <View style={styles.settingContent}>
-                <Text style={[styles.settingTitle, { color: colors.text }]}>
-                  Échanges
-                </Text>
-                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
-                  Confirmations et mises à jour
                 </Text>
               </View>
             </View>
@@ -338,20 +252,25 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1,
   },
-  header: {
-    padding: 24,
-    paddingBottom: 16,
+  headerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
-  title: {
-    fontSize: 32,
+  headerTitle: {
+    fontSize: 28,
     fontWeight: 'bold',
+    color: '#FFFFFF',
     marginBottom: 8,
   },
-  subtitle: {
+  headerSubtitle: {
     fontSize: 16,
+    color: 'rgba(255, 255, 255, 0.9)',
   },
   section: {
     paddingHorizontal: 16,
+    marginTop: 24,
     marginBottom: 24,
   },
   sectionTitle: {
@@ -410,33 +329,5 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 14,
     lineHeight: 20,
-  },
-  colorPreview: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-  },
-  colorRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 12,
-  },
-  colorItem: {
-    alignItems: 'center',
-    gap: 8,
-  },
-  colorSwatch: {
-    width: 50,
-    height: 50,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  colorLabel: {
-    fontSize: 11,
-    fontWeight: '600',
   },
 });

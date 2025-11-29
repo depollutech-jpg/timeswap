@@ -11,6 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from '../../src/constants/colors';
 import { useThemeStore } from '../../src/store/themeStore';
 import { Ionicons } from '@expo/vector-icons';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 export default function RappelScreen() {
   const { colors } = useThemeStore();
@@ -21,15 +22,18 @@ export default function RappelScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: colors.text }]}>Rappels & Notifications</Text>
-        </View>
+        {/* Header animé */}
+        <AnimatedHeader height={140}>
+          <View style={styles.headerContent}>
+            <Ionicons name="notifications" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
+            <Text style={styles.title}>Rappels & Notifications</Text>
+          </View>
+        </AnimatedHeader>
 
         {/* Info Card */}
-        <View style={styles.infoCard}>
-          <Ionicons name="information-circle" size={24} color={Colors.info} />
-          <Text style={styles.infoText}>
+        <View style={[styles.infoCard, { backgroundColor: colors.info + '20', borderColor: colors.info + '30' }]}>
+          <Ionicons name="information-circle" size={24} color={colors.info} />
+          <Text style={[styles.infoText, { color: colors.info }]}>
             Gérez vos notifications pour rester informé des messages, nouvelles annonces et échanges.
           </Text>
         </View>
@@ -38,12 +42,12 @@ export default function RappelScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Paramètres de notifications</Text>
 
-          <View style={styles.settingCard}>
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.settingInfo}>
-              <Ionicons name="chatbubbles" size={24} color={Colors.primary} />
+              <Ionicons name="chatbubbles" size={24} color="#3EADAD" />
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>Messages privés</Text>
-                <Text style={styles.settingDescription}>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
                   Recevoir une notification pour les nouveaux messages
                 </Text>
               </View>
@@ -51,17 +55,17 @@ export default function RappelScreen() {
             <Switch
               value={notifMessages}
               onValueChange={setNotifMessages}
-              trackColor={{ false: Colors.border, true: Colors.primary + '80' }}
-              thumbColor={notifMessages ? Colors.primary : '#f4f3f4'}
+              trackColor={{ false: colors.border, true: '#3EADAD' + '80' }}
+              thumbColor={notifMessages ? '#3EADAD' : '#f4f3f4'}
             />
           </View>
 
-          <View style={styles.settingCard}>
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.settingInfo}>
-              <Ionicons name="megaphone" size={24} color={Colors.secondary} />
+              <Ionicons name="megaphone" size={24} color="#4CAF9D" />
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>Nouvelles annonces</Text>
-                <Text style={styles.settingDescription}>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
                   Notifications basées sur vos centres d&apos;intérêt
                 </Text>
               </View>
@@ -69,17 +73,17 @@ export default function RappelScreen() {
             <Switch
               value={notifAnnonces}
               onValueChange={setNotifAnnonces}
-              trackColor={{ false: Colors.border, true: Colors.secondary + '80' }}
-              thumbColor={notifAnnonces ? Colors.secondary : '#f4f3f4'}
+              trackColor={{ false: colors.border, true: '#4CAF9D' + '80' }}
+              thumbColor={notifAnnonces ? '#4CAF9D' : '#f4f3f4'}
             />
           </View>
 
-          <View style={styles.settingCard}>
+          <View style={[styles.settingCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
             <View style={styles.settingInfo}>
-              <Ionicons name="swap-horizontal" size={24} color={Colors.success} />
+              <Ionicons name="swap-horizontal" size={24} color="#D4A574" />
               <View style={styles.settingText}>
                 <Text style={[styles.settingTitle, { color: colors.text }]}>Échanges</Text>
-                <Text style={styles.settingDescription}>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
                   Notifications sur l&apos;état de vos échanges
                 </Text>
               </View>
@@ -87,8 +91,8 @@ export default function RappelScreen() {
             <Switch
               value={notifEchanges}
               onValueChange={setNotifEchanges}
-              trackColor={{ false: Colors.border, true: Colors.success + '80' }}
-              thumbColor={notifEchanges ? Colors.success : '#f4f3f4'}
+              trackColor={{ false: colors.border, true: '#D4A574' + '80' }}
+              thumbColor={notifEchanges ? '#D4A574' : '#f4f3f4'}
             />
           </View>
         </View>
@@ -97,33 +101,33 @@ export default function RappelScreen() {
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.text }]}>Notifications récentes</Text>
 
-          <View style={styles.notificationCard}>
-            <View style={[styles.notifIcon, { backgroundColor: Colors.primary + '20' }]}>
-              <Ionicons name="chatbubble" size={20} color={Colors.primary} />
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="chatbubble" size={20} color="#3EADAD" />
             </View>
             <View style={styles.notifContent}>
               <Text style={[styles.notifTitle, { color: colors.text }]}>Nouveau message de Marie</Text>
-              <Text style={styles.notifTime}>Il y a 5 minutes</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 5 minutes</Text>
             </View>
           </View>
 
-          <View style={styles.notificationCard}>
-            <View style={[styles.notifIcon, { backgroundColor: Colors.secondary + '20' }]}>
-              <Ionicons name="megaphone" size={20} color={Colors.secondary} />
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="megaphone" size={20} color="#4CAF9D" />
             </View>
             <View style={styles.notifContent}>
               <Text style={[styles.notifTitle, { color: colors.text }]}>Nouvelle annonce : Cours de cuisine</Text>
-              <Text style={styles.notifTime}>Il y a 1 heure</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 1 heure</Text>
             </View>
           </View>
 
-          <View style={styles.notificationCard}>
-            <View style={[styles.notifIcon, { backgroundColor: Colors.success + '20' }]}>
-              <Ionicons name="checkmark-circle" size={20} color={Colors.success} />
+          <View style={[styles.notificationCard, { backgroundColor: colors.surface }]}>
+            <View style={styles.notifIcon}>
+              <Ionicons name="checkmark-circle" size={20} color="#D4A574" />
             </View>
             <View style={styles.notifContent}>
               <Text style={[styles.notifTitle, { color: colors.text }]}>Échange complété avec Jean</Text>
-              <Text style={styles.notifTime}>Il y a 2 heures</Text>
+              <Text style={[styles.notifTime, { color: colors.textSecondary }]}>Il y a 2 heures</Text>
             </View>
           </View>
         </View>
@@ -135,32 +139,35 @@ export default function RappelScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.background,
   },
   scrollContent: {
     paddingBottom: 100,
   },
-  header: {
-    padding: 16,
+  headerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: '#FFFFFF',
+    textAlign: 'center',
   },
   infoCard: {
     flexDirection: 'row',
-    backgroundColor: Colors.info + '20',
     marginHorizontal: 16,
+    marginTop: 16,
     padding: 16,
     borderRadius: 12,
+    borderWidth: 1,
     gap: 12,
     marginBottom: 24,
   },
   infoText: {
     flex: 1,
     fontSize: 14,
-    color: Colors.info,
     lineHeight: 20,
   },
   section: {
@@ -170,17 +177,16 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: Colors.text,
     marginBottom: 16,
   },
   settingCard: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: Colors.surface,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
+    borderWidth: 1,
   },
   settingInfo: {
     flexDirection: 'row',
@@ -194,17 +200,14 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
     marginBottom: 4,
   },
   settingDescription: {
     fontSize: 12,
-    color: Colors.textSecondary,
   },
   notificationCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.surface,
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
@@ -214,6 +217,7 @@ const styles = StyleSheet.create({
     width: 40,
     height: 40,
     borderRadius: 20,
+    backgroundColor: 'rgba(62, 173, 173, 0.2)',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -223,11 +227,9 @@ const styles = StyleSheet.create({
   notifTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: Colors.text,
     marginBottom: 4,
   },
   notifTime: {
     fontSize: 12,
-    color: Colors.textSecondary,
   },
 });

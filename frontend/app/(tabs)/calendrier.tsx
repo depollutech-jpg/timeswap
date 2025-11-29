@@ -16,6 +16,7 @@ import { useThemeStore } from '../../src/store/themeStore';
 import { useAuthStore } from '../../src/store/authStore';
 import { router } from 'expo-router';
 import Constants from 'expo-constants';
+import AnimatedHeader from '../../src/components/AnimatedHeader';
 
 interface Exchange {
   _id: string;
@@ -81,7 +82,7 @@ export default function CalendrierScreen() {
   const getStatusInfo = (status: string) => {
     switch (status) {
       case 'accepted':
-        return { label: 'En cours', color: Colors.primary, icon: 'hourglass-outline' };
+        return { label: 'En cours', color: '#3EADAD', icon: 'hourglass-outline' };
       case 'completed':
         return { label: 'Terminé', color: '#10B981', icon: 'checkmark-circle' };
       case 'cancelled':
@@ -89,7 +90,7 @@ export default function CalendrierScreen() {
       case 'pending':
         return { label: 'En attente', color: '#F59E0B', icon: 'time-outline' };
       default:
-        return { label: status, color: Colors.textSecondary, icon: 'help-circle-outline' };
+        return { label: status, color: colors.textSecondary, icon: 'help-circle-outline' };
     }
   };
 
@@ -166,7 +167,7 @@ export default function CalendrierScreen() {
             </View>
 
             <View style={styles.durationBadge}>
-              <Ionicons name="time-outline" size={14} color={Colors.primary} />
+              <Ionicons name="time-outline" size={14} color="#3EADAD" />
               <Text style={styles.durationText}>{exchange.duration}h</Text>
             </View>
           </View>
@@ -192,11 +193,14 @@ export default function CalendrierScreen() {
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-        <View style={[styles.header, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.headerTitle, { color: colors.text }]}>Calendrier</Text>
-        </View>
+        <AnimatedHeader height={140}>
+          <View style={styles.headerContent}>
+            <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
+            <Text style={styles.headerTitle}>Calendrier</Text>
+          </View>
+        </AnimatedHeader>
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={Colors.primary} />
+          <ActivityIndicator size="large" color="#3EADAD" />
         </View>
       </SafeAreaView>
     );
@@ -204,13 +208,16 @@ export default function CalendrierScreen() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.background }]}>
-      {/* Header */}
-      <View style={[styles.header, { backgroundColor: colors.surface }]}>
-        <Text style={[styles.headerTitle, { color: colors.text }]}>Calendrier</Text>
-        <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-          {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
-        </Text>
-      </View>
+      {/* Header animé */}
+      <AnimatedHeader height={140}>
+        <View style={styles.headerContent}>
+          <Ionicons name="calendar" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
+          <Text style={styles.headerTitle}>Calendrier</Text>
+          <Text style={styles.headerSubtitle}>
+            {exchanges.length} échange{exchanges.length > 1 ? 's' : ''}
+          </Text>
+        </View>
+      </AnimatedHeader>
 
       <ScrollView
         contentContainerStyle={styles.scrollContent}
@@ -218,7 +225,7 @@ export default function CalendrierScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor={Colors.primary}
+            tintColor="#3EADAD"
           />
         }
       >
@@ -243,22 +250,21 @@ export default function CalendrierScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
   },
-  header: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+  headerContent: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 20,
   },
   headerTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: Colors.text,
+    color: '#FFFFFF',
   },
   headerSubtitle: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: 'rgba(255, 255, 255, 0.9)',
     marginTop: 4,
   },
   loadingContainer: {
@@ -273,7 +279,6 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   exchangeCard: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     overflow: 'hidden',
     shadowColor: '#000',
@@ -302,7 +307,6 @@ const styles = StyleSheet.create({
   exchangeTitle: {
     fontSize: 16,
     fontWeight: 'bold',
-    color: Colors.text,
     marginBottom: 12,
   },
   exchangeInfo: {
@@ -330,14 +334,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 14,
-    color: Colors.text,
     fontWeight: '500',
     flex: 1,
   },
   durationBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: Colors.primary + '15',
+    backgroundColor: 'rgba(62, 173, 173, 0.15)',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -346,7 +349,7 @@ const styles = StyleSheet.create({
   durationText: {
     fontSize: 13,
     fontWeight: '600',
-    color: Colors.primary,
+    color: '#3EADAD',
   },
   exchangeFooter: {
     flexDirection: 'row',
@@ -367,10 +370,8 @@ const styles = StyleSheet.create({
   },
   dateText: {
     fontSize: 12,
-    color: Colors.textSecondary,
   },
   emptyState: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     padding: 48,
     alignItems: 'center',
@@ -384,12 +385,10 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: '600',
-    color: Colors.text,
     marginTop: 16,
   },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
     marginTop: 8,
     textAlign: 'center',
   },
