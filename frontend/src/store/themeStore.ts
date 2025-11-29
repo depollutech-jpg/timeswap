@@ -159,7 +159,7 @@ const themes: Record<ThemeMode, ThemeColors> = {
   // 👁 MODE DALTONIEN (Colorblind Safe)
   colorblind: {
     // Backgrounds (identiques au mode clair)
-    background: TimeNeutralColors.white,
+    background: 'rgba(62, 173, 173, 0.07)', // Turquoise du header à 7% d'opacité
     surface: TimeNeutralColors.lightGrey,
     cardBackground: TimeNeutralColors.lightGrey,
     inputBackground: '#F4F5F7',
