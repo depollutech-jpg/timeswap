@@ -6,7 +6,7 @@ Quick test for specific issues
 import requests
 import json
 
-BASE_URL = "https://helperxchange.preview.emergentagent.com/api"
+BASE_URL = "https://community-swap-2.preview.emergentagent.com/api"
 
 # Test photo validation
 def test_photo_validation():

@@ -683,7 +683,7 @@ agent_communication:
          - Filtrage transparent et automatique (22 services actifs retournés)
       
       ✅ BACKEND GÉNÉRAL (SANITY CHECK):
-      3. ✅ API Accessibility: API répond correctement à https://helperxchange.preview.emergentagent.com/api
+      3. ✅ API Accessibility: API répond correctement à https://community-swap-2.preview.emergentagent.com/api
       4. ✅ Authentification: POST /api/auth/register et POST /api/auth/login fonctionnent parfaitement
       5. ✅ Création de services: POST /api/services avec tous les champs requis (title, description, duration, category, location, type)
       6. ✅ Types de services: "offer" et "request" fonctionnels
