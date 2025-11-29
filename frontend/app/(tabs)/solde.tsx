@@ -212,7 +212,7 @@ export default function SoldeScreen() {
               </Text>
             </View>
           ) : (
-            exchanges.map((exchange: any) => (
+            exchanges.map((exchange) => (
               <View key={exchange._id} style={styles.historyItem}>
                 <View style={styles.historyIcon}>
                   <Ionicons
