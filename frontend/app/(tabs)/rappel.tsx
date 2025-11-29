@@ -21,13 +21,11 @@ export default function RappelScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* Header animé */}
-        <AnimatedHeader height={140}>
-          <View style={styles.headerContent}>
-            <Ionicons name="notifications" size={32} color="#FFFFFF" style={{ marginBottom: 8 }} />
-            <Text style={styles.title}>Rappels & Notifications</Text>
-          </View>
-        </AnimatedHeader>
+        {/* Titre de la page */}
+        <PageTitle 
+          title="Rappels & Notifications"
+          icon={<Ionicons name="notifications" size={28} color={colors.primary} />}
+        />
 
         {/* Info Card */}
         <View style={[styles.infoCard, { backgroundColor: colors.info + '20', borderColor: colors.info + '30' }]}>
