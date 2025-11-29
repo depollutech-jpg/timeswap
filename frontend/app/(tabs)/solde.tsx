@@ -279,7 +279,7 @@ export default function SoldeScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
