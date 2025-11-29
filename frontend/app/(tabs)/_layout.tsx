@@ -221,9 +221,9 @@ export default function TabsLayout() {
         <Tabs.Screen
           name="rappel"
           options={{
-            title: 'Calendrier',
+            title: 'Rappel',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="calendar" size={22} color={color} />
+              <Ionicons name="notifications" size={22} color={color} />
             ),
           }}
         />
@@ -231,7 +231,6 @@ export default function TabsLayout() {
           name="calendrier"
           options={{
             title: 'Calendrier',
-            href: null,
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="calendar" size={22} color={color} />
             ),
