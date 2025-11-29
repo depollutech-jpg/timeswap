@@ -7,7 +7,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuthStore } from '../../src/store/authStore';
 import { useRouter } from 'expo-router';
 import api from '../../src/utils/api';
-import AnimatedHeader from '../../src/components/AnimatedHeader';
+import PageTitle from '../../src/components/PageTitle';
 
 export default function MessagesScreen() {
   const { user } = useAuthStore();
