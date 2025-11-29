@@ -252,13 +252,13 @@ function TabItem({ route, label, isFocused, options, navigation, unreadCount, th
       >
         <View style={[
           styles.tabContent,
-          isFocused && styles.tabContentActive,
+          isFocused && [styles.tabContentActive, { backgroundColor: themeColors.primary + '15' }],
         ]}>
           {IconComponent && (
             <View style={styles.iconContainer}>
               {IconComponent({
                 color: isFocused ? themeColors.primary : themeColors.tabIconInactive,
-                size: 22,
+                size: 24,
                 focused: isFocused,
               })}
               {showBadge && (
