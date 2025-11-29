@@ -211,7 +211,7 @@ export default function HomeScreen() {
         <AnimatedHeader height={220}>
           <View style={styles.headerContent}>
             <View>
-              <Text style={styles.greeting}>Bonjour {user?.name?.split(' ')[0]} 👋</Text>
+              <Text style={styles.greeting}>Bonjour {user?.profile?.firstName} 👋</Text>
               <Text style={styles.subGreeting}>Trouvez un service à proximité</Text>
             </View>
             <TouchableOpacity
