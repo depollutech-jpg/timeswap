@@ -195,6 +195,137 @@ export default function ParametresScreen() {
             </View>
           </View>
         </View>
+
+        {/* Section Notifications */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            🔔 Notifications
+          </Text>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <View style={[styles.iconContainer, { backgroundColor: colors.primary + '20' }]}>
+                <Ionicons name="chatbubbles" size={24} color={colors.primary} />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>
+                  Messages privés
+                </Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Notifications pour nouveaux messages
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={true}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={'#FFFFFF'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <View style={[styles.iconContainer, { backgroundColor: colors.success + '20' }]}>
+                <Ionicons name="megaphone" size={24} color={colors.success} />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>
+                  Nouvelles annonces
+                </Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Services correspondant à vos intérêts
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={true}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={'#FFFFFF'}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <View style={[styles.iconContainer, { backgroundColor: colors.info + '20' }]}>
+                <Ionicons name="swap-horizontal" size={24} color={colors.info} />
+              </View>
+              <View style={styles.settingContent}>
+                <Text style={[styles.settingTitle, { color: colors.text }]}>
+                  Échanges
+                </Text>
+                <Text style={[styles.settingDescription, { color: colors.textSecondary }]}>
+                  Confirmations et mises à jour
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={true}
+              trackColor={{ false: colors.border, true: colors.primary }}
+              thumbColor={'#FFFFFF'}
+            />
+          </TouchableOpacity>
+        </View>
+
+        {/* Section Mentions légales */}
+        <View style={styles.section}>
+          <Text style={[styles.sectionTitle, { color: colors.text }]}>
+            ⚖️ Mentions légales
+          </Text>
+          
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {/* Navigation vers CGU */}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="document-text" size={24} color={colors.text} />
+              <Text style={[styles.settingTitle, { color: colors.text }]}>
+                Conditions Générales d'Utilisation
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {/* Navigation vers mentions légales */}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="information-circle" size={24} color={colors.text} />
+              <Text style={[styles.settingTitle, { color: colors.text }]}>
+                Mentions légales
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.settingItem, { backgroundColor: colors.cardBackground, borderColor: colors.border, borderWidth: 1 }]}
+            onPress={() => {/* Navigation vers politique */}}
+            activeOpacity={0.7}
+          >
+            <View style={styles.settingLeft}>
+              <Ionicons name="shield-checkmark" size={24} color={colors.text} />
+              <Text style={[styles.settingTitle, { color: colors.text }]}>
+                Politique de confidentialité
+              </Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
