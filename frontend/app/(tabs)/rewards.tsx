@@ -327,14 +327,6 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: 100,
   },
-  header: {
-    padding: 16,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: 'bold',
-    color: Colors.text,
-  },
   levelCardContainer: {
     marginHorizontal: 16,
     marginBottom: 24,
