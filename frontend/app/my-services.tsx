@@ -38,16 +38,17 @@ export default function MyServicesScreen() {
       // Vérifier différentes propriétés possibles pour l'ID utilisateur
       const myServices = response.data.filter(
         (service) => 
-          service.userId === user?.id || 
-          service.user_id === user?.id ||
-          service.createdBy === user?.id ||
-          service.created_by === user?.id ||
-          service.author?.id === user?.id ||
-          service.user?.id === user?.id
+          service.userId === user?._id || 
+          service.user_id === user?._id ||
+          service.createdBy === user?._id ||
+          service.created_by === user?._id ||
+          service.author?._id === user?._id ||
+          service.user?._id === user?._id
       );
       console.log('Total services:', response.data.length);
       console.log('Mes services:', myServices.length);
-      console.log('User ID:', user?.id);
+      console.log('User ID:', user?._id);
+      console.log('User object:', user);
       setServices(myServices);
     } catch (error) {
       console.error('Erreur chargement services:', error);
