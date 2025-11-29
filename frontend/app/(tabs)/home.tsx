@@ -465,7 +465,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingBottom: 24,
+    paddingBottom: 0,
   },
   header: {
     paddingHorizontal: 16,
