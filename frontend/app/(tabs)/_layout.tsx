@@ -166,6 +166,9 @@ export default function TabsLayout() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
+      {/* Header fixe animé sur toutes les pages */}
+      <FixedAnimatedHeader />
+      
       <Tabs
         tabBar={(props) => <CustomTabBar {...props} />}
         screenOptions={{
