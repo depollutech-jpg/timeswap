@@ -176,33 +176,6 @@ export default function HomeScreen() {
     }
   };
 
-  const handleDeleteService = (serviceId: string) => {
-    Alert.alert(
-      'Supprimer l\'annonce',
-      'Voulez-vous vraiment supprimer cette annonce ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Supprimer',
-          style: 'destructive',
-          onPress: async () => {
-            try {
-              await api.delete(`/services/${serviceId}`);
-              // Update UI immediately
-              setServices(services.filter((s: any) => s._id !== serviceId));
-              Alert.alert('Succès', 'Annonce supprimée avec succès');
-            } catch (error: any) {
-              Alert.alert(
-                'Erreur',
-                error.response?.data?.detail || 'Impossible de supprimer l\'annonce'
-              );
-            }
-          },
-        },
-      ]
-    );
-  };
-
   const onRefresh = async () => {
     setRefreshing(true);
     await loadServices(selectedCategory, sortBy);
