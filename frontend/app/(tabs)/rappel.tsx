@@ -141,18 +141,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     paddingBottom: 100,
   },
-  headerContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFFFFF',
-    textAlign: 'center',
-  },
   infoCard: {
     flexDirection: 'row',
     marginHorizontal: 16,
