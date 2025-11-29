@@ -135,7 +135,7 @@ export default function MessagesScreen() {
           ))
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
