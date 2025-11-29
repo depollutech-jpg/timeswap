@@ -83,9 +83,9 @@ export default function AnimatedHeader({ children, height = 200 }: AnimatedHeade
 
   return (
     <View style={[styles.container, { height }]}>
-      {/* Fond de base avec dégradé */}
+      {/* Fond de base avec dégradé (tons plus foncés pour visibilité) */}
       <LinearGradient
-        colors={['#DAF2E3', '#7DCFCF', '#2B9F9F']}
+        colors={['#5DBFBF', '#3EADAD', '#2B9F9F']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 0 }}
         style={StyleSheet.absoluteFill}
