@@ -25,7 +25,7 @@ export default function FixedAnimatedHeader({
   const wave3 = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Animation douce et infinie des vagues
+    // Animation plus visible et fluide des vagues
     const createWaveAnimation = (animatedValue: Animated.Value, duration: number, delay: number) => {
       return Animated.loop(
         Animated.sequence([
@@ -44,10 +44,10 @@ export default function FixedAnimatedHeader({
       );
     };
 
-    // 3 vagues avec des vitesses différentes
-    const animation1 = createWaveAnimation(wave1, 8000, 0);
-    const animation2 = createWaveAnimation(wave2, 10000, 2000);
-    const animation3 = createWaveAnimation(wave3, 12000, 4000);
+    // Animations plus rapides pour être plus visibles (durées réduites)
+    const animation1 = createWaveAnimation(wave1, 4000, 0);      // 4 secondes
+    const animation2 = createWaveAnimation(wave2, 5000, 1000);   // 5 secondes, délai 1s
+    const animation3 = createWaveAnimation(wave3, 6000, 2000);   // 6 secondes, délai 2s
 
     Animated.parallel([animation1, animation2, animation3]).start();
 
