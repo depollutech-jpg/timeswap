@@ -324,39 +324,7 @@ export default function MyServicesScreen() {
                   <TouchableOpacity
                     style={styles.actionButton}
                     activeOpacity={0.7}
-                    onPress={() => {
-                      console.log('🔴 BOUTON SUPPRIMER CLIQUÉ - SERVICE:', service._id, service.title);
-                      
-                      Alert.alert(
-                        'Confirmer la suppression',
-                        `Voulez-vous vraiment supprimer "${service.title}" ?`,
-                        [
-                          {
-                            text: 'Annuler',
-                            style: 'cancel',
-                            onPress: () => console.log('❌ Suppression annulée')
-                          },
-                          {
-                            text: 'Supprimer',
-                            style: 'destructive',
-                            onPress: async () => {
-                              console.log('✅ Suppression confirmée');
-                              try {
-                                console.log(`🔄 Appel API DELETE /services/${service._id}`);
-                                await api.delete(`/services/${service._id}`);
-                                console.log('✅ API a répondu - Suppression réussie');
-                                Alert.alert('Succès', 'Votre annonce a été supprimée');
-                                loadMyServices();
-                              } catch (error: any) {
-                                console.error('❌ Erreur suppression:', error);
-                                const errorMsg = error.response?.data?.detail || 'Impossible de supprimer l\'annonce';
-                                Alert.alert('Erreur', errorMsg);
-                              }
-                            }
-                          }
-                        ]
-                      );
-                    }}
+                    onPress={() => handleDeletePress(service._id, service.title)}
                   >
                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
                     <Text style={[styles.actionButtonText, { color: '#EF4444' }]}>
