@@ -267,6 +267,15 @@ export default function TabsLayout() {
             ),
           }}
         />
+        <Tabs.Screen
+          name="rewards"
+          options={{
+            title: 'Récompenses',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="trophy" size={22} color={color} />
+            ),
+          }}
+        />
       </Tabs>
       <FloatingAddButton />
     </GestureHandlerRootView>
