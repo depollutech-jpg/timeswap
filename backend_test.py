@@ -282,156 +282,78 @@ def test_authentication_required():
         results.add_result("Authentication test", False, f"Error: {str(e)}")
     
     return results
+def test_nonexistent_service():
+    """Test 4: Try to delete non-existent service"""
+    results = TestResults()
     
-    def test_service_creation_all_fields(self):
-        """Test service creation with all required fields"""
-        print("📝 TESTING SERVICE CREATION WITH ALL FIELDS")
+    print("\n🧪 TEST 4: DELETE NON-EXISTENT SERVICE")
+    print("-" * 50)
+    
+    # Create user for authentication
+    user = create_test_user("_nonexistent")
+    if not user:
+        results.add_result("Create test user", False, "Failed to create user")
+        return results
+    
+    results.add_result("Create test user", True, f"User created: {user['email']}")
+    
+    # Try to delete non-existent service
+    fake_service_id = str(uuid.uuid4())
+    headers = {**HEADERS, "Authorization": f"Bearer {user['token']}"}
+    
+    try:
+        response = requests.delete(f"{API_BASE}/services/{fake_service_id}", headers=headers)
         
-        if not self.auth_token:
-            self.log_test("Service Creation All Fields", False, "No auth token available")
-            return False
-        
-        # Test both offer and request types
-        test_services = [
-            {
-                "title": "Aide au déménagement",
-                "description": "Je propose mon aide pour déménager. Expérience avec gros mobilier.",
-                "category": "Déménagement",
-                "duration": 4.0,
-                "type": "offer",
-                "location": "Marseille",
-                "coordinates": {
-                    "latitude": 43.2965,
-                    "longitude": 5.3698
-                }
-            },
-            {
-                "title": "Recherche prof de guitare",
-                "description": "Je cherche quelqu'un pour m'apprendre la guitare acoustique.",
-                "category": "Musique",
-                "duration": 1.0,
-                "type": "request",
-                "location": "Toulouse"
-            }
-        ]
-        
-        success_count = 0
-        
-        for i, service_data in enumerate(test_services):
-            try:
-                response = self.session.post(f"{API_BASE}/services", json=service_data)
-                
-                if response.status_code == 200:
-                    data = response.json()
-                    service_id = data.get('serviceId')
-                    
-                    if service_id:
-                        # Verify the service was created with all fields
-                        service_response = self.session.get(f"{API_BASE}/services/{service_id}")
-                        
-                        if service_response.status_code == 200:
-                            service_details = service_response.json()
-                            
-                            # Check all required fields are present
-                            required_fields = ['title', 'description', 'category', 'duration', 'type', 'location', 'expiresAt']
-                            missing_fields = []
-                            
-                            for field in required_fields:
-                                if field not in service_details or service_details[field] is None:
-                                    missing_fields.append(field)
-                            
-                            if not missing_fields:
-                                success_count += 1
-                                self.log_test(f"Service Creation ({service_data['type']})", True, 
-                                            f"All fields present: {service_data['title']}")
-                            else:
-                                self.log_test(f"Service Creation ({service_data['type']})", False, 
-                                            f"Missing fields: {missing_fields}")
-                        else:
-                            self.log_test(f"Service Creation ({service_data['type']})", False, 
-                                        f"Failed to fetch created service")
-                    else:
-                        self.log_test(f"Service Creation ({service_data['type']})", False, 
-                                    "No serviceId in response")
-                else:
-                    self.log_test(f"Service Creation ({service_data['type']})", False, 
-                                f"Status: {response.status_code}, Response: {response.text}")
-                    
-            except Exception as e:
-                self.log_test(f"Service Creation ({service_data['type']})", False, f"Exception: {str(e)}")
-        
-        # Overall result
-        if success_count == len(test_services):
-            self.log_test("Service Creation All Fields - Overall", True, 
-                        f"All {success_count} services created successfully")
-            return True
+        if response.status_code == 404:
+            results.add_result("404 Not Found", True, "Correctly returned 404 for non-existent service")
         else:
-            self.log_test("Service Creation All Fields - Overall", False, 
-                        f"Only {success_count}/{len(test_services)} services created successfully")
-            return False
-    
-    def test_api_accessibility(self):
-        """Test that the API is accessible"""
-        print("🌐 TESTING API ACCESSIBILITY")
-        
-        try:
-            # Test a simple endpoint that doesn't require auth
-            response = self.session.get(f"{API_BASE}/payments/packages")
+            results.add_result("404 Not Found", False, f"Expected 404, got {response.status_code} - {response.text}")
             
-            if response.status_code == 200:
-                self.log_test("API Accessibility", True, f"API responding at {API_BASE}")
-                return True
-            else:
-                self.log_test("API Accessibility", False, f"API returned status {response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test("API Accessibility", False, f"Cannot reach API: {str(e)}")
-            return False
+    except Exception as e:
+        results.add_result("Non-existent service test", False, f"Error: {str(e)}")
     
-    def run_all_tests(self):
-        """Run all backend tests"""
-        print("🚀 STARTING COUP DE POUCE BACKEND TESTS")
-        print("=" * 60)
-        
-        test_results = []
-        
-        # Test API accessibility first
-        test_results.append(self.test_api_accessibility())
-        
-        # Test authentication
-        test_results.append(self.register_test_user())
-        test_results.append(self.test_login())
-        
-        # Test service functionality (requires auth)
-        if self.auth_token:
-            test_results.append(self.test_service_creation_with_expiration())
-            test_results.append(self.test_service_expiration_filtering())
-            test_results.append(self.test_service_creation_all_fields())
-        else:
-            print("⚠️  Skipping service tests - no authentication token")
-        
-        # Summary
-        print("=" * 60)
-        print("📊 TEST SUMMARY")
-        print("=" * 60)
-        
-        passed = sum(test_results)
-        total = len(test_results)
-        success_rate = (passed / total * 100) if total > 0 else 0
-        
-        print(f"✅ Tests Passed: {passed}/{total}")
-        print(f"📈 Success Rate: {success_rate:.1f}%")
-        
-        if success_rate >= 80:
-            print("🎉 BACKEND TESTS SUCCESSFUL!")
-        elif success_rate >= 60:
-            print("⚠️  BACKEND TESTS PARTIALLY SUCCESSFUL")
-        else:
-            print("❌ BACKEND TESTS FAILED")
-        
-        return success_rate >= 80
+    return results
+
+def main():
+    """Run all tests for DELETE service endpoint"""
+    print("🚀 STARTING BACKEND TESTS FOR DELETE SERVICE ENDPOINT")
+    print("=" * 60)
+    print("Testing DELETE /api/services/{service_id}")
+    print("Base URL:", API_BASE)
+    print("=" * 60)
+    
+    all_results = TestResults()
+    
+    # Run all test scenarios
+    test_scenarios = [
+        ("Successful Deletion", test_successful_deletion),
+        ("Security - Other User Service", test_security_other_user_service),
+        ("Authentication Required", test_authentication_required),
+        ("Non-existent Service", test_nonexistent_service)
+    ]
+    
+    for scenario_name, test_func in test_scenarios:
+        try:
+            scenario_results = test_func()
+            
+            # Merge results
+            all_results.total_tests += scenario_results.total_tests
+            all_results.passed_tests += scenario_results.passed_tests
+            all_results.failed_tests += scenario_results.failed_tests
+            all_results.results.extend(scenario_results.results)
+            
+        except Exception as e:
+            print(f"\n❌ ERROR in {scenario_name}: {str(e)}")
+            all_results.total_tests += 1
+            all_results.failed_tests += 1
+            all_results.results.append(f"❌ FAIL: {scenario_name} - Exception: {str(e)}")
+    
+    # Print final summary
+    all_results.print_summary()
+    
+    # Return exit code based on results
+    return 0 if all_results.failed_tests == 0 else 1
 
 if __name__ == "__main__":
-    tester = CoupDePouceBackendTester()
-    tester.run_all_tests()
+    exit_code = main()
+    sys.exit(exit_code)
