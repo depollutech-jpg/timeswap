@@ -117,6 +117,16 @@ class CheckoutRequest(BaseModel):
 class VerificationUpload(BaseModel):
     idDocument_base64: str
 
+class AppointmentCreate(BaseModel):
+    chatId: str
+    otherUserId: str
+    date: str  # ISO format
+    title: str
+    description: Optional[str] = None
+
+class AppointmentUpdate(BaseModel):
+    status: str  # "scheduled", "completed", "cancelled"
+
 # ============= AUTH HELPERS =============
 
 def hash_password(password: str) -> str:
