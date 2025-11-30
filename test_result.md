@@ -574,21 +574,26 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: |
-      🔧 BUG CRITIQUE CORRIGÉ - SUPPRESSION D'ANNONCES:
+      🔧 BUG CRITIQUE CORRIGÉ - SUPPRESSION D'ANNONCES (V2):
       
       PROBLÈME IDENTIFIÉ:
-      - Utilisation de window.confirm() et alert() (APIs web incompatibles avec React Native)
-      - Ces fonctions ne fonctionnent pas sur mobile
+      1. Première tentative: window.confirm() et alert() (APIs web incompatibles avec React Native)
+      2. Deuxième tentative: Alert.alert() ne fonctionne pas sur React Native Web (preview)
       
-      SOLUTION:
-      - Remplacé par Alert.alert() de React Native
-      - Dialogue natif avec boutons [Annuler, Supprimer]
-      - Messages de succès/erreur avec Alert
-      - Code simplifié et nettoyé
+      SOLUTION FINALE (V2):
+      - Créé un composant ConfirmDialog personnalisé avec Modal de React Native
+      - Fonctionne sur toutes les plateformes (Web, iOS, Android)
+      - Design moderne avec icône, titre, message et boutons stylisés
+      - Utilise Modal natif au lieu d'Alert.alert()
+      - État géré avec useState pour serviceToDelete et deleteDialogVisible
       
-      Backend vérifié: Endpoint DELETE /api/services/{service_id} existe et fonctionne.
+      FICHIERS MODIFIÉS:
+      - /app/frontend/src/components/ConfirmDialog.tsx (NOUVEAU)
+      - /app/frontend/app/my-services.tsx (intégration du dialogue)
       
-      Prêt pour test backend (endpoint already tested) et frontend.
+      Backend vérifié: Endpoint DELETE /api/services/{service_id} fonctionne (15/15 tests passés).
+      
+      Prêt pour test frontend avec le nouveau Modal personnalisé.
   
   - agent: "main"
     message: |
