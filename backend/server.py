@@ -1415,6 +1415,35 @@ async def send_message(
     if not chat or current_user["_id"] not in chat["participants"]:
         raise HTTPException(403, "Access denied")
     
+    # Get the other participant
+    other_participant_id = [p for p in chat["participants"] if p != current_user["_id"]][0]
+    
+    # Check if current user is blocked by the recipient
+    is_blocked = await db.blocked_users.find_one({
+        "blocker_id": other_participant_id,
+        "blocked_id": current_user["_id"]
+    })
+    
+    if is_blocked:
+        raise HTTPException(403, "Vous ne pouvez pas envoyer de messages à cet utilisateur")
+    
+    # Check if recipient blocked current user
+    is_blocking = await db.blocked_users.find_one({
+        "blocker_id": current_user["_id"],
+        "blocked_id": other_participant_id
+    })
+    
+    if is_blocking:
+        raise HTTPException(403, "Vous avez bloqué cet utilisateur")
+    
+    # If chat was deleted by the recipient, reactivate it for them
+    if "deleted_by" in chat and other_participant_id in chat["deleted_by"]:
+        deleted_by = [uid for uid in chat["deleted_by"] if uid != other_participant_id]
+        await db.chats.update_one(
+            {"_id": chat_id},
+            {"$set": {"deleted_by": deleted_by}}
+        )
+    
     message = {
         "_id": str(uuid.uuid4()),
         "chatId": chat_id,
