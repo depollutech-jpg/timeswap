@@ -551,6 +551,10 @@ const styles = StyleSheet.create({
   profileButton: {
     padding: 4,
   },
+  calendarButton: {
+    padding: 4,
+    marginRight: 8,
+  },
   serviceCard: {
     flexDirection: 'row',
     alignItems: 'center',
