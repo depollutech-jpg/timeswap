@@ -1,26 +1,21 @@
 #!/usr/bin/env python3
 """
-Backend Test Suite for Coup de Pouce - Service Deletion Endpoint
-Testing DELETE /api/services/{service_id} endpoint according to review request
+Backend Testing Suite for Coup de Pouce - Appointment System
+Tests all appointment endpoints according to the review request specifications.
 """
 
 import requests
 import json
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 import sys
-import os
-from dotenv import load_dotenv
+import traceback
 
-# Load environment variables
-load_dotenv('/app/frontend/.env')
-
-# Get backend URL from environment
-BACKEND_URL = os.getenv('EXPO_PUBLIC_BACKEND_URL', 'http://localhost:8001')
-API_BASE = f"{BACKEND_URL}/api"
+# Configuration
+BASE_URL = "https://servicexchange.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
-print(f"🔗 Testing DELETE endpoint at: {API_BASE}")
+print(f"🔗 Testing Appointment System at: {BASE_URL}")
 
 class TestResults:
     def __init__(self):
