@@ -1356,9 +1356,11 @@ async def create_chat(chat_data: ChatCreate, current_user: dict = Depends(get_cu
 
 @api_router.get("/chats")
 async def get_my_chats(current_user: dict = Depends(get_current_user)):
-    """Get all chats for current user"""
+    """Get all chats for current user (excluding deleted and blocked)"""
+    # Get chats where user is participant and hasn't deleted
     chats = await db.chats.find({
-        "participants": current_user["_id"]
+        "participants": current_user["_id"],
+        "deleted_by": {"$ne": current_user["_id"]}
     }).sort("lastMessageAt", -1).to_list(length=50)
     
     # Enrich with other user data
