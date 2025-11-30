@@ -288,35 +288,40 @@ export default function MyServicesScreen() {
                   <View style={styles.actionDivider} />
 
                   <TouchableOpacity
-                    style={[styles.actionButton, { zIndex: 10000 }]}
+                    style={styles.actionButton}
                     activeOpacity={0.7}
-                    pointerEvents="auto"
-                    onPressIn={() => console.log('🟢 PRESS IN')}
-                    onPressOut={() => console.log('🟢 PRESS OUT')}
                     onPress={() => {
-                      console.log('🔴🔴🔴 BOUTON CLIQUÉ - SERVICE:', service._id, service.title);
+                      console.log('🔴 BOUTON SUPPRIMER CLIQUÉ - SERVICE:', service._id, service.title);
                       
-                      const serviceIdToDelete = service._id;
-                      const serviceTitleToDelete = service.title;
-                      
-                      setTimeout(async () => {
-                        console.log('⏰ TIMEOUT - Début suppression');
-                        
-                        if (window.confirm(`Supprimer "${serviceTitleToDelete}" ?`)) {
-                          console.log('✅ Confirmé');
-                          
-                          try {
-                            await api.delete(`/services/${serviceIdToDelete}`);
-                            alert('✅ Supprimé !');
-                            loadMyServices();
-                          } catch (error: any) {
-                            console.error('❌ Erreur:', error);
-                            alert('❌ Erreur: ' + (error.response?.data?.detail || 'Échec'));
+                      Alert.alert(
+                        'Confirmer la suppression',
+                        `Voulez-vous vraiment supprimer "${service.title}" ?`,
+                        [
+                          {
+                            text: 'Annuler',
+                            style: 'cancel',
+                            onPress: () => console.log('❌ Suppression annulée')
+                          },
+                          {
+                            text: 'Supprimer',
+                            style: 'destructive',
+                            onPress: async () => {
+                              console.log('✅ Suppression confirmée');
+                              try {
+                                console.log(`🔄 Appel API DELETE /services/${service._id}`);
+                                await api.delete(`/services/${service._id}`);
+                                console.log('✅ API a répondu - Suppression réussie');
+                                Alert.alert('Succès', 'Votre annonce a été supprimée');
+                                loadMyServices();
+                              } catch (error: any) {
+                                console.error('❌ Erreur suppression:', error);
+                                const errorMsg = error.response?.data?.detail || 'Impossible de supprimer l\'annonce';
+                                Alert.alert('Erreur', errorMsg);
+                              }
+                            }
                           }
-                        } else {
-                          console.log('❌ Annulé');
-                        }
-                      }, 100);
+                        ]
+                      );
                     }}
                   >
                     <Ionicons name="trash-outline" size={20} color="#EF4444" />
