@@ -274,8 +274,8 @@ export default function MyServicesScreen() {
                   )}
                 </TouchableOpacity>
 
-                {/* Boutons d'action - AVEC POINTER EVENTS */}
-                <View style={[styles.actionButtons, { zIndex: 9999, elevation: 9999 }]} pointerEvents="box-none">
+                {/* Boutons d'action */}
+                <View style={styles.actionButtons}>
                   <TouchableOpacity
                     style={styles.actionButton}
                     onPress={() => Alert.alert('Info', 'Fonctionnalité à venir')}
