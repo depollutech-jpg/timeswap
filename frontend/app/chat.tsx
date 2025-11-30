@@ -512,7 +512,8 @@ export default function ChatScreen() {
       <AppointmentModal
         visible={showAppointmentModal}
         onClose={() => setShowAppointmentModal(false)}
-        onSubmit={createAppointment}
+        onConfirm={createAppointment}
+        otherUserName={chat?.otherUser?.name || 'l\'utilisateur'}
       />
     </SafeAreaView>
   );
