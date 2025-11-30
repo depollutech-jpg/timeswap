@@ -51,6 +51,8 @@ export default function ChatScreen() {
   const [showAppointmentModal, setShowAppointmentModal] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [messageToDelete, setMessageToDelete] = useState<string | null>(null);
+  const [showDeleteChatDialog, setShowDeleteChatDialog] = useState(false);
+  const [showBlockDialog, setShowBlockDialog] = useState(false);
 
   useEffect(() => {
     loadChat();
