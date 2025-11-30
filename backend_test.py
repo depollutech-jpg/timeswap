@@ -249,82 +249,39 @@ def test_security_other_user_service():
         results.add_result("Security test", False, f"Error: {str(e)}")
     
     return results
+def test_authentication_required():
+    """Test 3: Authentication required - no JWT token"""
+    results = TestResults()
     
-    def test_service_expiration_filtering(self):
-        """Test that GET /api/services filters out expired services automatically"""
-        print("🔍 TESTING SERVICE EXPIRATION FILTERING")
+    print("\n🧪 TEST 3: AUTHENTICATION REQUIRED")
+    print("-" * 50)
+    
+    # Create a service first (need valid user for this)
+    user = create_test_user("_auth")
+    if not user:
+        results.add_result("Create test user", False, "Failed to create user")
+        return results
+    
+    service_id = create_test_service(user["token"], "Service pour test auth")
+    if not service_id:
+        results.add_result("Create test service", False, "Failed to create service")
+        return results
+    
+    results.add_result("Setup test service", True, f"Service created: {service_id}")
+    
+    # Try to delete without authentication
+    try:
+        response = requests.delete(f"{API_BASE}/services/{service_id}", headers=HEADERS)
         
-        if not self.auth_token:
-            self.log_test("Service Expiration Filtering", False, "No auth token available")
-            return False
-        
-        try:
-            # First, create a normal service (should appear in results)
-            current_time = datetime.utcnow()
+        if response.status_code in [401, 403]:
+            results.add_result("Authentication required", True, f"Correctly rejected unauthenticated request: {response.status_code}")
+        else:
+            results.add_result("Authentication required", False, f"Expected 401/403, got {response.status_code} - {response.text}")
             
-            normal_service = {
-                "title": "Service Normal - Visible",
-                "description": "Ce service devrait être visible car il n'est pas expiré",
-                "category": "Jardinage",
-                "duration": 1.5,
-                "type": "offer",
-                "location": "Lyon"
-            }
-            
-            normal_response = self.session.post(f"{API_BASE}/services", json=normal_service)
-            
-            if normal_response.status_code != 200:
-                self.log_test("Service Expiration Filtering", False, 
-                            "Failed to create normal service for test")
-                return False
-            
-            normal_service_id = normal_response.json().get('serviceId')
-            
-            # Wait a moment then fetch services
-            time.sleep(1)
-            
-            # Get all services
-            services_response = self.session.get(f"{API_BASE}/services")
-            
-            if services_response.status_code == 200:
-                services = services_response.json()
-                
-                # Check that our normal service appears
-                normal_service_found = False
-                expired_services_found = []
-                
-                for service in services:
-                    if service.get('_id') == normal_service_id:
-                        normal_service_found = True
-                    
-                    # Check if any service has expiresAt in the past
-                    expires_at_str = service.get('expiresAt')
-                    if expires_at_str:
-                        expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00'))
-                        if expires_at < current_time:
-                            expired_services_found.append(service.get('_id'))
-                
-                # Verify results
-                if normal_service_found and len(expired_services_found) == 0:
-                    self.log_test("Service Expiration Filtering", True, 
-                                f"✅ Normal service found, no expired services returned. Total services: {len(services)}")
-                    return True
-                elif not normal_service_found:
-                    self.log_test("Service Expiration Filtering", False, 
-                                "Normal service not found in results")
-                    return False
-                else:
-                    self.log_test("Service Expiration Filtering", False, 
-                                f"Found {len(expired_services_found)} expired services in results: {expired_services_found}")
-                    return False
-            else:
-                self.log_test("Service Expiration Filtering", False, 
-                            f"Failed to fetch services: {services_response.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Service Expiration Filtering", False, f"Exception: {str(e)}")
-            return False
+    except Exception as e:
+        results.add_result("Authentication test", False, f"Error: {str(e)}")
+    
+    return results
     
     def test_service_creation_all_fields(self):
         """Test service creation with all required fields"""
