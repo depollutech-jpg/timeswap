@@ -21,6 +21,7 @@ import UserProfileCard from '../src/components/UserProfileCard';
 import ReportModal from '../src/components/ReportModal';
 import ConfirmationModal from '../src/components/ConfirmationModal';
 import CountdownTimer from '../src/components/CountdownTimer';
+import ConfirmDialog from '../src/components/ConfirmDialog';
 
 const { width } = Dimensions.get('window');
 
@@ -36,6 +37,7 @@ export default function ServiceDetailsScreen() {
   const [showReportModal, setShowReportModal] = useState(false);
   const [showAcceptModal, setShowAcceptModal] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   useEffect(() => {
     loadService();
