@@ -476,9 +476,9 @@ test_plan:
 
   - task: "Fix Delete Announcement Button"
     implemented: true
-    working: true
+    working: false
     file: "app/my-services.tsx"
-    stuck_count: 3
+    stuck_count: 4
     priority: "critical"
     needs_retesting: false
     status_history:
@@ -534,6 +534,40 @@ test_plan:
           L'ENDPOINT DELETE /api/services/{service_id} FONCTIONNE PARFAITEMENT!
           Le fix du main agent (Alert.alert au lieu de window.confirm) était la bonne solution.
           Backend prêt pour production.
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ FRONTEND DELETE FUNCTIONALITY TESTING FAILED - CRITICAL ISSUE FOUND
+          
+          Tests effectués selon la review request sur mobile (390x844):
+          
+          ✅ NAVIGATION ET UI:
+          1. ✅ Navigation vers "Mes annonces": Succès via Profile → Mes annonces
+          2. ✅ Affichage page: Titre "Mes Annonces" correct
+          3. ✅ Stats affichées: 3 Offres, 0 Demandes, 4 Total
+          4. ✅ Filtres fonctionnels: Tous, Offres, Demandes
+          5. ✅ Services listés: 4 services avec boutons "Supprimer" visibles
+          6. ✅ Mobile responsive: Interface adaptée 390x844
+          
+          ❌ FONCTIONNALITÉ CRITIQUE CASSÉE:
+          1. ❌ Alert.alert() NE S'AFFICHE PAS: Clic sur "Supprimer" ne déclenche aucun dialogue
+          2. ❌ Pas de dialogue de confirmation: "Confirmer la suppression" n'apparaît pas
+          3. ❌ Impossible de supprimer: Utilisateurs ne peuvent pas supprimer leurs annonces
+          4. ❌ Fix Alert.alert() non fonctionnel: Le remplacement de window.confirm() a échoué
+          
+          🔍 DIAGNOSTIC:
+          - Backend DELETE endpoint fonctionne parfaitement (testé précédemment)
+          - Page "Mes annonces" se charge correctement
+          - Boutons "Supprimer" sont présents et cliquables
+          - MAIS Alert.alert() ne se déclenche pas dans l'environnement mobile
+          
+          🚨 IMPACT UTILISATEUR:
+          - Fonctionnalité de suppression complètement cassée
+          - Utilisateurs ne peuvent pas gérer leurs annonces
+          - Bug critique bloquant pour l'application
+          
+          ⚠️ RECOMMANDATION: Le main agent doit investiguer pourquoi Alert.alert() ne fonctionne pas
+          et implémenter une solution alternative pour les dialogues de confirmation sur mobile.
 
 agent_communication:
   - agent: "main"
