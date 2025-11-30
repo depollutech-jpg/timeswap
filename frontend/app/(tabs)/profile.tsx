@@ -77,21 +77,13 @@ export default function ProfileScreen() {
   }, []);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Déconnexion',
-      'Êtes-vous sûr de vouloir vous déconnecter ?',
-      [
-        { text: 'Annuler', style: 'cancel' },
-        {
-          text: 'Déconnecter',
-          style: 'destructive',
-          onPress: async () => {
-            await logout();
-            router.replace('/');
-          },
-        },
-      ]
-    );
+    setShowLogoutDialog(true);
+  };
+
+  const handleConfirmLogout = async () => {
+    setShowLogoutDialog(false);
+    await logout();
+    router.replace('/');
   };
 
   const pickImage = async () => {
