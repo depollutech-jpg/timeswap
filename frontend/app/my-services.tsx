@@ -83,8 +83,9 @@ export default function MyServicesScreen() {
       console.log(`🔄 Appel API DELETE /services/${serviceToDelete.id}`);
       await api.delete(`/services/${serviceToDelete.id}`);
       console.log('✅ Suppression réussie');
-      Alert.alert('Succès', 'Votre annonce a été supprimée');
-      loadMyServices();
+      
+      // Recharger la liste immédiatement
+      await loadMyServices();
     } catch (error: any) {
       console.error('❌ Erreur suppression:', error);
       const errorMsg = error.response?.data?.detail || 'Impossible de supprimer l\'annonce';
