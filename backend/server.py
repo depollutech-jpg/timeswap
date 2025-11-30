@@ -1909,6 +1909,20 @@ async def create_appointment(
     Créer un rendez-vous entre deux utilisateurs
     """
     try:
+        # Validation du titre
+        if not appointment_data.title or not appointment_data.title.strip():
+            raise HTTPException(400, "Le titre du rendez-vous est obligatoire")
+        
+        # Validation de la date
+        try:
+            appointment_date = datetime.fromisoformat(appointment_data.date.replace('Z', '+00:00'))
+        except (ValueError, AttributeError):
+            raise HTTPException(400, "Format de date invalide. Utilisez le format ISO 8601")
+        
+        # Vérifier que la date est dans le futur
+        if appointment_date < datetime.utcnow():
+            raise HTTPException(400, "La date du rendez-vous doit être dans le futur")
+        
         # Vérifier que le chat existe
         chat = await db.chats.find_one({"_id": appointment_data.chatId})
         if not chat:
