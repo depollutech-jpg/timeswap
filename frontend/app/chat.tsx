@@ -233,6 +233,36 @@ export default function ChatScreen() {
     }
   };
 
+  const handleDeleteChat = async () => {
+    setShowDeleteChatDialog(false);
+    try {
+      await api.delete(`/chats/${id}`);
+      router.replace('/(tabs)/messages');
+    } catch (error: any) {
+      console.error('Erreur suppression conversation:', error);
+      Alert.alert('Erreur', error.response?.data?.detail || 'Impossible de supprimer la conversation');
+    }
+  };
+
+  const handleBlockUser = async () => {
+    setShowBlockDialog(false);
+    const otherUserId = chat?.otherUser?._id;
+    if (!otherUserId) return;
+
+    try {
+      await api.post(`/users/${otherUserId}/block`);
+      Alert.alert('Succès', `${chat.otherUser.name} a été bloqué`, [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)/messages'),
+        },
+      ]);
+    } catch (error: any) {
+      console.error('Erreur blocage utilisateur:', error);
+      Alert.alert('Erreur', error.response?.data?.detail || 'Impossible de bloquer l\'utilisateur');
+    }
+  };
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
