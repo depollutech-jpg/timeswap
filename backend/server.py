@@ -1565,6 +1565,88 @@ async def mark_all_notifications_read(current_user: dict = Depends(get_current_u
     )
     return {"marked_read": result.modified_count}
 
+# ============= CHAT MANAGEMENT ROUTES =============
+
+@api_router.delete("/chats/{chat_id}")
+async def delete_chat(chat_id: str, current_user: dict = Depends(get_current_user)):
+    """
+    Delete a chat for the current user.
+    If the other user sends a message, the chat will be recreated.
+    """
+    chat = await db.chats.find_one({"_id": chat_id})
+    if not chat:
+        raise HTTPException(404, "Chat non trouvé")
+    
+    if current_user["_id"] not in chat["participants"]:
+        raise HTTPException(403, "Accès refusé")
+    
+    # Mark chat as deleted for this user (soft delete)
+    deleted_by = chat.get("deleted_by", [])
+    if current_user["_id"] not in deleted_by:
+        deleted_by.append(current_user["_id"])
+    
+    await db.chats.update_one(
+        {"_id": chat_id},
+        {"$set": {"deleted_by": deleted_by}}
+    )
+    
+    return {"message": "Conversation supprimée avec succès"}
+
+@api_router.post("/users/{user_id}/block")
+async def block_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Block a user"""
+    if user_id == current_user["_id"]:
+        raise HTTPException(400, "Vous ne pouvez pas vous bloquer vous-même")
+    
+    # Check if user exists
+    blocked_user = await db.users.find_one({"_id": user_id})
+    if not blocked_user:
+        raise HTTPException(404, "Utilisateur non trouvé")
+    
+    # Check if already blocked
+    existing_block = await db.blocked_users.find_one({
+        "blocker_id": current_user["_id"],
+        "blocked_id": user_id
+    })
+    
+    if existing_block:
+        return {"message": "Utilisateur déjà bloqué"}
+    
+    # Create block record
+    block = {
+        "_id": str(uuid.uuid4()),
+        "blocker_id": current_user["_id"],
+        "blocked_id": user_id,
+        "blocked_name": f"{blocked_user['profile']['firstName']} {blocked_user['profile']['lastName']}",
+        "created_at": datetime.utcnow()
+    }
+    
+    await db.blocked_users.insert_one(block)
+    
+    return {"message": f"Utilisateur {block['blocked_name']} bloqué avec succès"}
+
+@api_router.delete("/users/{user_id}/block")
+async def unblock_user(user_id: str, current_user: dict = Depends(get_current_user)):
+    """Unblock a user"""
+    result = await db.blocked_users.delete_one({
+        "blocker_id": current_user["_id"],
+        "blocked_id": user_id
+    })
+    
+    if result.deleted_count == 0:
+        raise HTTPException(404, "Utilisateur non bloqué")
+    
+    return {"message": "Utilisateur débloqué avec succès"}
+
+@api_router.get("/users/blocked")
+async def get_blocked_users(current_user: dict = Depends(get_current_user)):
+    """Get list of blocked users"""
+    blocked = await db.blocked_users.find({
+        "blocker_id": current_user["_id"]
+    }).to_list(length=100)
+    
+    return blocked
+
 # ============= ADMIN ROUTES =============
 
 async def check_admin(current_user: dict = Depends(get_current_user)):
