@@ -242,9 +242,8 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     header: {
-      height: 88,
       paddingTop: 50,
-      paddingBottom: 8,
+      paddingBottom: 12,
       paddingHorizontal: 16,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
