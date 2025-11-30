@@ -200,6 +200,23 @@ const styles = StyleSheet.create({
     padding: 16,
     fontSize: 16,
   },
+  passwordInputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.surface,
+    borderWidth: 1,
+    borderColor: Colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 16,
+    fontSize: 16,
+  },
+  eyeIcon: {
+    padding: 8,
+  },
   button: {
     backgroundColor: Colors.primary,
     padding: 16,
