@@ -302,19 +302,79 @@ async def forgot_password(request: ForgotPasswordRequest):
         }
     )
     
-    # In development: log the code (in production, send via email)
+    # Log the code for development/debugging
     print(f"\n{'='*50}")
     print(f"PASSWORD RESET CODE FOR {request.email}")
     print(f"Code: {reset_code}")
     print(f"Expires at: {reset_code_expiry}")
     print(f"{'='*50}\n")
     
-    # TODO: Send email with reset code using SendGrid/similar service
-    # For now, we just log it
+    # Send email with reset code using Resend
+    try:
+        params = {
+            "from": "Coup de Pouce <onboarding@resend.dev>",
+            "to": [request.email],
+            "subject": "Réinitialisation de votre mot de passe - Coup de Pouce",
+            "html": f"""
+            <html>
+                <head>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; color: #333; background-color: #f4f4f4; }}
+                        .container {{ max-width: 600px; margin: 40px auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }}
+                        .header {{ background: linear-gradient(135deg, #3EADAD 0%, #5FCFCF 100%); color: white; padding: 30px 20px; text-align: center; }}
+                        .header h1 {{ margin: 0; font-size: 28px; }}
+                        .content {{ padding: 30px; }}
+                        .code-box {{ background-color: #f0f9f9; border: 2px solid #3EADAD; border-radius: 8px; padding: 20px; text-align: center; margin: 25px 0; }}
+                        .code {{ font-size: 32px; font-weight: bold; color: #3EADAD; letter-spacing: 8px; font-family: 'Courier New', monospace; }}
+                        .expiry {{ color: #666; font-size: 14px; margin-top: 10px; }}
+                        .footer {{ background-color: #f9f9f9; padding: 20px; text-align: center; color: #666; font-size: 12px; border-top: 1px solid #e5e5e5; }}
+                        .warning {{ background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 6px; padding: 15px; margin: 20px 0; color: #856404; }}
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>🔐 Réinitialisation de mot de passe</h1>
+                        </div>
+                        <div class="content">
+                            <p style="font-size: 16px;">Bonjour,</p>
+                            <p style="font-size: 16px; line-height: 1.6;">
+                                Vous avez demandé à réinitialiser votre mot de passe pour votre compte <strong>Coup de Pouce</strong>.
+                            </p>
+                            <p style="font-size: 16px; line-height: 1.6;">
+                                Voici votre code de vérification :
+                            </p>
+                            <div class="code-box">
+                                <div class="code">{reset_code}</div>
+                                <div class="expiry">⏰ Ce code expire dans 15 minutes</div>
+                            </div>
+                            <p style="font-size: 16px; line-height: 1.6;">
+                                Entrez ce code sur la page de réinitialisation pour créer un nouveau mot de passe.
+                            </p>
+                            <div class="warning">
+                                <strong>⚠️ Important :</strong> Si vous n'avez pas demandé cette réinitialisation, ignorez cet email. Votre mot de passe actuel reste inchangé.
+                            </div>
+                        </div>
+                        <div class="footer">
+                            <p><strong>Coup de Pouce</strong> - Échangez du temps, créez des liens</p>
+                            <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+                        </div>
+                    </div>
+                </body>
+            </html>
+            """
+        }
+        
+        email_response = resend.Emails.send(params)
+        print(f"✅ Email envoyé avec succès via Resend: {email_response}")
+        
+    except Exception as e:
+        print(f"❌ Erreur lors de l'envoi de l'email: {str(e)}")
+        # On continue même si l'email échoue (pour ne pas révéler si l'utilisateur existe)
     
     return {
-        "message": "If this email exists, a reset code has been sent.",
-        "dev_code": reset_code  # Remove this in production!
+        "message": "Si un compte existe avec cet email, un code de réinitialisation a été envoyé.",
+        "dev_code": reset_code  # Pour le développement - à retirer en production
     }
 
 @api_router.post("/auth/verify-reset-code")
