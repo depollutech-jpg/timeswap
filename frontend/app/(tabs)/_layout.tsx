@@ -187,24 +187,6 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="solde"
-          options={{
-            title: 'Solde',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="wallet" size={22} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="rewards"
-          options={{
-            title: 'Récompenses',
-            tabBarIcon: ({ color, size }) => (
-              <Ionicons name="trophy" size={22} color={color} />
-            ),
-          }}
-        />
-        <Tabs.Screen
           name="messages"
           options={{
             title: 'Messages',
@@ -223,11 +205,11 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
-          name="rappel"
+          name="solde"
           options={{
-            title: 'Rappel',
+            title: 'Solde',
             tabBarIcon: ({ color, size }) => (
-              <Ionicons name="notifications" size={22} color={color} />
+              <Ionicons name="wallet" size={22} color={color} />
             ),
           }}
         />
@@ -241,9 +223,18 @@ export default function TabsLayout() {
           }}
         />
         <Tabs.Screen
+          name="rappel"
+          options={{
+            title: 'Rappel',
+            tabBarIcon: ({ color, size }) => (
+              <Ionicons name="notifications" size={22} color={color} />
+            ),
+          }}
+        />
+        <Tabs.Screen
           name="parametres"
           options={{
-            title: 'Paramètres',
+            title: 'Réglages',
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="settings" size={22} color={color} />
             ),
@@ -256,6 +247,12 @@ export default function TabsLayout() {
             tabBarIcon: ({ color, size }) => (
               <Ionicons name="shield-checkmark" size={22} color={color} />
             ),
+          }}
+        />
+        <Tabs.Screen
+          name="rewards"
+          options={{
+            href: null,
           }}
         />
       </Tabs>
