@@ -681,6 +681,11 @@ const styles = StyleSheet.create({
   otherMessageTime: {
     color: Colors.textSecondary,
   },
+  deleteMessageButton: {
+    padding: 8,
+    borderRadius: 12,
+    backgroundColor: '#FEE2E2',
+  },
   inputContainer: {
     flexDirection: 'row',
     padding: 16,
