@@ -1897,6 +1897,196 @@ async def get_user_profile(user_id: str):
 async def root():
     return {"message": "TimeSwap API is running", "version": "1.0.0"}
 
+
+# ============= APPOINTMENTS ROUTES =============
+
+@api_router.post("/appointments")
+async def create_appointment(
+    appointment_data: AppointmentCreate,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Créer un rendez-vous entre deux utilisateurs
+    """
+    try:
+        # Vérifier que le chat existe
+        chat = await db.chats.find_one({"_id": appointment_data.chatId})
+        if not chat:
+            raise HTTPException(404, "Chat non trouvé")
+        
+        # Créer le rendez-vous
+        appointment = {
+            "_id": str(uuid.uuid4()),
+            "chatId": appointment_data.chatId,
+            "participants": [current_user["_id"], appointment_data.otherUserId],
+            "date": appointment_data.date,
+            "title": appointment_data.title,
+            "description": appointment_data.description or "",
+            "createdBy": current_user["_id"],
+            "status": "scheduled",
+            "createdAt": datetime.utcnow().isoformat(),
+            "reminderSent": False
+        }
+        
+        await db.appointments.insert_one(appointment)
+        
+        # Créer une notification pour l'autre utilisateur
+        notification = {
+            "_id": str(uuid.uuid4()),
+            "userId": appointment_data.otherUserId,
+            "type": "appointment_created",
+            "title": "Nouveau rendez-vous",
+            "message": f"{current_user['profile']['firstName']} vous a proposé un rendez-vous : {appointment_data.title}",
+            "data": {
+                "appointmentId": appointment["_id"],
+                "date": appointment_data.date
+            },
+            "read": False,
+            "createdAt": datetime.utcnow().isoformat()
+        }
+        
+        await db.notifications.insert_one(notification)
+        
+        return {"message": "Rendez-vous créé avec succès", "appointmentId": appointment["_id"]}
+    
+    except Exception as e:
+        logger.error(f"Erreur création rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
+@api_router.get("/appointments/my")
+async def get_my_appointments(
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Récupérer tous mes rendez-vous
+    """
+    try:
+        # Récupérer les rendez-vous où l'utilisateur est participant
+        appointments = await db.appointments.find({
+            "participants": current_user["_id"],
+            "status": {"$ne": "cancelled"}
+        }).sort("date", 1).to_list(length=100)
+        
+        # Enrichir avec les infos des participants
+        enriched_appointments = []
+        for appointment in appointments:
+            # Trouver l'autre participant
+            other_user_id = [p for p in appointment["participants"] if p != current_user["_id"]][0]
+            other_user = await db.users.find_one({"_id": other_user_id})
+            
+            enriched_appointments.append({
+                "_id": appointment["_id"],
+                "date": appointment["date"],
+                "title": appointment["title"],
+                "description": appointment["description"],
+                "status": appointment["status"],
+                "createdBy": appointment["createdBy"],
+                "otherUser": {
+                    "_id": other_user["_id"],
+                    "name": f"{other_user['profile']['firstName']} {other_user['profile']['lastName']}",
+                    "photo": other_user["profile"].get("photo_base64")
+                } if other_user else None,
+                "reminderSent": appointment.get("reminderSent", False)
+            })
+        
+        return enriched_appointments
+    
+    except Exception as e:
+        logger.error(f"Erreur récupération rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
+@api_router.put("/appointments/{appointment_id}")
+async def update_appointment(
+    appointment_id: str,
+    update_data: AppointmentUpdate,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Mettre à jour un rendez-vous (changer le statut)
+    """
+    try:
+        # Vérifier que l'utilisateur est participant
+        appointment = await db.appointments.find_one({
+            "_id": appointment_id,
+            "participants": current_user["_id"]
+        })
+        
+        if not appointment:
+            raise HTTPException(404, "Rendez-vous non trouvé ou vous n'êtes pas participant")
+        
+        # Mettre à jour le statut
+        await db.appointments.update_one(
+            {"_id": appointment_id},
+            {
+                "$set": {
+                    "status": update_data.status,
+                    "updatedAt": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        # Créer une notification pour l'autre participant
+        other_user_id = [p for p in appointment["participants"] if p != current_user["_id"]][0]
+        
+        status_messages = {
+            "completed": "a marqué le rendez-vous comme terminé",
+            "cancelled": "a annulé le rendez-vous"
+        }
+        
+        if update_data.status in status_messages:
+            notification = {
+                "_id": str(uuid.uuid4()),
+                "userId": other_user_id,
+                "type": f"appointment_{update_data.status}",
+                "title": "Rendez-vous mis à jour",
+                "message": f"{current_user['profile']['firstName']} {status_messages[update_data.status]} : {appointment['title']}",
+                "data": {
+                    "appointmentId": appointment_id
+                },
+                "read": False,
+                "createdAt": datetime.utcnow().isoformat()
+            }
+            
+            await db.notifications.insert_one(notification)
+        
+        return {"message": "Rendez-vous mis à jour avec succès"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur mise à jour rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
+@api_router.delete("/appointments/{appointment_id}")
+async def delete_appointment(
+    appointment_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Supprimer un rendez-vous (uniquement par le créateur)
+    """
+    try:
+        # Vérifier que l'utilisateur est le créateur
+        appointment = await db.appointments.find_one({
+            "_id": appointment_id,
+            "createdBy": current_user["_id"]
+        })
+        
+        if not appointment:
+            raise HTTPException(404, "Rendez-vous non trouvé ou vous n'êtes pas le créateur")
+        
+        # Supprimer le rendez-vous
+        await db.appointments.delete_one({"_id": appointment_id})
+        
+        return {"message": "Rendez-vous supprimé avec succès"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur suppression rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
+
 @api_router.get("/health")
 async def health_check():
     try:
