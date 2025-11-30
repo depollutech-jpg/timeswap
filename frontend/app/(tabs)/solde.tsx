@@ -295,7 +295,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingTop: 0, // Plus de header fixe
+    paddingTop: 20, // Espace pour le header fixe
     paddingBottom: 100,
   },
   balanceCard: {
