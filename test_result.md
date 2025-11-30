@@ -301,6 +301,25 @@ backend:
           - Tous les champs présents dans les services créés, y compris expiresAt
 
 frontend:
+  - task: "Appointment System - Chat Integration"
+    implemented: true
+    working: "NA"
+    file: "app/chat.tsx, src/components/AppointmentModal.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Intégration complète du système de rendez-vous dans le chat:
+          1. Bouton calendrier ajouté dans le header du chat
+          2. AppointmentModal avec formulaire (date, heure, titre, description)
+          3. Fonction createAppointment qui appelle POST /api/appointments
+          4. Validation: titre obligatoire, date dans le futur
+          5. Props correctement passés (otherUserName, onConfirm)
+          Prêt pour test
+
   - task: "Fix Admin Role Field"
     implemented: true
     working: true
