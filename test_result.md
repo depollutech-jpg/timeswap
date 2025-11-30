@@ -491,23 +491,10 @@ test_plan:
       - working: "NA"
         agent: "main"
         comment: |
-          ROOT CAUSE IDENTIFIED AND FIXED:
-          
-          PROBLÈME:
-          - Le code utilisait window.confirm() et alert() qui sont des API web et ne fonctionnent PAS en React Native
-          - Ces fonctions n'existent pas dans l'environnement mobile
-          
-          SOLUTION APPLIQUÉE:
-          1. Remplacé window.confirm() par Alert.alert() de React Native avec boutons [Annuler, Supprimer]
-          2. Remplacé alert() par Alert.alert() pour les messages de succès/erreur
-          3. Simplifié le code en supprimant le setTimeout inutile
-          4. Nettoyé les z-index et pointerEvents inutiles
-          5. Conservé les logs console.log pour le debugging
-          
-          L'endpoint backend /api/services/{service_id} existe et fonctionne correctement.
-          La fonction utilise maintenant les bons composants React Native.
-          
-          Prêt pour test.
+          TENTATIVE 1 - ÉCHEC:
+          - Le code utilisait window.confirm() et alert() (APIs web incompatibles avec React Native)
+          - Remplacé par Alert.alert() de React Native
+          - Alert.alert() ne fonctionne pas sur React Native Web (preview web)
       - working: true
         agent: "testing"
         comment: |
