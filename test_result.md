@@ -123,6 +123,55 @@ user_problem_statement: |
   - GET /api/services - Lister les services (avec filtrage automatique des expirés)
 
 backend:
+  - task: "Appointment System - Create Appointment"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint POST /api/appointments implémenté:
+          - Modèle AppointmentCreate (chatId, otherUserId, date, title, description)
+          - Validation date future
+          - Enregistrement dans MongoDB
+          - Prêt pour test
+  
+  - task: "Appointment System - Get My Appointments"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint GET /api/appointments/my implémenté:
+          - Récupère tous les rendez-vous de l'utilisateur connecté
+          - Données triées par date
+          - Prêt pour test
+  
+  - task: "Appointment System - Update Status"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          Endpoint PATCH /api/appointments/{id}/status implémenté:
+          - Permet de modifier le statut d'un rendez-vous
+          - Vérification de propriété
+          - Prêt pour test
+
   - task: "Endpoints Admin Dashboard"
     implemented: true
     working: true
