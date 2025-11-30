@@ -502,7 +502,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   scrollContent: {
-    paddingTop: 20, // Espace pour le header fixe (20px)
+    paddingTop: 0, // Plus de header fixe
     paddingBottom: 0,
   },
   header: {
