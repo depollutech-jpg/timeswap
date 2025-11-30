@@ -142,6 +142,31 @@ backend:
       - working: false
         agent: "testing"
         comment: |
+          BUG CRITIQUE TROUVÉ: Le système acceptait des dates dans le passé (Test 1 échoué)
+          Autres validations manquantes également
+      - working: "NA"
+        agent: "main"
+        comment: |
+          CORRECTION APPLIQUÉE:
+          1. Validation du titre (obligatoire et non vide)
+          2. Parsing et validation du format ISO de la date
+          3. Vérification que la date est dans le futur
+          Code ajouté dans server.py ligne 1910-1920
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ 6/6 TESTS PASSÉS (100%) - BUG CORRIGÉ!
+          - ✅ Date dans le passé rejetée (400) avec bon message
+          - ✅ Format de date invalide rejeté (400)
+          - ✅ Titre vide rejeté (400)
+          - ✅ Rendez-vous valide créé (200)
+          - ✅ GET /api/appointments/my fonctionne
+          - ✅ Authentification requise (403)
+          
+          Backend PRÊT POUR PRODUCTION!
+      - working: false
+        agent: "testing"
+        comment: |
           ❌ CRITICAL VALIDATION ISSUE FOUND - 5/7 TESTS PASSED (71.4%)
           
           Tests effectués selon la review request:
