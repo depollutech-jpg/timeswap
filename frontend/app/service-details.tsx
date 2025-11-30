@@ -115,6 +115,24 @@ export default function ServiceDetailsScreen() {
     }
   };
 
+  const handleDeleteService = async () => {
+    setShowDeleteDialog(false);
+    try {
+      console.log('🔄 Suppression du service:', service._id);
+      await api.delete(`/services/${service._id}`);
+      console.log('✅ Service supprimé avec succès');
+      Alert.alert('Succès', 'Votre annonce a été supprimée', [
+        {
+          text: 'OK',
+          onPress: () => router.replace('/(tabs)/home'),
+        },
+      ]);
+    } catch (error: any) {
+      console.error('❌ Erreur suppression:', error);
+      Alert.alert('Erreur', error.response?.data?.detail || 'Impossible de supprimer l\'annonce');
+    }
+  };
+
   if (loading) {
     return (
       <SafeAreaView style={styles.container}>
