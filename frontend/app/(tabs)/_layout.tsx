@@ -8,7 +8,6 @@ import { GestureHandlerRootView, PanGestureHandler } from 'react-native-gesture-
 import CustomTabBar from '../../src/components/CustomTabBar';
 import AnimatedFloatingButton from '../../src/components/AnimatedFloatingButton';
 import { useThemeStore } from '../../src/store/themeStore';
-import FixedAnimatedHeader from '../../src/components/FixedAnimatedHeader';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 const BUTTON_SIZE = 64;
