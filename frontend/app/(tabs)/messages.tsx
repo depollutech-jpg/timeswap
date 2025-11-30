@@ -242,14 +242,16 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     header: {
+      height: 88,
       paddingTop: 50,
-      paddingBottom: 12,
+      paddingBottom: 4,
       paddingHorizontal: 16,
       shadowColor: '#000',
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
       elevation: 4,
+      justifyContent: 'center',
     },
     headerContent: {
       flexDirection: 'row',
