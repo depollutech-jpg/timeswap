@@ -1964,6 +1964,8 @@ async def create_appointment(
         
         return {"message": "Rendez-vous créé avec succès", "appointmentId": appointment["_id"]}
     
+    except HTTPException:
+        raise
     except Exception as e:
         logger.error(f"Erreur création rendez-vous: {str(e)}")
         raise HTTPException(500, f"Erreur: {str(e)}")
