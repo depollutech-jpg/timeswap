@@ -189,6 +189,24 @@ export default function ChatScreen() {
     }
   };
 
+  const createAppointment = async (date: Date, title: string, description: string) => {
+    try {
+      await api.post('/appointments', {
+        chatId: chat._id,
+        otherUserId: chat.otherUser._id,
+        date: date.toISOString(),
+        title,
+        description
+      });
+      
+      Alert.alert('✅ Succès', 'Rendez-vous créé avec succès !');
+      setShowAppointmentModal(false);
+    } catch (error) {
+      console.error('Erreur création rendez-vous:', error);
+      Alert.alert('❌ Erreur', 'Impossible de créer le rendez-vous');
+    }
+  };
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
