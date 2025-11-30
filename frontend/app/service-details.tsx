@@ -348,6 +348,18 @@ export default function ServiceDetailsScreen() {
         onConfirm={handleAcceptExchange}
         onCancel={() => setShowAcceptModal(false)}
       />
+
+      {/* Dialogue de suppression */}
+      <ConfirmDialog
+        visible={showDeleteDialog}
+        title="Supprimer l'annonce"
+        message={`Voulez-vous vraiment supprimer "${service.title}" ?\n\nCette action est irréversible.`}
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleDeleteService}
+        onCancel={() => setShowDeleteDialog(false)}
+        destructive
+      />
     </SafeAreaView>
   );
 }
