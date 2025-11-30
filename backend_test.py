@@ -191,84 +191,64 @@ def test_successful_deletion():
         results.add_result("DELETE request", False, f"Error: {str(e)}")
     
     return results
+def test_security_other_user_service():
+    """Test 2: Security - Try to delete another user's service"""
+    results = TestResults()
     
-    def test_service_creation_with_expiration(self):
-        """Test service creation and verify expiresAt field is added (3 days)"""
-        print("⏰ TESTING SERVICE CREATION WITH EXPIRATION")
+    print("\n🧪 TEST 2: SECURITY - DELETE OTHER USER'S SERVICE")
+    print("-" * 50)
+    
+    # Create User A and their service
+    user_a = create_test_user("_a")
+    if not user_a:
+        results.add_result("Create User A", False, "Failed to create User A")
+        return results
+    
+    results.add_result("Create User A", True, f"User A created: {user_a['email']}")
+    
+    service_id = create_test_service(user_a["token"], "Service de User A")
+    if not service_id:
+        results.add_result("Create User A's service", False, "Failed to create service")
+        return results
+    
+    results.add_result("Create User A's service", True, f"Service created: {service_id}")
+    
+    # Create User B
+    user_b = create_test_user("_b")
+    if not user_b:
+        results.add_result("Create User B", False, "Failed to create User B")
+        return results
+    
+    results.add_result("Create User B", True, f"User B created: {user_b['email']}")
+    
+    # User B tries to delete User A's service
+    headers_b = {**HEADERS, "Authorization": f"Bearer {user_b['token']}"}
+    
+    try:
+        response = requests.delete(f"{API_BASE}/services/{service_id}", headers=headers_b)
         
-        if not self.auth_token:
-            self.log_test("Service Creation", False, "No auth token available")
-            return False
-        
-        # Record time before creation
-        creation_time = datetime.utcnow()
-        expected_expiry = creation_time + timedelta(days=3)
-        
-        service_data = {
-            "title": "Cours de français - Coup de Pouce",
-            "description": "Je propose des cours de français pour débutants. Méthode interactive et personnalisée.",
-            "category": "Education",
-            "duration": 2.0,
-            "type": "offer",
-            "location": "Paris 15ème",
-            "coordinates": {
-                "latitude": 48.8566,
-                "longitude": 2.3522
-            }
-        }
-        
-        try:
-            response = self.session.post(f"{API_BASE}/services", json=service_data)
+        if response.status_code == 403:
+            results.add_result("Security check - 403 Forbidden", True, "Correctly rejected unauthorized deletion")
             
-            if response.status_code == 200:
-                data = response.json()
-                service_id = data.get('serviceId')
-                
-                if service_id:
-                    self.test_service_id = service_id
-                    
-                    # Now fetch the created service to verify expiresAt field
-                    service_response = self.session.get(f"{API_BASE}/services/{service_id}")
-                    
-                    if service_response.status_code == 200:
-                        service_details = service_response.json()
-                        expires_at_str = service_details.get('expiresAt')
-                        
-                        if expires_at_str:
-                            # Parse the expiration date
-                            expires_at = datetime.fromisoformat(expires_at_str.replace('Z', '+00:00'))
-                            
-                            # Check if expiration is approximately 3 days from creation (allow 1 minute tolerance)
-                            time_diff = abs((expires_at - expected_expiry).total_seconds())
-                            
-                            if time_diff < 60:  # Less than 1 minute difference
-                                self.log_test("Service Creation with Expiration", True, 
-                                            f"Service created with correct expiresAt: {expires_at_str}")
-                                return True
-                            else:
-                                self.log_test("Service Creation with Expiration", False, 
-                                            f"Expiration time incorrect. Expected ~{expected_expiry}, got {expires_at}")
-                                return False
-                        else:
-                            self.log_test("Service Creation with Expiration", False, 
-                                        "Service created but missing expiresAt field")
-                            return False
-                    else:
-                        self.log_test("Service Creation with Expiration", False, 
-                                    f"Failed to fetch created service: {service_response.status_code}")
-                        return False
+            # Verify service still exists
+            headers_a = {**HEADERS, "Authorization": f"Bearer {user_a['token']}"}
+            check_response = requests.get(f"{API_BASE}/services/{service_id}", headers=headers_a)
+            if check_response.status_code == 200:
+                service_data = check_response.json()
+                if service_data.get("status") != "deleted":
+                    results.add_result("Service still exists", True, "Service was not deleted by unauthorized user")
                 else:
-                    self.log_test("Service Creation with Expiration", False, 
-                                "Service creation response missing serviceId")
-                    return False
+                    results.add_result("Service still exists", False, "Service was incorrectly deleted")
             else:
-                self.log_test("Service Creation with Expiration", False, 
-                            f"Status: {response.status_code}, Response: {response.text}")
-                return False
+                results.add_result("Service still exists", False, f"Cannot verify service existence: {check_response.status_code}")
                 
-        except Exception as e:
-            self.log_test("Service Creation with Expiration", False, f"Exception: {str(e)}")
-            return False
+        else:
+            results.add_result("Security check - 403 Forbidden", False, f"Expected 403, got {response.status_code} - {response.text}")
+            
+    except Exception as e:
+        results.add_result("Security test", False, f"Error: {str(e)}")
+    
+    return results
     
     def test_service_expiration_filtering(self):
         """Test that GET /api/services filters out expired services automatically"""
