@@ -399,11 +399,11 @@ backend:
 frontend:
   - task: "Appointment System - Chat Integration"
     implemented: true
-    working: "NA"
+    working: false
     file: "app/chat.tsx, src/components/AppointmentModal.tsx"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -415,6 +415,35 @@ frontend:
           4. Validation: titre obligatoire, date dans le futur
           5. Props correctement passés (otherUserName, onConfirm)
           Prêt pour test
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ APPOINTMENT SYSTEM FRONTEND TESTING FAILED - AUTHENTICATION ISSUES
+          
+          TESTING ATTEMPTS MADE:
+          1. ❌ Standard login flow: Timeout issues with login form submission
+          2. ❌ Direct token injection: AsyncStorage vs localStorage incompatibility
+          3. ❌ User registration + login: Form interaction failures
+          
+          CODE ANALYSIS COMPLETED:
+          ✅ Calendar button implementation verified in chat.tsx (lines 307-312)
+          ✅ AppointmentModal component fully implemented with:
+             - Complete form (date, time, title, description)
+             - Frontend validation (title required, future date)
+             - DateTimePicker integration
+             - Proper styling and UX
+          ✅ createAppointment function implemented (lines 192-208)
+          ✅ API integration with POST /api/appointments
+          ✅ Backend already tested and working (6/6 tests passed)
+          
+          CRITICAL ISSUE:
+          - Cannot access chat interface due to authentication problems
+          - Login form interactions failing in browser automation
+          - AsyncStorage authentication not compatible with web testing
+          
+          RECOMMENDATION:
+          Main agent should investigate authentication flow for web preview
+          or provide alternative testing approach for appointment system.
 
   - task: "Fix Admin Role Field"
     implemented: true
