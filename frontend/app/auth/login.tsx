@@ -17,6 +17,7 @@ import { Colors } from '../../src/constants/colors';
 import api from '../../src/utils/api';
 import { useAuthStore } from '../../src/store/authStore';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { analytics_service } from '../../src/services/analytics';
 
 export default function LoginScreen() {
   const router = useRouter();
