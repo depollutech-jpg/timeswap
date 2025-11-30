@@ -1,17 +1,20 @@
 import { useEffect, useRef } from 'react';
 import { useNotificationStore } from '../store/notificationStore';
 import { useAuthStore } from '../store/authStore';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, AppStateStatus, Alert, Platform } from 'react-native';
 
 /**
  * Hook personnalisé pour gérer le polling des notifications
  * Récupère les notifications toutes les 10 secondes quand l'app est active
+ * Affiche une alerte pour les nouvelles notifications
  */
 export const useNotificationPolling = () => {
-  const { fetchNotifications } = useNotificationStore();
+  const { fetchNotifications, notifications, unreadCount } = useNotificationStore();
   const { isAuthenticated } = useAuthStore();
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const appState = useRef(AppState.currentState);
+  const previousUnreadCount = useRef(0);
+  const lastNotificationId = useRef<string | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
