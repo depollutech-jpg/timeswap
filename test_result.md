@@ -397,9 +397,9 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Page Calendrier - Liste chronologique des échanges"
-    - "Notification System (in-app)"
-    - "Admin Dashboard Complete"
+    - "Appointment System - Create Appointment"
+    - "Appointment System - Get My Appointments"
+    - "Appointment System - Chat Integration"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
