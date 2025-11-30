@@ -15,9 +15,13 @@ import jwt
 import random
 import string
 from emergentintegrations.payments.stripe.checkout import StripeCheckout, CheckoutSessionResponse, CheckoutStatusResponse, CheckoutSessionRequest
+import resend
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
+
+# Configure Resend
+resend.api_key = os.environ.get('RESEND_API_KEY', '')
 
 # MongoDB connection
 mongo_url = os.environ['MONGO_URL']
