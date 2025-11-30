@@ -379,6 +379,18 @@ export default function ChatScreen() {
           <Ionicons name="calendar-outline" size={26} color={Colors.primary} />
         </TouchableOpacity>
         <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => setShowDeleteChatDialog(true)}
+        >
+          <Ionicons name="trash-outline" size={24} color="#EF4444" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.headerButton}
+          onPress={() => setShowBlockDialog(true)}
+        >
+          <Ionicons name="ban-outline" size={24} color="#EF4444" />
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.profileButton}
           onPress={() => chat?.otherUser?._id && router.push(`/user-profile?id=${chat.otherUser._id}`)}
         >
