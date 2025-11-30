@@ -319,33 +319,8 @@ export default function ServiceDetailsScreen() {
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={() => {
-              console.log('Delete button pressed - User ID:', user._id, 'Service User ID:', service.userId);
-              Alert.alert(
-                'Supprimer l\'annonce',
-                'Êtes-vous sûr de vouloir supprimer cette annonce ? Cette action est irréversible.',
-                [
-                  { text: 'Annuler', style: 'cancel' },
-                  {
-                    text: 'Supprimer',
-                    style: 'destructive',
-                    onPress: async () => {
-                      try {
-                        console.log('Deleting service:', service._id);
-                        const response = await api.delete(`/services/${service._id}`);
-                        console.log('Delete response:', response);
-                        Alert.alert('Succès', 'Annonce supprimée avec succès');
-                        router.replace('/(tabs)/home');
-                      } catch (error: any) {
-                        console.error('Delete error:', error);
-                        Alert.alert(
-                          'Erreur',
-                          error.response?.data?.detail || 'Impossible de supprimer l\'annonce'
-                        );
-                      }
-                    },
-                  },
-                ]
-              );
+              console.log('🔴 Bouton supprimer cliqué - Service:', service._id);
+              setShowDeleteDialog(true);
             }}
           >
             <Ionicons name="trash-outline" size={20} color="#FFFFFF" />
