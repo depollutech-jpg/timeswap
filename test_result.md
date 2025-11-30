@@ -541,6 +541,28 @@ test_plan:
           
           ⚠️ RECOMMANDATION: Le main agent doit investiguer pourquoi Alert.alert() ne fonctionne pas
           et implémenter une solution alternative pour les dialogues de confirmation sur mobile.
+      - working: "NA"
+        agent: "main"
+        comment: |
+          TENTATIVE 2 - SOLUTION FINALE:
+          
+          PROBLÈME:
+          - Alert.alert() ne fonctionne pas sur React Native Web (utilisé pour la preview)
+          
+          SOLUTION V2:
+          1. Créé un composant ConfirmDialog personnalisé avec Modal de React Native
+          2. Fonctionne sur toutes les plateformes (Web, iOS, Android)
+          3. Design moderne avec:
+             - Overlay semi-transparent
+             - Icône rouge de corbeille dans cercle rose
+             - Titre et message personnalisés
+             - Boutons stylisés (Annuler gris, Supprimer rouge)
+          4. État géré avec useState (deleteDialogVisible, serviceToDelete)
+          5. Intégration propre dans my-services.tsx
+          
+          FICHIERS:
+          - /app/frontend/src/components/ConfirmDialog.tsx (NOUVEAU)
+          - /app/frontend/app/my-services.tsx (modifié)
       - working: true
         agent: "testing"
         comment: |
