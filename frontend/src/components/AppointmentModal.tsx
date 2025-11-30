@@ -54,20 +54,41 @@ export default function AppointmentModal({
   };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
-    setShowDatePicker(Platform.OS === 'ios');
+    if (Platform.OS !== 'web') {
+      setShowDatePicker(Platform.OS === 'ios');
+    }
     if (selectedDate) {
       setDate(selectedDate);
     }
   };
 
   const onTimeChange = (event: any, selectedTime?: Date) => {
-    setShowTimePicker(Platform.OS === 'ios');
+    if (Platform.OS !== 'web') {
+      setShowTimePicker(Platform.OS === 'ios');
+    }
     if (selectedTime) {
       const newDate = new Date(date);
       newDate.setHours(selectedTime.getHours());
       newDate.setMinutes(selectedTime.getMinutes());
       setDate(newDate);
     }
+  };
+
+  const handleWebDateChange = (e: any) => {
+    const newDate = new Date(e.target.value);
+    const updatedDate = new Date(date);
+    updatedDate.setFullYear(newDate.getFullYear());
+    updatedDate.setMonth(newDate.getMonth());
+    updatedDate.setDate(newDate.getDate());
+    setDate(updatedDate);
+  };
+
+  const handleWebTimeChange = (e: any) => {
+    const [hours, minutes] = e.target.value.split(':');
+    const updatedDate = new Date(date);
+    updatedDate.setHours(parseInt(hours));
+    updatedDate.setMinutes(parseInt(minutes));
+    setDate(updatedDate);
   };
 
   const formatDate = (date: Date) => {
