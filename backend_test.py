@@ -114,55 +114,83 @@ def create_test_service(token, title="Service de test"):
     except Exception as e:
         print(f"Error creating service: {str(e)}")
         return None
+def test_successful_deletion():
+    """Test 1: Successful service deletion"""
+    results = TestResults()
     
-    def test_login(self):
-        """Test user login functionality"""
-        print("🔐 TESTING USER LOGIN")
+    print("\n🧪 TEST 1: SUCCESSFUL SERVICE DELETION")
+    print("-" * 50)
+    
+    # Create user and service
+    user = create_test_user("_deletion")
+    if not user:
+        results.add_result("Create test user", False, "Failed to create user")
+        return results
+    
+    results.add_result("Create test user", True, f"User created: {user['email']}")
+    
+    service_id = create_test_service(user["token"], "Service à supprimer")
+    if not service_id:
+        results.add_result("Create test service", False, "Failed to create service")
+        return results
+    
+    results.add_result("Create test service", True, f"Service created: {service_id}")
+    
+    # Verify service exists before deletion
+    headers = {**HEADERS, "Authorization": f"Bearer {user['token']}"}
+    try:
+        response = requests.get(f"{API_BASE}/services/{service_id}", headers=headers)
+        if response.status_code == 200:
+            results.add_result("Verify service exists", True, "Service found before deletion")
+        else:
+            results.add_result("Verify service exists", False, f"Service not found: {response.status_code}")
+            return results
+    except Exception as e:
+        results.add_result("Verify service exists", False, f"Error: {str(e)}")
+        return results
+    
+    # Delete the service
+    try:
+        response = requests.delete(f"{API_BASE}/services/{service_id}", headers=headers)
         
-        # First register a user to login with
-        timestamp = int(time.time())
-        test_email = f"logintest_{timestamp}@example.com"
-        
-        # Register
-        register_data = {
-            "email": test_email,
-            "password": "LoginTest123!",
-            "firstName": "Jean",
-            "lastName": "Martin"
-        }
-        
-        try:
-            reg_response = self.session.post(f"{API_BASE}/auth/register", json=register_data)
-            if reg_response.status_code != 200:
-                self.log_test("Login Test Setup", False, "Failed to register test user for login")
-                return False
+        if response.status_code in [200, 204]:
+            results.add_result("DELETE request status", True, f"Status: {response.status_code}")
             
-            # Now test login
-            login_data = {
-                "email": test_email,
-                "password": "LoginTest123!"
-            }
-            
-            response = self.session.post(f"{API_BASE}/auth/login", json=login_data)
-            
-            if response.status_code == 200:
-                data = response.json()
-                token = data.get('token')
-                user = data.get('user', {})
-                
-                if token and user.get('_id'):
-                    self.log_test("User Login", True, f"Login successful, token received")
-                    return True
+            # Verify service is deleted (should return 404 or be marked as deleted)
+            check_response = requests.get(f"{API_BASE}/services/{service_id}", headers=headers)
+            if check_response.status_code == 404:
+                results.add_result("Service deleted from database", True, "Service not found after deletion")
+            elif check_response.status_code == 200:
+                service_data = check_response.json()
+                if service_data.get("status") == "deleted":
+                    results.add_result("Service soft deleted", True, "Service marked as deleted")
                 else:
-                    self.log_test("User Login", False, "Missing token or user data in response")
-                    return False
+                    results.add_result("Service deletion verification", False, f"Service still active: {service_data.get('status')}")
             else:
-                self.log_test("User Login", False, f"Status: {response.status_code}, Response: {response.text}")
-                return False
+                results.add_result("Service deletion verification", False, f"Unexpected status: {check_response.status_code}")
+            
+            # Verify service doesn't appear in GET /api/services
+            try:
+                services_response = requests.get(f"{API_BASE}/services", headers=headers)
+                if services_response.status_code == 200:
+                    services = services_response.json()
+                    service_found = any(s.get("_id") == service_id for s in services)
+                    if not service_found:
+                        results.add_result("Service filtered from list", True, "Service not in active services list")
+                    else:
+                        results.add_result("Service filtered from list", False, "Service still appears in active list")
+                else:
+                    results.add_result("Check services list", False, f"Failed to get services: {services_response.status_code}")
+            except Exception as e:
+                results.add_result("Check services list", False, f"Error: {str(e)}")
                 
-        except Exception as e:
-            self.log_test("User Login", False, f"Exception: {str(e)}")
-            return False
+        else:
+            results.add_result("DELETE request status", False, f"Status: {response.status_code} - {response.text}")
+            
+    except Exception as e:
+        results.add_result("DELETE request", False, f"Error: {str(e)}")
+    
+    return results
     
     def test_service_creation_with_expiration(self):
         """Test service creation and verify expiresAt field is added (3 days)"""
