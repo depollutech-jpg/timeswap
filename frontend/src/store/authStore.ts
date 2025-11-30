@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { analytics_service } from '../services/analytics';
 
 interface User {
   _id: string;
