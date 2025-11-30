@@ -1391,7 +1391,26 @@ async def send_message(
     await db.notifications.insert_one(notification)
     
     return message
+
+
+@api_router.delete("/messages/{message_id}")
+async def delete_message(
+    message_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """Delete a message (only by sender)"""
+    message = await db.messages.find_one({"_id": message_id})
+    if not message:
+        raise HTTPException(404, "Message non trouvé")
     
+    # Vérifier que l'utilisateur est bien l'expéditeur
+    if message["senderId"] != current_user["_id"]:
+        raise HTTPException(403, "Vous ne pouvez supprimer que vos propres messages")
+    
+    # Supprimer le message
+    await db.messages.delete_one({"_id": message_id})
+    
+    return {"message": "Message supprimé avec succès"}
 
 
 @api_router.get("/messages/unread/count")
