@@ -337,6 +337,18 @@ export default function MyServicesScreen() {
           })
         )}
       </ScrollView>
+
+      {/* Dialogue de confirmation de suppression */}
+      <ConfirmDialog
+        visible={deleteDialogVisible}
+        title="Supprimer l'annonce"
+        message={`Voulez-vous vraiment supprimer "${serviceToDelete?.title}" ?\n\nCette action est irréversible.`}
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        destructive
+      />
     </View>
   );
 }
