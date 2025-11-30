@@ -144,27 +144,60 @@ export default function AppointmentModal({
             {/* Date */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Date</Text>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => setShowDatePicker(true)}
-              >
-                <Ionicons name="calendar-outline" size={20} color="#3EADAD" />
-                <Text style={styles.dateText}>{formatDate(date)}</Text>
-                <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="date"
+                  value={date.toISOString().split('T')[0]}
+                  onChange={handleWebDateChange}
+                  min={new Date().toISOString().split('T')[0]}
+                  style={{
+                    width: '100%',
+                    padding: 12,
+                    borderRadius: 12,
+                    border: '1px solid #E5E7EB',
+                    fontSize: 16,
+                    fontFamily: 'system-ui',
+                  }}
+                />
+              ) : (
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setShowDatePicker(true)}
+                >
+                  <Ionicons name="calendar-outline" size={20} color="#3EADAD" />
+                  <Text style={styles.dateText}>{formatDate(date)}</Text>
+                  <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Heure */}
             <View style={styles.inputGroup}>
               <Text style={styles.label}>Heure</Text>
-              <TouchableOpacity
-                style={styles.dateButton}
-                onPress={() => setShowTimePicker(true)}
-              >
-                <Ionicons name="time-outline" size={20} color="#3EADAD" />
-                <Text style={styles.dateText}>{formatTime(date)}</Text>
-                <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
-              </TouchableOpacity>
+              {Platform.OS === 'web' ? (
+                <input
+                  type="time"
+                  value={`${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`}
+                  onChange={handleWebTimeChange}
+                  style={{
+                    width: '100%',
+                    padding: 12,
+                    borderRadius: 12,
+                    border: '1px solid #E5E7EB',
+                    fontSize: 16,
+                    fontFamily: 'system-ui',
+                  }}
+                />
+              ) : (
+                <TouchableOpacity
+                  style={styles.dateButton}
+                  onPress={() => setShowTimePicker(true)}
+                >
+                  <Ionicons name="time-outline" size={20} color="#3EADAD" />
+                  <Text style={styles.dateText}>{formatTime(date)}</Text>
+                  <Ionicons name="chevron-down" size={20} color="#9CA3AF" />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* Description */}
