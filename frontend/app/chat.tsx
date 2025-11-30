@@ -610,6 +610,30 @@ export default function ChatScreen() {
         }}
         destructive
       />
+
+      {/* Dialogue de suppression de conversation */}
+      <ConfirmDialog
+        visible={showDeleteChatDialog}
+        title="Supprimer la conversation"
+        message="Voulez-vous vraiment supprimer cette conversation ?\n\nSi l'autre personne vous envoie un nouveau message, la conversation réapparaîtra."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={handleDeleteChat}
+        onCancel={() => setShowDeleteChatDialog(false)}
+        destructive
+      />
+
+      {/* Dialogue de blocage d'utilisateur */}
+      <ConfirmDialog
+        visible={showBlockDialog}
+        title="Bloquer l'utilisateur"
+        message={`Voulez-vous vraiment bloquer ${chat?.otherUser?.name} ?\n\nCette personne ne pourra plus vous envoyer de messages. Vous pouvez débloquer depuis votre profil.`}
+        confirmText="Bloquer"
+        cancelText="Annuler"
+        onConfirm={handleBlockUser}
+        onCancel={() => setShowBlockDialog(false)}
+        destructive
+      />
     </SafeAreaView>
   );
 }
