@@ -24,6 +24,7 @@ import ExchangeStatusBanner from '../src/components/ExchangeStatusBanner';
 import ConfirmationModal from '../src/components/ConfirmationModal';
 import RatingModal from '../src/components/RatingModal';
 import ReportModal from '../src/components/ReportModal';
+import AppointmentModal from '../src/components/AppointmentModal';
 
 export default function ChatScreen() {
   const router = useRouter();
