@@ -16,9 +16,57 @@ export const useNotificationPolling = () => {
   const previousUnreadCount = useRef(0);
   const lastNotificationId = useRef<string | null>(null);
 
+  // Détecter les nouvelles notifications et afficher une alerte
+  useEffect(() => {
+    if (notifications.length === 0) return;
+    
+    const latestNotification = notifications[0];
+    
+    // Vérifier s'il y a une nouvelle notification non lue
+    if (
+      latestNotification &&
+      !latestNotification.read &&
+      latestNotification._id !== lastNotificationId.current
+    ) {
+      lastNotificationId.current = latestNotification._id;
+      
+      // Afficher une alerte pour les notifications de message
+      if (latestNotification.type === 'message') {
+        const message = `${latestNotification.senderName || 'Quelqu\'un'} vous a envoyé un message`;
+        
+        if (Platform.OS === 'web') {
+          // Sur web, utiliser une notification native du navigateur si possible
+          if ('Notification' in window && Notification.permission === 'granted') {
+            new Notification('Nouveau message', {
+              body: latestNotification.content || message,
+              icon: '/icon.png',
+            });
+          } else {
+            // Fallback sur console.log pour le web
+            console.log('📬 Nouveau message:', message);
+          }
+        } else {
+          // Sur mobile, utiliser Alert (ou plus tard, des notifications push)
+          Alert.alert(
+            '📬 Nouveau message',
+            message,
+            [{ text: 'OK' }]
+          );
+        }
+      }
+    }
+    
+    previousUnreadCount.current = unreadCount;
+  }, [notifications, unreadCount]);
+
   useEffect(() => {
     if (!isAuthenticated) {
       return;
+    }
+
+    // Demander la permission pour les notifications web
+    if (Platform.OS === 'web' && 'Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
     }
 
     // Fetch initial notifications
