@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 """
-Backend Testing for Coup de Pouce Application
-Tests service expiration functionality and general backend operations
+Backend Test Suite for Coup de Pouce - Service Deletion Endpoint
+Testing DELETE /api/services/{service_id} endpoint according to review request
 """
 
 import requests
 import json
-import time
-from datetime import datetime, timedelta
+import uuid
+from datetime import datetime
+import sys
 import os
 from dotenv import load_dotenv
 
@@ -17,8 +18,48 @@ load_dotenv('/app/frontend/.env')
 # Get backend URL from environment
 BACKEND_URL = os.getenv('EXPO_PUBLIC_BACKEND_URL', 'http://localhost:8001')
 API_BASE = f"{BACKEND_URL}/api"
+HEADERS = {"Content-Type": "application/json"}
 
-print(f"🔗 Testing backend at: {API_BASE}")
+print(f"🔗 Testing DELETE endpoint at: {API_BASE}")
+
+class TestResults:
+    def __init__(self):
+        self.total_tests = 0
+        self.passed_tests = 0
+        self.failed_tests = 0
+        self.results = []
+    
+    def add_result(self, test_name, passed, message=""):
+        self.total_tests += 1
+        if passed:
+            self.passed_tests += 1
+            status = "✅ PASS"
+        else:
+            self.failed_tests += 1
+            status = "❌ FAIL"
+        
+        result = f"{status}: {test_name}"
+        if message:
+            result += f" - {message}"
+        
+        self.results.append(result)
+        print(result)
+    
+    def print_summary(self):
+        print(f"\n{'='*60}")
+        print(f"TEST SUMMARY - DELETE SERVICE ENDPOINT")
+        print(f"{'='*60}")
+        print(f"Total Tests: {self.total_tests}")
+        print(f"Passed: {self.passed_tests}")
+        print(f"Failed: {self.failed_tests}")
+        print(f"Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
+        print(f"{'='*60}")
+        
+        if self.failed_tests > 0:
+            print("\n❌ FAILED TESTS:")
+            for result in self.results:
+                if "❌ FAIL" in result:
+                    print(f"  {result}")
 
 class CoupDePouceBackendTester:
     def __init__(self):
