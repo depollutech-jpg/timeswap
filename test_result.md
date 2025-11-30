@@ -616,6 +616,31 @@ agent_communication:
       
       Prêt pour test frontend avec le nouveau Modal personnalisé.
   
+  - agent: "main"
+    message: |
+      ✅ SYSTÈME DE RENDEZ-VOUS - INTÉGRATION COMPLÈTE:
+      
+      BACKEND (déjà implémenté dans server.py):
+      - Modèle AppointmentCreate (chatId, otherUserId, date, title, description)
+      - Modèle AppointmentInDB (avec _id et createdAt)
+      - POST /api/appointments - Créer un rendez-vous
+      - GET /api/appointments/my - Récupérer mes rendez-vous
+      - PATCH /api/appointments/{id}/status - Modifier le statut
+      
+      FRONTEND:
+      1. Composant AppointmentModal (src/components/AppointmentModal.tsx)
+         - Formulaire avec date, heure, titre, description
+         - Validation (titre obligatoire, date future)
+         - DateTimePicker pour iOS/Android
+      
+      2. Intégration dans chat.tsx:
+         - Bouton calendrier dans le header
+         - État showAppointmentModal
+         - Fonction createAppointment qui appelle POST /api/appointments
+         - Modal intégré avec props corrects
+      
+      Prêt pour test backend et frontend.
+  
   - agent: "testing"
     message: |
       🎉 DELETE ANNOUNCEMENT FUNCTIONALITY V2 TESTING COMPLETED - SUCCESS!
