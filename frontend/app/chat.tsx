@@ -675,6 +675,10 @@ const styles = StyleSheet.create({
     padding: 4,
     marginRight: 8,
   },
+  headerButton: {
+    padding: 4,
+    marginRight: 8,
+  },
   serviceCard: {
     flexDirection: 'row',
     alignItems: 'center',
