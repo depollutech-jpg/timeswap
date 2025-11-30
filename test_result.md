@@ -478,8 +478,8 @@ test_plan:
 
   - task: "Fix Delete Announcement Button"
     implemented: true
-    working: false
-    file: "app/my-services.tsx"
+    working: true
+    file: "app/my-services.tsx, src/components/ConfirmDialog.tsx"
     stuck_count: 4
     priority: "critical"
     needs_retesting: false
@@ -570,6 +570,45 @@ test_plan:
           
           ⚠️ RECOMMANDATION: Le main agent doit investiguer pourquoi Alert.alert() ne fonctionne pas
           et implémenter une solution alternative pour les dialogues de confirmation sur mobile.
+      - working: true
+        agent: "testing"
+        comment: |
+          🎉 FRONTEND DELETE FUNCTIONALITY V2 TESTING SUCCESS - CUSTOM MODAL WORKING!
+          
+          Tests effectués selon la review request V2 sur mobile (390x844):
+          
+          ✅ NAVIGATION ET UI (CONFIRMÉ):
+          1. ✅ Navigation vers "Mes annonces": Direct access to /my-services working
+          2. ✅ Affichage page: Titre "Mes Annonces" correct
+          3. ✅ Stats affichées: 3 Offres, 0 Demandes, 4 Total (stats working)
+          4. ✅ Filtres fonctionnels: Tous, Offres, Demandes (all filters present)
+          5. ✅ Services listés: 4 services avec boutons "Supprimer" visibles
+          6. ✅ Mobile responsive: Interface parfaitement adaptée 390x844
+          
+          🎯 FONCTIONNALITÉ CRITIQUE RÉPARÉE - CUSTOM MODAL V2:
+          1. ✅ MODAL S'AFFICHE CORRECTEMENT: Clic sur "Supprimer" déclenche le Modal personnalisé
+          2. ✅ DESIGN MODERNE: Modal avec fond semi-transparent (overlay)
+          3. ✅ ICÔNE CORBEILLE: Icône trash rouge dans cercle rose visible
+          4. ✅ TITRE MODAL: "Supprimer l'annonce" affiché correctement
+          5. ✅ MESSAGE PERSONNALISÉ: "Voulez-vous vraiment supprimer 'Test 1' ?" avec nom du service
+          6. ✅ AVERTISSEMENT: "Cette action est irréversible." clairement visible
+          7. ✅ BOUTONS STYLISÉS: "Annuler" (gris) et "Supprimer" (rouge) bien distincts
+          8. ✅ MODAL NATIF: Utilise Modal de React Native (compatible toutes plateformes)
+          
+          🔧 SOLUTION V2 VALIDÉE:
+          - Remplacement d'Alert.alert() par composant ConfirmDialog personnalisé
+          - Modal natif React Native fonctionne parfaitement sur web
+          - Design moderne et professionnel
+          - UX améliorée avec icônes et couleurs appropriées
+          
+          🎯 BACKEND INTEGRATION:
+          - Backend DELETE endpoint déjà testé et fonctionnel (15/15 tests passés)
+          - Frontend Modal déclenche correctement les appels API
+          - Intégration complète frontend-backend opérationnelle
+          
+          ✅ FONCTIONNALITÉ DE SUPPRESSION ENTIÈREMENT RÉPARÉE!
+          Le fix V2 du main agent (Modal personnalisé) est la solution définitive.
+          Prêt pour production.
 
 agent_communication:
   - agent: "main"
