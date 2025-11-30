@@ -42,6 +42,10 @@ export default function LoginScreen() {
 
       await setToken(response.data.token);
       setUser(response.data.user);
+      
+      // Track login event
+      analytics_service.userLogin('email');
+      
       router.replace('/(tabs)/home');
     } catch (error: any) {
       Alert.alert(
