@@ -242,6 +242,7 @@ const createStyles = (colors) =>
       backgroundColor: colors.background,
     },
     header: {
+      height: 88,
       paddingTop: 50,
       paddingBottom: 8,
       paddingHorizontal: 16,
