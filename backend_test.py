@@ -64,52 +64,56 @@ class TestResults:
 class CoupDePouceBackendTester:
     def __init__(self):
         self.session = requests.Session()
-        self.auth_token = None
-        self.test_user_id = None
-        self.test_service_id = None
-        
-    def log_test(self, test_name, success, details=""):
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"   📝 {details}")
-        print()
-        
-    def register_test_user(self):
-        """Register a test user for authentication"""
-        print("🔐 TESTING USER REGISTRATION")
-        
-        # Generate unique email for this test run
-        timestamp = int(time.time())
-        test_email = f"testuser_{timestamp}@example.com"
-        
-        user_data = {
-            "email": test_email,
-            "password": "TestPassword123!",
-            "firstName": "Marie",
-            "lastName": "Dupont"
-        }
-        
-        try:
-            response = self.session.post(f"{API_BASE}/auth/register", json=user_data)
-            
-            if response.status_code == 200:
-                data = response.json()
-                self.auth_token = data.get('token')
-                self.test_user_id = data.get('user', {}).get('_id')
-                
-                # Set authorization header for future requests
-                self.session.headers.update({'Authorization': f'Bearer {self.auth_token}'})
-                
-                self.log_test("User Registration", True, f"User created with ID: {self.test_user_id}")
-                return True
-            else:
-                self.log_test("User Registration", False, f"Status: {response.status_code}, Response: {response.text}")
-                return False
-                
-        except Exception as e:
-            self.log_test("User Registration", False, f"Exception: {str(e)}")
-            return False
+
+def create_test_user(email_suffix=""):
+    """Create a test user and return user data with token"""
+    user_data = {
+        "email": f"testuser{email_suffix}_{uuid.uuid4().hex[:8]}@example.com",
+        "password": "TestPassword123!",
+        "firstName": "Test",
+        "lastName": f"User{email_suffix}"
+    }
+    
+    try:
+        response = requests.post(f"{API_BASE}/auth/register", json=user_data, headers=HEADERS)
+        if response.status_code == 200:
+            data = response.json()
+            return {
+                "user_id": data["user"]["_id"],
+                "token": data["token"],
+                "email": user_data["email"]
+            }
+        else:
+            print(f"Failed to create user: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"Error creating user: {str(e)}")
+        return None
+
+def create_test_service(token, title="Service de test"):
+    """Create a test service and return service ID"""
+    service_data = {
+        "title": title,
+        "description": "Service créé pour les tests de suppression",
+        "category": "Aide ménagère",
+        "duration": 2.0,
+        "type": "offer",
+        "location": "Paris, France"
+    }
+    
+    headers = {**HEADERS, "Authorization": f"Bearer {token}"}
+    
+    try:
+        response = requests.post(f"{API_BASE}/services", json=service_data, headers=headers)
+        if response.status_code == 200:
+            data = response.json()
+            return data.get("serviceId")
+        else:
+            print(f"Failed to create service: {response.status_code} - {response.text}")
+            return None
+    except Exception as e:
+        print(f"Error creating service: {str(e)}")
+        return None
     
     def test_login(self):
         """Test user login functionality"""
