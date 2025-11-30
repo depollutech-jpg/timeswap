@@ -210,6 +210,27 @@ export default function ChatScreen() {
     }
   };
 
+  const handleDeleteMessage = (messageId: string) => {
+    setMessageToDelete(messageId);
+    setShowDeleteDialog(true);
+  };
+
+  const confirmDeleteMessage = async () => {
+    if (!messageToDelete) return;
+    
+    setShowDeleteDialog(false);
+    try {
+      await api.delete(`/messages/${messageToDelete}`);
+      // Rafraîchir la liste des messages
+      await loadMessages();
+    } catch (error: any) {
+      console.error('Erreur suppression message:', error);
+      Alert.alert('Erreur', error.response?.data?.detail || 'Impossible de supprimer le message');
+    } finally {
+      setMessageToDelete(null);
+    }
+  };
+
   const sendMessage = async () => {
     if (!newMessage.trim()) return;
 
