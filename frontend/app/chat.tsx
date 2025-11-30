@@ -508,6 +508,12 @@ export default function ChatScreen() {
         targetId={chat?.otherUser?._id || ''}
         onClose={() => setShowReportModal(false)}
       />
+
+      <AppointmentModal
+        visible={showAppointmentModal}
+        onClose={() => setShowAppointmentModal(false)}
+        onSubmit={createAppointment}
+      />
     </SafeAreaView>
   );
 }
