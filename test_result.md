@@ -329,8 +329,7 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Endpoint Calendrier - Liste des échanges"
-    - "Page Calendrier - Liste chronologique des échanges"
+    - "Fix Delete Announcement Button"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
