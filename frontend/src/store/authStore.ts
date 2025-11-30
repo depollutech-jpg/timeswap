@@ -50,7 +50,20 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   token: null,
   isLoading: true,
-  setUser: (user) => set({ user }),
+  setUser: (user) => {
+    set({ user });
+    
+    // Track user login et set user properties
+    if (user) {
+      analytics_service.setUser(user._id);
+      analytics_service.setUserProperties({
+        user_level: user.gamification.level,
+        user_xp: user.gamification.xp,
+        is_verified: user.verification.isVerified,
+        user_role: user.role,
+      });
+    }
+  },
   setToken: async (token) => {
     if (token) {
       await AsyncStorage.setItem('auth_token', token);
@@ -60,6 +73,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     set({ token });
   },
   logout: async () => {
+    analytics_service.userLogout();
     await AsyncStorage.removeItem('auth_token');
     set({ user: null, token: null });
   },
