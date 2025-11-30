@@ -551,6 +551,21 @@ export default function ChatScreen() {
         onConfirm={createAppointment}
         otherUserName={chat?.otherUser?.name || 'l\'utilisateur'}
       />
+
+      {/* Dialogue de confirmation de suppression de message */}
+      <ConfirmDialog
+        visible={showDeleteDialog}
+        title="Supprimer le message"
+        message="Voulez-vous vraiment supprimer ce message ?\n\nCette action est irréversible."
+        confirmText="Supprimer"
+        cancelText="Annuler"
+        onConfirm={confirmDeleteMessage}
+        onCancel={() => {
+          setShowDeleteDialog(false);
+          setMessageToDelete(null);
+        }}
+        destructive
+      />
     </SafeAreaView>
   );
 }
