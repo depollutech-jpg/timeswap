@@ -19,6 +19,7 @@ import api from '../../src/utils/api';
 import * as ImagePicker from 'expo-image-picker';
 import { CATEGORIES } from '../../src/constants/categories';
 import { LinearGradient } from 'expo-linear-gradient';
+import ConfirmDialog from '../../src/components/ConfirmDialog';
 
 export default function ProfileScreen() {
   const { user, logout, setUser } = useAuthStore();
@@ -26,6 +27,7 @@ export default function ProfileScreen() {
   const router = useRouter();
   const [isEditing, setIsEditing] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   // Animation refs
   const scaleAnim = useRef(new Animated.Value(0)).current;
