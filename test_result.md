@@ -125,11 +125,11 @@ user_problem_statement: |
 backend:
   - task: "Appointment System - Create Appointment"
     implemented: true
-    working: "NA"
+    working: false
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -139,14 +139,42 @@ backend:
           - Validation date future
           - Enregistrement dans MongoDB
           - Prêt pour test
+      - working: false
+        agent: "testing"
+        comment: |
+          ❌ CRITICAL VALIDATION ISSUE FOUND - 5/7 TESTS PASSED (71.4%)
+          
+          Tests effectués selon la review request:
+          
+          ✅ FONCTIONNALITÉS OPÉRATIONNELLES:
+          1. ✅ Création de rendez-vous: POST /api/appointments fonctionne (200 OK)
+          2. ✅ Récupération: GET /api/appointments/my retourne les rendez-vous correctement
+          3. ✅ Validation titre obligatoire: Rejette correctement les requêtes sans titre (422)
+          4. ✅ Authentification: Rejette les requêtes non authentifiées (403)
+          5. ✅ Modification statut: PUT /api/appointments/{id} fonctionne (200 OK)
+          
+          ❌ PROBLÈMES CRITIQUES IDENTIFIÉS:
+          1. ❌ VALIDATION DATE MANQUANTE: L'endpoint accepte les dates dans le passé
+             - Test avec date passée: Retourne 200 au lieu de 400/422
+             - Aucune validation de date future implémentée dans le code
+             - IMPACT: Utilisateurs peuvent créer des RDV dans le passé
+          
+          2. ❌ SÉCURITÉ DISCUTABLE: Tous les participants peuvent modifier le statut
+             - Test sécurité: User B peut modifier le RDV de User A (200 au lieu de 403)
+             - Code permet à tous les participants de modifier (pas seulement le créateur)
+             - IMPACT: Logique métier à clarifier (est-ce voulu ou bug?)
+          
+          🔧 CORRECTIONS NÉCESSAIRES:
+          - Ajouter validation date future dans POST /api/appointments
+          - Clarifier les règles de modification (créateur seul ou tous participants?)
   
   - task: "Appointment System - Get My Appointments"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -155,14 +183,26 @@ backend:
           - Récupère tous les rendez-vous de l'utilisateur connecté
           - Données triées par date
           - Prêt pour test
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ ENDPOINT GET MY APPOINTMENTS TESTÉ AVEC SUCCÈS
+          
+          Test effectué selon la review request:
+          - GET /api/appointments/my fonctionne correctement (200 OK)
+          - Retourne les rendez-vous de l'utilisateur connecté
+          - Structure de données correcte (_id, date, title, status, otherUser)
+          - Données enrichies avec informations de l'autre utilisateur
+          - Tri par date fonctionnel
+          - Authentification requise correctement implémentée
   
   - task: "Appointment System - Update Status"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -171,6 +211,20 @@ backend:
           - Permet de modifier le statut d'un rendez-vous
           - Vérification de propriété
           - Prêt pour test
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ ENDPOINT UPDATE STATUS TESTÉ AVEC SUCCÈS
+          
+          Test effectué selon la review request:
+          - PUT /api/appointments/{id} fonctionne (200 OK) - Note: PUT au lieu de PATCH
+          - Modification du statut opérationnelle (scheduled → completed)
+          - Authentification requise correctement implémentée
+          - Vérification que l'utilisateur est participant
+          - Notifications créées pour l'autre participant
+          
+          ⚠️ NOTE TECHNIQUE: Endpoint implémenté en PUT au lieu de PATCH comme spécifié
+          ⚠️ SÉCURITÉ: Tous les participants peuvent modifier (pas seulement le créateur)
 
   - task: "Endpoints Admin Dashboard"
     implemented: true
