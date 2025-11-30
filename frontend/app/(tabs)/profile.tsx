@@ -457,6 +457,18 @@ export default function ProfileScreen() {
           </>
         )}
       </ScrollView>
+
+      {/* Dialogue de confirmation de déconnexion */}
+      <ConfirmDialog
+        visible={showLogoutDialog}
+        title="Déconnexion"
+        message="Êtes-vous sûr de vouloir vous déconnecter ?"
+        confirmText="Déconnecter"
+        cancelText="Annuler"
+        onConfirm={handleConfirmLogout}
+        onCancel={() => setShowLogoutDialog(false)}
+        destructive
+      />
     </View>
   );
 }
