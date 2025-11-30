@@ -16,6 +16,7 @@ import { useRouter } from 'expo-router';
 import api from '../src/utils/api';
 import { LinearGradient } from 'expo-linear-gradient';
 import CountdownTimer from '../src/components/CountdownTimer';
+import ConfirmDialog from '../src/components/ConfirmDialog';
 
 export default function MyServicesScreen() {
   const { user } = useAuthStore();
@@ -25,6 +26,8 @@ export default function MyServicesScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [filter, setFilter] = useState('all'); // 'all', 'offer', 'demand'
+  const [deleteDialogVisible, setDeleteDialogVisible] = useState(false);
+  const [serviceToDelete, setServiceToDelete] = useState<{id: string, title: string} | null>(null);
 
   useEffect(() => {
     loadMyServices();
