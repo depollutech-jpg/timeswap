@@ -67,7 +67,38 @@ export default function MyServicesScreen() {
     loadMyServices();
   };
 
-  // Old delete functions removed
+  const handleDeletePress = (serviceId: string, title: string) => {
+    console.log('🔴 Préparation suppression:', { id: serviceId, title });
+    setServiceToDelete({ id: serviceId, title });
+    setDeleteDialogVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!serviceToDelete) return;
+
+    console.log('✅ Confirmation suppression:', serviceToDelete);
+    setDeleteDialogVisible(false);
+
+    try {
+      console.log(`🔄 Appel API DELETE /services/${serviceToDelete.id}`);
+      await api.delete(`/services/${serviceToDelete.id}`);
+      console.log('✅ Suppression réussie');
+      Alert.alert('Succès', 'Votre annonce a été supprimée');
+      loadMyServices();
+    } catch (error: any) {
+      console.error('❌ Erreur suppression:', error);
+      const errorMsg = error.response?.data?.detail || 'Impossible de supprimer l\'annonce';
+      Alert.alert('Erreur', errorMsg);
+    } finally {
+      setServiceToDelete(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    console.log('❌ Suppression annulée');
+    setDeleteDialogVisible(false);
+    setServiceToDelete(null);
+  };
 
   const filteredServices = services.filter((service) => {
     if (filter === 'all') return true;
