@@ -1920,7 +1920,8 @@ async def create_appointment(
             raise HTTPException(400, "Format de date invalide. Utilisez le format ISO 8601")
         
         # Vérifier que la date est dans le futur
-        if appointment_date < datetime.utcnow():
+        current_time = datetime.utcnow().replace(tzinfo=appointment_date.tzinfo)
+        if appointment_date < current_time:
             raise HTTPException(400, "La date du rendez-vous doit être dans le futur")
         
         # Vérifier que le chat existe
