@@ -267,34 +267,46 @@ export default function ChatScreen() {
           isMyMessage ? styles.myMessageContainer : styles.otherMessageContainer,
         ]}
       >
-        <View
-          style={[
-            styles.messageBubble,
-            isMyMessage ? styles.myMessageBubble : styles.otherMessageBubble,
-          ]}
-        >
-          {!isMyMessage && (
-            <Text style={styles.senderName}>{item.senderName}</Text>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <View
+            style={[
+              styles.messageBubble,
+              isMyMessage ? styles.myMessageBubble : styles.otherMessageBubble,
+            ]}
+          >
+            {!isMyMessage && (
+              <Text style={styles.senderName}>{item.senderName}</Text>
+            )}
+            <Text
+              style={[
+                styles.messageText,
+                isMyMessage ? styles.myMessageText : styles.otherMessageText,
+              ]}
+            >
+              {item.content}
+            </Text>
+            <Text
+              style={[
+                styles.messageTime,
+                isMyMessage ? styles.myMessageTime : styles.otherMessageTime,
+              ]}
+            >
+              {new Date(item.createdAt).toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+              })}
+            </Text>
+          </View>
+          
+          {/* Bouton de suppression pour mes messages */}
+          {isMyMessage && (
+            <TouchableOpacity
+              onPress={() => handleDeleteMessage(item._id)}
+              style={styles.deleteMessageButton}
+            >
+              <Ionicons name="trash-outline" size={16} color="#EF4444" />
+            </TouchableOpacity>
           )}
-          <Text
-            style={[
-              styles.messageText,
-              isMyMessage ? styles.myMessageText : styles.otherMessageText,
-            ]}
-          >
-            {item.content}
-          </Text>
-          <Text
-            style={[
-              styles.messageTime,
-              isMyMessage ? styles.myMessageTime : styles.otherMessageTime,
-            ]}
-          >
-            {new Date(item.createdAt).toLocaleTimeString('fr-FR', {
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
-          </Text>
         </View>
       </View>
     );
