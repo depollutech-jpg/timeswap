@@ -1,7 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Coup de Pouce - Appointment System
-Tests all appointment endpoints according to the review request specifications.
+Backend Testing Suite for Appointment System - RE-TESTING AFTER DATE VALIDATION FIX
+Tests according to review request specifications:
+
+CRITICAL TESTS:
+1. Date validation - past dates should be rejected (MAIN BUG FIX)
+2. Date format validation 
+3. Title validation
+4. Valid appointment creation with future date
+5. Get my appointments functionality
+
+Focus: Verify that the date validation bug has been fixed.
 """
 
 import requests
