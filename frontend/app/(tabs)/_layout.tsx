@@ -164,6 +164,13 @@ function FloatingAddButton() {
 
 export default function TabsLayout() {
   const insets = useSafeAreaInsets();
+  const { colors } = useThemeStore();
+  const { notifications } = useNotificationStore();
+  
+  // Compter uniquement les notifications de message non lues
+  const unreadMessageCount = notifications.filter(
+    n => n.type === 'message' && !n.read
+  ).length;
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
