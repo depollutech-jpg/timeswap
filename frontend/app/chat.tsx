@@ -305,6 +305,12 @@ export default function ChatScreen() {
           </TouchableOpacity>
         </View>
         <TouchableOpacity
+          style={styles.calendarButton}
+          onPress={() => setShowAppointmentModal(true)}
+        >
+          <Ionicons name="calendar-outline" size={26} color={Colors.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity
           style={styles.profileButton}
           onPress={() => chat?.otherUser?._id && router.push(`/user-profile?id=${chat.otherUser._id}`)}
         >
