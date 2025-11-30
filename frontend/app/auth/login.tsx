@@ -88,17 +88,27 @@ export default function LoginScreen() {
             <View style={styles.inputContainer}>
               <View style={styles.labelRow}>
                 <Text style={styles.label}>Mot de passe</Text>
-                <TouchableOpacity onPress={() => router.push('/auth/forgot-password')}>
+                <TouchableOpacity onPress={() => router.push('/forgot-password')}>
                   <Text style={styles.forgotPasswordText}>Mot de passe oublié ?</Text>
                 </TouchableOpacity>
               </View>
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-              />
+              <View style={styles.passwordInputContainer}>
+                <TextInput
+                  style={styles.passwordInput}
+                  placeholder="••••••••"
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                  autoCapitalize="none"
+                />
+                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                  <Ionicons
+                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                    size={22}
+                    color={Colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              </View>
             </View>
 
             <TouchableOpacity
