@@ -500,29 +500,12 @@ test_plan:
         comment: |
           ✅ BACKEND DELETE ENDPOINT TESTÉ AVEC SUCCÈS - 15/15 TESTS PASSÉS (100%)
           
-          Tests effectués selon la review request:
+          Tests effectués:
+          1. ✅ Suppression réussie (200 OK)
+          2. ✅ Sécurité - impossible de supprimer l'annonce d'un autre utilisateur (403)
+          3. ✅ Authentification requise (401/403)
+          4. ✅ Service inexistant géré (404)
           
-          1. ✅ Test de suppression réussie:
-             - Service créé et supprimé avec succès
-             - Code de statut 200 OK
-             - Service n'existe plus dans la base de données
-             - GET /api/services ne retourne plus le service supprimé
-          
-          2. ✅ Test de sécurité - Suppression d'un service d'un autre utilisateur:
-             - User B ne peut pas supprimer le service de User A
-             - Code de statut 403 Forbidden
-             - Le service existe toujours après la tentative
-          
-          3. ✅ Test d'authentification:
-             - Tentative sans token JWT rejetée
-             - Code de statut 401/403
-          
-          4. ✅ Test de service inexistant:
-             - Tentative de suppression avec ID invalide
-             - Code de statut 404 Not Found
-          
-          L'ENDPOINT DELETE /api/services/{service_id} FONCTIONNE PARFAITEMENT!
-          Le fix du main agent (Alert.alert au lieu de window.confirm) était la bonne solution.
           Backend prêt pour production.
       - working: false
         agent: "testing"
