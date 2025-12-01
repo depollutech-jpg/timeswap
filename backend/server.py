@@ -1372,11 +1372,26 @@ async def get_my_chats(current_user: dict = Depends(get_current_user)):
         "deleted_by": {"$ne": current_user["_id"]}
     }).sort("lastMessageAt", -1).to_list(length=50)
     
+    # OPTIMIZATION: Batch fetch all other users at once
+    other_user_ids = []
+    for chat in chats:
+        other_id = [p for p in chat["participants"] if p != current_user["_id"]][0]
+        other_user_ids.append(other_id)
+    
+    users_list = await db.users.find(
+        {"_id": {"$in": other_user_ids}},
+        {"_id": 1, "profile.firstName": 1, "profile.lastName": 1, "profile.photo_base64": 1}
+    ).to_list(length=len(other_user_ids))
+    users_dict = {u["_id"]: u for u in users_list}
+    
     # Enrich with other user data
     enriched_chats = []
     for chat in chats:
         other_user_id = [p for p in chat["participants"] if p != current_user["_id"]][0]
-        other_user = await db.users.find_one({"_id": other_user_id})
+        other_user = users_dict.get(other_user_id)
+        
+        if not other_user:
+            continue
         
         enriched_chat = {
             **chat,
