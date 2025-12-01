@@ -573,11 +573,21 @@ async def get_services(
     # Fetch all active services
     services = await db.services.find(query).to_list(length=None)
     
+    # OPTIMIZATION: Batch fetch all users at once to avoid N+1 queries
+    user_ids = list(set([s["userId"] for s in services]))
+    users_list = await db.users.find(
+        {"_id": {"$in": user_ids}},
+        {"_id": 1, "profile": 1, "gamification": 1, "verification": 1}  # Only fetch needed fields
+    ).to_list(length=len(user_ids))
+    users_dict = {u["_id"]: u for u in users_list}
+    
     # Enrich with user data and calculate scores
     enriched_services = []
     
     for service in services:
-        user = await db.users.find_one({"_id": service["userId"]})
+        user = users_dict.get(service["userId"])
+        if not user:
+            continue  # Skip if user not found
         
         # Calculate age score (newer = higher score)
         created_at = service.get("createdAt", current_time)
