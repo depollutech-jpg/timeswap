@@ -373,8 +373,7 @@ async def forgot_password(request: ForgotPasswordRequest):
         # On continue même si l'email échoue (pour ne pas révéler si l'utilisateur existe)
     
     return {
-        "message": "Si un compte existe avec cet email, un code de réinitialisation a été envoyé.",
-        "dev_code": reset_code  # Pour le développement - à retirer en production
+        "message": "Si un compte existe avec cet email, un code de réinitialisation a été envoyé."
     }
 
 @api_router.post("/auth/verify-reset-code")
