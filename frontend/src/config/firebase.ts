@@ -2,15 +2,15 @@ import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAnalytics, Analytics, isSupported } from 'firebase/analytics';
 import { Platform } from 'react-native';
 
-// Your web app's Firebase configuration
+// Your web app's Firebase configuration from environment variables
 const firebaseConfig = {
-  apiKey: "AIzaSyCMWNH_AtZ0-b6LDL4RuCN6SkZ_vGJVHiY",
-  authDomain: "timeswap-755ac.firebaseapp.com",
-  projectId: "timeswap-755ac",
-  storageBucket: "timeswap-755ac.firebasestorage.app",
-  messagingSenderId: "219683140780",
-  appId: "1:219683140780:web:135eb06476578d01f89b09",
-  measurementId: "G-EFZNZ6PMQQ"
+  apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY || '',
+  authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || '',
+  projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID || '',
+  storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || '',
+  messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '',
+  appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID || '',
+  measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID || ''
 };
 
 // Initialize Firebase
