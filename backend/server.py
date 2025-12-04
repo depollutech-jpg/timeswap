@@ -2158,9 +2158,11 @@ async def create_appointment(
             "title": appointment_data.title,
             "description": appointment_data.description or "",
             "createdBy": current_user["_id"],
-            "status": "scheduled",
+            "status": "pending",  # En attente d'acceptation
             "createdAt": datetime.utcnow().isoformat(),
-            "reminderSent": False
+            "reminderSent": False,
+            "acceptedBy": [],  # Liste des utilisateurs ayant accepté
+            "rejectedBy": []  # Liste des utilisateurs ayant rejeté
         }
         
         await db.appointments.insert_one(appointment)
