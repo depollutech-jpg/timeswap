@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 """
-Backend Testing Suite for Appointment System - RE-TESTING AFTER DATE VALIDATION FIX
-Tests according to review request specifications:
+Test complet du système de rendez-vous - Acceptation/Refus
+Selon la review request pour l'application Coup de Pouce
 
-CRITICAL TESTS:
-1. Date validation - past dates should be rejected (MAIN BUG FIX)
-2. Date format validation 
-3. Title validation
-4. Valid appointment creation with future date
-5. Get my appointments functionality
+TESTS PRIORITAIRES (NOUVEAUX ENDPOINTS):
+1. POST /api/appointments/{appointment_id}/accept (NOUVEAU - PRIORITAIRE)
+2. POST /api/appointments/{appointment_id}/reject (NOUVEAU - PRIORITAIRE)
+3. Tests de validation (double acceptation/refus, authentification)
+4. Flux complet end-to-end
+5. Tests de régression des anciens endpoints
 
-Focus: Verify that the date validation bug has been fixed.
+Focus: Tester les nouveaux endpoints d'acceptation et de refus des rendez-vous
 """
 
 import requests
