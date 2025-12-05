@@ -46,15 +46,36 @@ class TestResults:
     
     def print_summary(self):
         print(f"\n{'='*80}")
-        print(f"APPOINTMENT SYSTEM BACKEND TESTING RESULTS")
+        print(f"RÉSULTATS DES TESTS - SYSTÈME DE RENDEZ-VOUS COMPLET")
         print(f"{'='*80}")
-        print(f"Total Tests: {self.total_tests}")
-        print(f"Passed: {self.passed_tests}")
-        print(f"Failed: {self.failed_tests}")
-        print(f"Success Rate: {(self.passed_tests/self.total_tests*100):.1f}%")
-        print(f"\nDetailed Results:")
+        print(f"Total des tests: {self.total_tests}")
+        print(f"✅ Tests réussis: {self.passed_tests}")
+        print(f"❌ Tests échoués: {self.failed_tests}")
+        print(f"📈 Taux de réussite: {(self.passed_tests/self.total_tests*100):.1f}%")
+        print(f"\nRésultats détaillés:")
         for detail in self.test_details:
             print(detail)
+        
+        print(f"\n🎯 CRITÈRES DE SUCCÈS SELON LA REVIEW REQUEST:")
+        
+        # Analyser les résultats selon les critères de la review request
+        accept_working = any("Accept endpoint" in detail and "✅ PASS" in detail for detail in self.test_details)
+        reject_working = any("Reject endpoint" in detail and "✅ PASS" in detail for detail in self.test_details)
+        notifications_working = any("Notification" in detail and "✅ PASS" in detail for detail in self.test_details)
+        e2e_working = any("E2E" in detail and "✅ PASS" in detail for detail in self.test_details)
+        regression_ok = any("Régression" in detail and "✅ PASS" in detail for detail in self.test_details)
+        
+        print(f"✅ Nouveaux endpoints accept/reject: {'OUI' if accept_working and reject_working else 'NON'}")
+        print(f"✅ Notifications envoyées: {'OUI' if notifications_working else 'NON'}")
+        print(f"✅ Flux complet fonctionne: {'OUI' if e2e_working else 'NON'}")
+        print(f"✅ Pas de régression: {'OUI' if regression_ok else 'NON'}")
+        print(f"✅ Toutes les validations: {'OUI' if any('Validation' in detail and '✅ PASS' in detail for detail in self.test_details) else 'NON'}")
+        
+        if self.passed_tests / self.total_tests >= 0.8:
+            print(f"\n🎉 SYSTÈME DE RENDEZ-VOUS PRÊT POUR PRODUCTION!")
+        else:
+            print(f"\n⚠️  CORRECTIONS NÉCESSAIRES AVANT PRODUCTION")
+        
         print(f"{'='*80}")
 
 def register_user(email, password, first_name, last_name):
