@@ -2454,6 +2454,29 @@ async def health_check():
     except Exception as e:
         return {"status": "unhealthy", "error": str(e)}
 
+# Health check route at root for Kubernetes
+@app.get("/")
+async def root_health_check():
+    """
+    Health check endpoint for Kubernetes at the root path
+    """
+    try:
+        # Test MongoDB connection
+        await db.command("ping")
+        return {
+            "status": "healthy",
+            "service": "TimeSwap API",
+            "version": "1.0.0",
+            "database": "connected"
+        }
+    except Exception as e:
+        return {
+            "status": "unhealthy",
+            "service": "TimeSwap API",
+            "database": "disconnected",
+            "error": str(e)
+        }
+
 # Include router
 app.include_router(api_router)
 
