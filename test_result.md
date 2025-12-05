@@ -123,13 +123,45 @@ user_problem_statement: |
   - GET /api/services - Lister les services (avec filtrage automatique des expirés)
 
 backend:
+  - task: "Appointment System - Accept Appointment"
+    implemented: true
+    working: "NA"
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: |
+          NOUVEAUX ENDPOINTS AJOUTÉS:
+          1. POST /api/appointments/{appointment_id}/accept
+             - Permet au destinataire d'accepter un rendez-vous en attente (status=pending)
+             - Passe le statut à "scheduled"
+             - Ajoute l'utilisateur à la liste acceptedBy
+             - Crée une notification pour le créateur
+          
+          2. POST /api/appointments/{appointment_id}/reject
+             - Permet au destinataire de refuser un rendez-vous en attente
+             - Passe le statut à "rejected"
+             - Ajoute l'utilisateur à la liste rejectedBy
+             - Crée une notification pour le créateur
+          
+          FLUX COMPLET:
+          - Personne A crée un RDV avec POST /api/appointments (status=pending)
+          - Personne B reçoit une notification
+          - Personne B peut accepter (POST /accept) ou refuser (POST /reject)
+          - Personne A reçoit une notification du choix de B
+          
+          Prêt pour test backend complet.
+
   - task: "Appointment System - Create Appointment"
     implemented: true
     working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
