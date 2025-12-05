@@ -620,9 +620,6 @@ metadata:
 test_plan:
   current_focus:
     - "Appointment System - Accept Appointment"
-    - "Appointment System - Reject Appointment"
-    - "Appointment System - Create Appointment"
-    - "Appointment System - Get My Appointments"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
