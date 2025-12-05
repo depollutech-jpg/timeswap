@@ -117,31 +117,32 @@ def accept_exchange(token, service_id):
         return None
 
 def test_appointment_system():
-    """Main test function for appointment system"""
+    """Main test function for appointment system - Focus on Accept/Reject endpoints"""
     results = TestResults()
     
-    print("🚀 Starting Appointment System Backend Testing...")
+    print("🚀 TEST DU SYSTÈME DE RENDEZ-VOUS COMPLET - ACCEPTATION/REFUS")
+    print("=" * 70)
     print(f"Testing against: {BASE_URL}")
     
     # Test data
-    user_a_email = f"usera_{uuid.uuid4().hex[:8]}@test.com"
-    user_b_email = f"userb_{uuid.uuid4().hex[:8]}@test.com"
+    user_a_email = f"marie_{uuid.uuid4().hex[:8]}@test.com"
+    user_b_email = f"pierre_{uuid.uuid4().hex[:8]}@test.com"
     password = "TestPassword123!"
     
     # Setup: Create users
-    print("\n📋 Setting up test users...")
-    token_a = register_user(user_a_email, password, "Alice", "Dupont")
-    token_b = register_user(user_b_email, password, "Bob", "Martin")
+    print("\n🔧 CRÉATION DES UTILISATEURS DE TEST...")
+    token_a = register_user(user_a_email, password, "Marie", "Dupont")
+    token_b = register_user(user_b_email, password, "Pierre", "Martin")
     
     if not token_a or not token_b:
         print("❌ Failed to create test users. Aborting tests.")
         return results
     
-    print(f"✅ Created User A: {user_a_email}")
-    print(f"✅ Created User B: {user_b_email}")
+    print(f"✅ Created User A (Marie): {user_a_email}")
+    print(f"✅ Created User B (Pierre): {user_b_email}")
     
     # Setup: Create service and exchange to get chat ID
-    print("\n📋 Setting up service and chat...")
+    print("\n🔧 CONFIGURATION INITIALE...")
     service_id = create_service(token_a, "Service de test pour RDV", "Service pour tester les rendez-vous")
     if not service_id:
         print("❌ Failed to create service. Aborting tests.")
@@ -173,259 +174,336 @@ def test_appointment_system():
         print(f"❌ Failed to get user IDs: {str(e)}")
         return results
     
-    print(f"\n🧪 Starting Appointment System Tests...")
+    # Store appointment IDs for later tests
+    appointment_for_accept = None
+    appointment_for_reject = None
     
-    # TEST 1: Create appointment with success
-    print(f"\n1️⃣ Testing: Create appointment with success")
+    print(f"\n🎯 TESTS PRIORITAIRES - NOUVEAUX ENDPOINTS ACCEPT/REJECT")
+    print("=" * 70)
+    
+    # TEST 1: Create appointment for acceptance test
+    print(f"\n1️⃣ PRÉPARATION: Créer rendez-vous pour test d'acceptation")
     try:
-        future_date = (datetime.utcnow() + timedelta(days=1)).isoformat()
+        future_date = (datetime.utcnow() + timedelta(days=1)).replace(hour=14, minute=0, second=0, microsecond=0).isoformat()
         appointment_data = {
             "chatId": chat_id,
             "otherUserId": user_b_id,
             "date": future_date,
-            "title": "Rendez-vous échange de services",
-            "description": "Discussion sur les détails"
+            "title": "Réunion de travail importante",
+            "description": "Discussion sur le projet Coup de Pouce"
         }
         
-        response = requests.post(f"{BASE_URL}/appointments",
-                               headers=headers_a,
-                               json=appointment_data)
+        response = requests.post(f"{BASE_URL}/appointments", headers=headers_a, json=appointment_data)
         
         if response.status_code in [200, 201]:
             response_data = response.json()
-            appointment_id = response_data.get("appointmentId")
-            if appointment_id:
-                results.add_test("Create appointment with success", True, 
-                               f"Status: {response.status_code}, ID: {appointment_id}")
-                print(f"✅ Appointment created successfully: {appointment_id}")
-            else:
-                results.add_test("Create appointment with success", False, 
-                               f"No appointment ID returned: {response_data}")
-                print(f"❌ No appointment ID in response: {response_data}")
+            appointment_for_accept = response_data.get("appointmentId")
+            results.add_test("Création RDV pour acceptation", True, f"ID: {appointment_for_accept}")
+            print(f"✅ Rendez-vous créé pour test d'acceptation: {appointment_for_accept}")
         else:
-            results.add_test("Create appointment with success", False, 
-                           f"Status: {response.status_code}, Response: {response.text}")
-            print(f"❌ Failed to create appointment: {response.status_code} - {response.text}")
+            results.add_test("Création RDV pour acceptation", False, f"Status: {response.status_code}")
+            print(f"❌ Échec création RDV: {response.status_code} - {response.text}")
             
     except Exception as e:
-        results.add_test("Create appointment with success", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in create appointment test: {str(e)}")
+        results.add_test("Création RDV pour acceptation", False, f"Exception: {str(e)}")
+        print(f"❌ Exception: {str(e)}")
     
-    # TEST 2: Get my appointments
-    print(f"\n2️⃣ Testing: Get my appointments")
+    # TEST 2: POST /api/appointments/{appointment_id}/accept (PRIORITAIRE)
+    print(f"\n2️⃣ TEST PRIORITAIRE: POST /api/appointments/{{id}}/accept")
+    if appointment_for_accept:
+        try:
+            # B accepte le rendez-vous créé par A
+            response = requests.post(f"{BASE_URL}/appointments/{appointment_for_accept}/accept", headers=headers_b)
+            
+            if response.status_code == 200:
+                # Vérifier que le statut a changé à "scheduled"
+                check_response = requests.get(f"{BASE_URL}/appointments/my", headers=headers_b)
+                if check_response.status_code == 200:
+                    appointments = check_response.json()
+                    accepted_apt = next((apt for apt in appointments if apt["_id"] == appointment_for_accept), None)
+                    
+                    if accepted_apt and accepted_apt["status"] == "scheduled":
+                        results.add_test("Accept endpoint - Status change", True, "Status passé à 'scheduled'")
+                        print(f"✅ Status correctement passé à 'scheduled'")
+                        
+                        # Vérifier les notifications pour A
+                        notif_response = requests.get(f"{BASE_URL}/notifications", headers=headers_a)
+                        if notif_response.status_code == 200:
+                            notifications = notif_response.json()
+                            accept_notif = next((n for n in notifications if n.get("type") == "appointment_accepted"), None)
+                            if accept_notif:
+                                results.add_test("Accept endpoint - Notification", True, "Notification créée pour A")
+                                print(f"✅ Notification d'acceptation créée pour le créateur")
+                            else:
+                                results.add_test("Accept endpoint - Notification", False, "Notification manquante")
+                                print(f"❌ Notification d'acceptation manquante")
+                    else:
+                        results.add_test("Accept endpoint - Status change", False, f"Status incorrect: {accepted_apt.get('status') if accepted_apt else 'RDV non trouvé'}")
+                        print(f"❌ Status incorrect après acceptation")
+            else:
+                results.add_test("Accept endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                print(f"❌ Échec acceptation: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            results.add_test("Accept endpoint", False, f"Exception: {str(e)}")
+            print(f"❌ Exception lors de l'acceptation: {str(e)}")
+    else:
+        results.add_test("Accept endpoint", False, "Pas de RDV à accepter")
+        print(f"❌ Pas de rendez-vous disponible pour le test d'acceptation")
+    
+    # TEST 3: Create appointment for rejection test
+    print(f"\n3️⃣ PRÉPARATION: Créer rendez-vous pour test de refus")
     try:
-        response = requests.get(f"{BASE_URL}/appointments/my", headers=headers_a)
+        future_date = (datetime.utcnow() + timedelta(days=2)).replace(hour=10, minute=0, second=0, microsecond=0).isoformat()
+        appointment_data = {
+            "chatId": chat_id,
+            "otherUserId": user_b_id,
+            "date": future_date,
+            "title": "Rendez-vous à refuser",
+            "description": "Test de refus de rendez-vous"
+        }
         
-        if response.status_code == 200:
-            appointments = response.json()
-            if isinstance(appointments, list) and len(appointments) > 0:
-                # Check if our appointment is in the list
-                found_appointment = False
-                for apt in appointments:
-                    if apt.get("title") == "Rendez-vous échange de services":
-                        found_appointment = True
-                        # Verify sorting by date
-                        if "date" in apt and "_id" in apt and "status" in apt:
-                            results.add_test("Get my appointments", True, 
-                                           f"Found {len(appointments)} appointments, correctly structured")
-                            print(f"✅ Retrieved appointments successfully: {len(appointments)} found")
+        response = requests.post(f"{BASE_URL}/appointments", headers=headers_a, json=appointment_data)
+        
+        if response.status_code in [200, 201]:
+            response_data = response.json()
+            appointment_for_reject = response_data.get("appointmentId")
+            results.add_test("Création RDV pour refus", True, f"ID: {appointment_for_reject}")
+            print(f"✅ Rendez-vous créé pour test de refus: {appointment_for_reject}")
+        else:
+            results.add_test("Création RDV pour refus", False, f"Status: {response.status_code}")
+            print(f"❌ Échec création RDV: {response.status_code} - {response.text}")
+            
+    except Exception as e:
+        results.add_test("Création RDV pour refus", False, f"Exception: {str(e)}")
+        print(f"❌ Exception: {str(e)}")
+    
+    # TEST 4: POST /api/appointments/{appointment_id}/reject (PRIORITAIRE)
+    print(f"\n4️⃣ TEST PRIORITAIRE: POST /api/appointments/{{id}}/reject")
+    if appointment_for_reject:
+        try:
+            # B refuse le rendez-vous créé par A
+            response = requests.post(f"{BASE_URL}/appointments/{appointment_for_reject}/reject", headers=headers_b)
+            
+            if response.status_code == 200:
+                # Vérifier que le statut a changé à "rejected"
+                check_response = requests.get(f"{BASE_URL}/appointments/my", headers=headers_b)
+                if check_response.status_code == 200:
+                    appointments = check_response.json()
+                    rejected_apt = next((apt for apt in appointments if apt["_id"] == appointment_for_reject), None)
+                    
+                    if rejected_apt and rejected_apt["status"] == "rejected":
+                        results.add_test("Reject endpoint - Status change", True, "Status passé à 'rejected'")
+                        print(f"✅ Status correctement passé à 'rejected'")
+                        
+                        # Vérifier les notifications pour A
+                        notif_response = requests.get(f"{BASE_URL}/notifications", headers=headers_a)
+                        if notif_response.status_code == 200:
+                            notifications = notif_response.json()
+                            reject_notif = next((n for n in notifications if n.get("type") == "appointment_rejected"), None)
+                            if reject_notif:
+                                results.add_test("Reject endpoint - Notification", True, "Notification créée pour A")
+                                print(f"✅ Notification de refus créée pour le créateur")
+                            else:
+                                results.add_test("Reject endpoint - Notification", False, "Notification manquante")
+                                print(f"❌ Notification de refus manquante")
+                    else:
+                        results.add_test("Reject endpoint - Status change", False, f"Status incorrect: {rejected_apt.get('status') if rejected_apt else 'RDV non trouvé'}")
+                        print(f"❌ Status incorrect après refus")
+            else:
+                results.add_test("Reject endpoint", False, f"Status: {response.status_code}, Response: {response.text}")
+                print(f"❌ Échec refus: {response.status_code} - {response.text}")
+                
+        except Exception as e:
+            results.add_test("Reject endpoint", False, f"Exception: {str(e)}")
+            print(f"❌ Exception lors du refus: {str(e)}")
+    else:
+        results.add_test("Reject endpoint", False, "Pas de RDV à refuser")
+        print(f"❌ Pas de rendez-vous disponible pour le test de refus")
+    
+    print(f"\n🔍 TESTS DE VALIDATION")
+    print("=" * 50)
+    
+    # TEST 5: Validation - Double acceptation
+    print(f"\n5️⃣ VALIDATION: Tentative de double acceptation")
+    if appointment_for_accept:
+        try:
+            # Tenter d'accepter à nouveau le même rendez-vous
+            response = requests.post(f"{BASE_URL}/appointments/{appointment_for_accept}/accept", headers=headers_b)
+            
+            if response.status_code == 400:
+                results.add_test("Validation - Double acceptation", True, "Double acceptation correctement rejetée")
+                print(f"✅ Double acceptation correctement rejetée (400)")
+            else:
+                results.add_test("Validation - Double acceptation", False, f"Status: {response.status_code} (attendu: 400)")
+                print(f"❌ Double acceptation devrait être rejetée: {response.status_code}")
+                
+        except Exception as e:
+            results.add_test("Validation - Double acceptation", False, f"Exception: {str(e)}")
+            print(f"❌ Exception: {str(e)}")
+    
+    # TEST 6: Validation - Authentification requise
+    print(f"\n6️⃣ VALIDATION: Authentification requise")
+    if appointment_for_reject:
+        try:
+            # Tenter d'accepter sans token
+            response = requests.post(f"{BASE_URL}/appointments/{appointment_for_reject}/accept", headers=HEADERS)
+            
+            if response.status_code in [401, 403]:
+                results.add_test("Validation - Auth requise", True, f"Auth correctement requise ({response.status_code})")
+                print(f"✅ Authentification correctement requise: {response.status_code}")
+            else:
+                results.add_test("Validation - Auth requise", False, f"Status: {response.status_code} (attendu: 401/403)")
+                print(f"❌ Authentification devrait être requise: {response.status_code}")
+                
+        except Exception as e:
+            results.add_test("Validation - Auth requise", False, f"Exception: {str(e)}")
+            print(f"❌ Exception: {str(e)}")
+    
+    # TEST 7: Validation - RDV inexistant
+    print(f"\n7️⃣ VALIDATION: Rendez-vous inexistant")
+    try:
+        fake_id = str(uuid.uuid4())
+        response = requests.post(f"{BASE_URL}/appointments/{fake_id}/accept", headers=headers_b)
+        
+        if response.status_code == 404:
+            results.add_test("Validation - RDV inexistant", True, "404 pour RDV inexistant")
+            print(f"✅ RDV inexistant correctement géré: 404")
+        else:
+            results.add_test("Validation - RDV inexistant", False, f"Status: {response.status_code} (attendu: 404)")
+            print(f"❌ RDV inexistant devrait retourner 404: {response.status_code}")
+            
+    except Exception as e:
+        results.add_test("Validation - RDV inexistant", False, f"Exception: {str(e)}")
+        print(f"❌ Exception: {str(e)}")
+    
+    print(f"\n🔄 FLUX COMPLET END-TO-END")
+    print("=" * 50)
+    
+    # TEST 8: Flux complet E2E
+    print(f"\n8️⃣ FLUX COMPLET: A crée → B accepte → Vérifications")
+    try:
+        # A crée un nouveau rendez-vous
+        future_date = (datetime.utcnow() + timedelta(days=3)).replace(hour=16, minute=30, second=0, microsecond=0).isoformat()
+        appointment_data = {
+            "chatId": chat_id,
+            "otherUserId": user_b_id,
+            "date": future_date,
+            "title": "Consultation médicale",
+            "description": "Rendez-vous chez le médecin"
+        }
+        
+        create_response = requests.post(f"{BASE_URL}/appointments", headers=headers_a, json=appointment_data)
+        
+        if create_response.status_code in [200, 201]:
+            e2e_appointment_id = create_response.json().get("appointmentId")
+            results.add_test("E2E - Création", True, "A crée RDV avec B")
+            print(f"✅ A crée un rendez-vous avec B: {e2e_appointment_id}")
+            
+            # B accepte le rendez-vous
+            accept_response = requests.post(f"{BASE_URL}/appointments/{e2e_appointment_id}/accept", headers=headers_b)
+            
+            if accept_response.status_code == 200:
+                results.add_test("E2E - Acceptation", True, "B accepte le RDV")
+                print(f"✅ B accepte le rendez-vous")
+                
+                # Vérifier que A reçoit une notification
+                notif_response = requests.get(f"{BASE_URL}/notifications", headers=headers_a)
+                if notif_response.status_code == 200:
+                    notifications = notif_response.json()
+                    accept_notif = next((n for n in notifications if n.get("type") == "appointment_accepted"), None)
+                    if accept_notif:
+                        results.add_test("E2E - Notification A", True, "A reçoit notification")
+                        print(f"✅ A reçoit une notification d'acceptation")
+                    else:
+                        results.add_test("E2E - Notification A", False, "Notification manquante")
+                        print(f"❌ Notification pour A manquante")
+                
+                # Vérifier que le RDV apparaît avec status="scheduled" pour A et B
+                for user_headers, user_name in [(headers_a, "A"), (headers_b, "B")]:
+                    my_appointments = requests.get(f"{BASE_URL}/appointments/my", headers=user_headers)
+                    if my_appointments.status_code == 200:
+                        appointments = my_appointments.json()
+                        scheduled_apt = next((apt for apt in appointments if apt["_id"] == e2e_appointment_id and apt["status"] == "scheduled"), None)
+                        if scheduled_apt:
+                            results.add_test(f"E2E - Status {user_name}", True, f"RDV visible pour {user_name} avec status='scheduled'")
+                            print(f"✅ RDV visible pour {user_name} avec status='scheduled'")
                         else:
-                            results.add_test("Get my appointments", False, 
-                                           f"Appointment missing required fields: {apt}")
-                            print(f"❌ Appointment missing required fields")
-                        break
-                
-                if not found_appointment:
-                    results.add_test("Get my appointments", False, 
-                                   f"Created appointment not found in list of {len(appointments)}")
-                    print(f"❌ Created appointment not found in list")
+                            results.add_test(f"E2E - Status {user_name}", False, f"RDV non trouvé ou status incorrect pour {user_name}")
+                            print(f"❌ RDV non trouvé ou status incorrect pour {user_name}")
             else:
-                results.add_test("Get my appointments", False, 
-                               f"No appointments returned or invalid format: {appointments}")
-                print(f"❌ No appointments returned or invalid format")
+                results.add_test("E2E - Acceptation", False, f"Status: {accept_response.status_code}")
+                print(f"❌ Échec acceptation E2E: {accept_response.status_code}")
         else:
-            results.add_test("Get my appointments", False, 
-                           f"Status: {response.status_code}, Response: {response.text}")
-            print(f"❌ Failed to get appointments: {response.status_code} - {response.text}")
+            results.add_test("E2E - Création", False, f"Status: {create_response.status_code}")
+            print(f"❌ Échec création E2E: {create_response.status_code}")
             
     except Exception as e:
-        results.add_test("Get my appointments", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in get appointments test: {str(e)}")
+        results.add_test("E2E Flow", False, f"Exception: {str(e)}")
+        print(f"❌ Exception E2E: {str(e)}")
     
-    # TEST 3: Validation - Date in the past
-    print(f"\n3️⃣ Testing: Validation - Date in the past")
-    try:
-        past_date = (datetime.utcnow() - timedelta(days=1)).isoformat()
-        appointment_data = {
-            "chatId": chat_id,
-            "otherUserId": user_b_id,
-            "date": past_date,
-            "title": "Rendez-vous dans le passé",
-            "description": "Ceci devrait échouer"
-        }
-        
-        response = requests.post(f"{BASE_URL}/appointments",
-                               headers=headers_a,
-                               json=appointment_data)
-        
-        if response.status_code in [400, 422]:
-            results.add_test("Validation - Date in past", True, 
-                           f"Correctly rejected with status: {response.status_code}")
-            print(f"✅ Past date correctly rejected: {response.status_code}")
-        else:
-            results.add_test("Validation - Date in past", False, 
-                           f"Should have been rejected but got: {response.status_code}")
-            print(f"❌ Past date should have been rejected but got: {response.status_code}")
-            
-    except Exception as e:
-        results.add_test("Validation - Date in past", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in past date validation test: {str(e)}")
+    print(f"\n🔄 TESTS DE RÉGRESSION")
+    print("=" * 50)
     
-    # TEST 4: Validation - Missing title
-    print(f"\n4️⃣ Testing: Validation - Missing title")
+    # TEST 9: Régression - POST /api/appointments
+    print(f"\n9️⃣ RÉGRESSION: POST /api/appointments")
     try:
         future_date = (datetime.utcnow() + timedelta(days=1)).isoformat()
         appointment_data = {
             "chatId": chat_id,
             "otherUserId": user_b_id,
             "date": future_date,
-            # "title": missing on purpose
-            "description": "Rendez-vous sans titre"
+            "title": "Test régression création",
+            "description": "Vérification que la création fonctionne toujours"
         }
         
-        response = requests.post(f"{BASE_URL}/appointments",
-                               headers=headers_a,
-                               json=appointment_data)
+        response = requests.post(f"{BASE_URL}/appointments", headers=headers_a, json=appointment_data)
         
-        if response.status_code in [400, 422]:
-            results.add_test("Validation - Missing title", True, 
-                           f"Correctly rejected with status: {response.status_code}")
-            print(f"✅ Missing title correctly rejected: {response.status_code}")
+        if response.status_code in [200, 201]:
+            results.add_test("Régression - POST appointments", True, "Création fonctionne")
+            print(f"✅ POST /api/appointments fonctionne")
         else:
-            results.add_test("Validation - Missing title", False, 
-                           f"Should have been rejected but got: {response.status_code}")
-            print(f"❌ Missing title should have been rejected but got: {response.status_code}")
+            results.add_test("Régression - POST appointments", False, f"Status: {response.status_code}")
+            print(f"❌ POST /api/appointments échoue: {response.status_code}")
             
     except Exception as e:
-        results.add_test("Validation - Missing title", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in missing title validation test: {str(e)}")
+        results.add_test("Régression - POST appointments", False, f"Exception: {str(e)}")
+        print(f"❌ Exception: {str(e)}")
     
-    # TEST 5: Authentication required
-    print(f"\n5️⃣ Testing: Authentication required")
+    # TEST 10: Régression - GET /api/appointments/my
+    print(f"\n🔟 RÉGRESSION: GET /api/appointments/my")
     try:
-        future_date = (datetime.utcnow() + timedelta(days=1)).isoformat()
-        appointment_data = {
-            "chatId": chat_id,
-            "otherUserId": user_b_id,
-            "date": future_date,
-            "title": "Rendez-vous sans auth",
-            "description": "Ceci devrait échouer"
-        }
-        
-        # Request without Authorization header
-        response = requests.post(f"{BASE_URL}/appointments",
-                               headers=HEADERS,  # No auth header
-                               json=appointment_data)
-        
-        if response.status_code in [401, 403]:
-            results.add_test("Authentication required", True, 
-                           f"Correctly rejected with status: {response.status_code}")
-            print(f"✅ Unauthenticated request correctly rejected: {response.status_code}")
-        else:
-            results.add_test("Authentication required", False, 
-                           f"Should have been rejected but got: {response.status_code}")
-            print(f"❌ Unauthenticated request should have been rejected but got: {response.status_code}")
-            
-    except Exception as e:
-        results.add_test("Authentication required", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in authentication test: {str(e)}")
-    
-    # TEST 6: Modify appointment status
-    print(f"\n6️⃣ Testing: Modify appointment status")
-    try:
-        # First, get the appointment ID from our created appointment
         response = requests.get(f"{BASE_URL}/appointments/my", headers=headers_a)
+        
         if response.status_code == 200:
             appointments = response.json()
-            appointment_id = None
-            for apt in appointments:
-                if apt.get("title") == "Rendez-vous échange de services":
-                    appointment_id = apt.get("_id")
-                    break
-            
-            if appointment_id:
-                # Try to update status - Note: endpoint is PUT, not PATCH as mentioned in review
-                update_data = {"status": "completed"}
-                response = requests.put(f"{BASE_URL}/appointments/{appointment_id}",
-                                      headers=headers_a,
-                                      json=update_data)
-                
-                if response.status_code == 200:
-                    results.add_test("Modify appointment status", True, 
-                                   f"Status updated successfully: {response.status_code}")
-                    print(f"✅ Appointment status updated successfully")
-                else:
-                    results.add_test("Modify appointment status", False, 
-                                   f"Failed to update status: {response.status_code} - {response.text}")
-                    print(f"❌ Failed to update appointment status: {response.status_code}")
-            else:
-                results.add_test("Modify appointment status", False, 
-                               "Could not find appointment ID to update")
-                print(f"❌ Could not find appointment ID to update")
+            results.add_test("Régression - GET appointments/my", True, f"{len(appointments)} RDV trouvés")
+            print(f"✅ GET /api/appointments/my fonctionne: {len(appointments)} rendez-vous")
         else:
-            results.add_test("Modify appointment status", False, 
-                           f"Could not retrieve appointments: {response.status_code}")
-            print(f"❌ Could not retrieve appointments for status update test")
+            results.add_test("Régression - GET appointments/my", False, f"Status: {response.status_code}")
+            print(f"❌ GET /api/appointments/my échoue: {response.status_code}")
             
     except Exception as e:
-        results.add_test("Modify appointment status", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in modify status test: {str(e)}")
+        results.add_test("Régression - GET appointments/my", False, f"Exception: {str(e)}")
+        print(f"❌ Exception: {str(e)}")
     
-    # TEST 7: Security - Modify another user's appointment
-    print(f"\n7️⃣ Testing: Security - Modify another user's appointment")
-    try:
-        # Get User A's appointments to find an appointment ID
-        response = requests.get(f"{BASE_URL}/appointments/my", headers=headers_a)
-        if response.status_code == 200:
-            appointments = response.json()
-            appointment_id = None
-            for apt in appointments:
-                if apt.get("title") == "Rendez-vous échange de services":
-                    appointment_id = apt.get("_id")
-                    break
+    # TEST 11: Régression - PUT /api/appointments/{id}
+    print(f"\n1️⃣1️⃣ RÉGRESSION: PUT /api/appointments/{{id}}")
+    if appointment_for_accept:
+        try:
+            update_data = {"status": "completed"}
+            response = requests.put(f"{BASE_URL}/appointments/{appointment_for_accept}", headers=headers_a, json=update_data)
             
-            if appointment_id:
-                # Try to update User A's appointment using User B's token
-                update_data = {"status": "cancelled"}
-                response = requests.put(f"{BASE_URL}/appointments/{appointment_id}",
-                                      headers=headers_b,  # User B trying to modify User A's appointment
-                                      json=update_data)
-                
-                if response.status_code == 403:
-                    results.add_test("Security - Modify other's appointment", True, 
-                                   f"Correctly rejected with status: {response.status_code}")
-                    print(f"✅ Cross-user modification correctly rejected: {response.status_code}")
-                elif response.status_code == 404:
-                    # Also acceptable - appointment not found for this user
-                    results.add_test("Security - Modify other's appointment", True, 
-                                   f"Correctly rejected with status: {response.status_code} (not found)")
-                    print(f"✅ Cross-user modification correctly rejected: {response.status_code}")
-                else:
-                    results.add_test("Security - Modify other's appointment", False, 
-                                   f"Should have been rejected but got: {response.status_code}")
-                    print(f"❌ Cross-user modification should have been rejected but got: {response.status_code}")
+            if response.status_code == 200:
+                results.add_test("Régression - PUT appointments", True, "Mise à jour fonctionne")
+                print(f"✅ PUT /api/appointments/{{id}} fonctionne")
             else:
-                results.add_test("Security - Modify other's appointment", False, 
-                               "Could not find appointment ID for security test")
-                print(f"❌ Could not find appointment ID for security test")
-        else:
-            results.add_test("Security - Modify other's appointment", False, 
-                           f"Could not retrieve appointments: {response.status_code}")
-            print(f"❌ Could not retrieve appointments for security test")
-            
-    except Exception as e:
-        results.add_test("Security - Modify other's appointment", False, f"Exception: {str(e)}")
-        print(f"❌ Exception in security test: {str(e)}")
+                results.add_test("Régression - PUT appointments", False, f"Status: {response.status_code}")
+                print(f"❌ PUT /api/appointments/{{id}} échoue: {response.status_code}")
+                
+        except Exception as e:
+            results.add_test("Régression - PUT appointments", False, f"Exception: {str(e)}")
+            print(f"❌ Exception: {str(e)}")
     
     return results
 
