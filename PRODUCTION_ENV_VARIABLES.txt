@@ -1,0 +1,100 @@
+=====================================================
+VARIABLES D'ENVIRONNEMENT POUR PRODUCTION - TIMESWAP
+=====================================================
+
+📋 INSTRUCTIONS :
+1. Trouvez l'URL de production dans Emergent (onglet Home)
+2. Créez MongoDB Atlas et obtenez l'URL de connexion
+3. Remplacez [VOTRE_URL_PRODUCTION] et [VOTRE_MONGODB_ATLAS_URL]
+4. Copiez-collez ces variables dans l'interface Emergent
+
+=====================================================
+🔵 BACKEND - Variables d'environnement
+=====================================================
+
+Name: MONGO_URL
+Value: [VOTRE_MONGODB_ATLAS_URL]
+Note: Remplacer par votre URL MongoDB Atlas
+Exemple: mongodb+srv://user:password@cluster0.xxxxx.mongodb.net/timeswap
+
+Name: DB_NAME
+Value: timeswap
+
+Name: STRIPE_API_KEY
+Value: sk_test_51SXtY3JwEFuWgv198BijVKwZxh6ZMYVhAFwtdC9pHIHS8LSANi8SmArU4kBiaS3JNPVUP8IXXc6VskPmsqRtnQbQ00c2QY51hu
+
+Name: JWT_SECRET
+Value: timeswap_secret_key_change_in_production_2025
+
+Name: RESEND_API_KEY
+Value: re_GZrfK5m8_AWGhQTWhDj2A4RheaKHq6kFb
+
+=====================================================
+🟢 FRONTEND - Variables d'environnement
+=====================================================
+
+Name: EXPO_PUBLIC_BACKEND_URL
+Value: [VOTRE_URL_PRODUCTION]
+Note: Remplacer par l'URL de production (ex: https://timeswap-abc123.emergentagent.com)
+
+Name: EXPO_PACKAGER_HOSTNAME
+Value: [VOTRE_URL_PRODUCTION]
+Note: Même valeur que EXPO_PUBLIC_BACKEND_URL
+
+Name: EXPO_TUNNEL_SUBDOMAIN
+Value: timeswap
+
+Name: EXPO_USE_FAST_RESOLVER
+Value: 1
+
+Name: METRO_CACHE_ROOT
+Value: /app/frontend/.metro-cache
+
+Name: EXPO_PUBLIC_FIREBASE_API_KEY
+Value: AIzaSyCMWNH_AtZ0-b6LDL4RuCN6SkZ_vGJVHiY
+
+Name: EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN
+Value: timeswap-755ac.firebaseapp.com
+
+Name: EXPO_PUBLIC_FIREBASE_PROJECT_ID
+Value: timeswap-755ac
+
+Name: EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET
+Value: timeswap-755ac.firebasestorage.app
+
+Name: EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID
+Value: 219683140780
+
+Name: EXPO_PUBLIC_FIREBASE_APP_ID
+Value: 1:219683140780:web:135eb06476578d01f89b09
+
+Name: EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
+Value: G-EFZNZ6PMQQ
+
+=====================================================
+📊 RÉSUMÉ
+=====================================================
+
+BACKEND: 5 variables
+FRONTEND: 12 variables
+TOTAL: 17 variables
+
+À REMPLACER:
+- [VOTRE_URL_PRODUCTION] → URL visible dans Emergent Home
+- [VOTRE_MONGODB_ATLAS_URL] → URL de votre cluster MongoDB Atlas
+
+À CONSERVER:
+✅ Toutes les clés API (Stripe, Resend, Firebase)
+✅ JWT_SECRET
+✅ DB_NAME
+
+=====================================================
+🚀 PROCESSUS DE DÉPLOIEMENT
+=====================================================
+
+1. ✅ FAIT: Application déployée (statut "Live")
+2. 📍 EN COURS: Configuration des variables d'environnement
+3. ⏳ APRÈS: Re-deploy pour appliquer les variables
+4. 🌐 ENSUITE: Configuration domaine www.timeswap.fr
+
+=====================================================
