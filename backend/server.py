@@ -2296,6 +2296,125 @@ async def update_appointment(
         logger.error(f"Erreur mise à jour rendez-vous: {str(e)}")
         raise HTTPException(500, f"Erreur: {str(e)}")
 
+@api_router.post("/appointments/{appointment_id}/accept")
+async def accept_appointment(
+    appointment_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Accepter un rendez-vous proposé
+    """
+    try:
+        # Vérifier que le rendez-vous existe et que l'utilisateur est participant
+        appointment = await db.appointments.find_one({
+            "_id": appointment_id,
+            "participants": current_user["_id"]
+        })
+        
+        if not appointment:
+            raise HTTPException(404, "Rendez-vous non trouvé ou vous n'êtes pas participant")
+        
+        # Vérifier que le rendez-vous est en attente
+        if appointment["status"] != "pending":
+            raise HTTPException(400, f"Ce rendez-vous est déjà {appointment['status']}")
+        
+        # Ajouter l'utilisateur à la liste des acceptations
+        await db.appointments.update_one(
+            {"_id": appointment_id},
+            {
+                "$addToSet": {"acceptedBy": current_user["_id"]},
+                "$set": {
+                    "status": "scheduled",  # Rendez-vous confirmé
+                    "updatedAt": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        # Créer une notification pour le créateur
+        creator_id = appointment["createdBy"]
+        if creator_id != current_user["_id"]:
+            notification = {
+                "_id": str(uuid.uuid4()),
+                "userId": creator_id,
+                "type": "appointment_accepted",
+                "title": "Rendez-vous accepté",
+                "message": f"{current_user['profile']['firstName']} a accepté votre rendez-vous : {appointment['title']}",
+                "data": {
+                    "appointmentId": appointment_id,
+                    "date": appointment["date"]
+                },
+                "read": False,
+                "createdAt": datetime.utcnow().isoformat()
+            }
+            await db.notifications.insert_one(notification)
+        
+        return {"message": "Rendez-vous accepté avec succès"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur acceptation rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
+@api_router.post("/appointments/{appointment_id}/reject")
+async def reject_appointment(
+    appointment_id: str,
+    current_user: dict = Depends(get_current_user)
+):
+    """
+    Refuser un rendez-vous proposé
+    """
+    try:
+        # Vérifier que le rendez-vous existe et que l'utilisateur est participant
+        appointment = await db.appointments.find_one({
+            "_id": appointment_id,
+            "participants": current_user["_id"]
+        })
+        
+        if not appointment:
+            raise HTTPException(404, "Rendez-vous non trouvé ou vous n'êtes pas participant")
+        
+        # Vérifier que le rendez-vous est en attente
+        if appointment["status"] != "pending":
+            raise HTTPException(400, f"Ce rendez-vous est déjà {appointment['status']}")
+        
+        # Marquer comme rejeté
+        await db.appointments.update_one(
+            {"_id": appointment_id},
+            {
+                "$addToSet": {"rejectedBy": current_user["_id"]},
+                "$set": {
+                    "status": "rejected",
+                    "updatedAt": datetime.utcnow().isoformat()
+                }
+            }
+        )
+        
+        # Créer une notification pour le créateur
+        creator_id = appointment["createdBy"]
+        if creator_id != current_user["_id"]:
+            notification = {
+                "_id": str(uuid.uuid4()),
+                "userId": creator_id,
+                "type": "appointment_rejected",
+                "title": "Rendez-vous refusé",
+                "message": f"{current_user['profile']['firstName']} a refusé votre rendez-vous : {appointment['title']}",
+                "data": {
+                    "appointmentId": appointment_id
+                },
+                "read": False,
+                "createdAt": datetime.utcnow().isoformat()
+            }
+            await db.notifications.insert_one(notification)
+        
+        return {"message": "Rendez-vous refusé"}
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Erreur refus rendez-vous: {str(e)}")
+        raise HTTPException(500, f"Erreur: {str(e)}")
+
 @api_router.delete("/appointments/{appointment_id}")
 async def delete_appointment(
     appointment_id: str,
