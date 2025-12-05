@@ -21,7 +21,7 @@ import sys
 import traceback
 
 # Configuration
-BASE_URL = "https://servicexchange.preview.emergentagent.com/api"
+BASE_URL = "https://servicetrade.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 class TestResults:

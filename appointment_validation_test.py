@@ -10,7 +10,7 @@ import uuid
 from datetime import datetime, timedelta
 import sys
 
-BASE_URL = "https://servicexchange.preview.emergentagent.com/api"
+BASE_URL = "https://servicetrade.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 def register_user(email, password, first_name, last_name):
