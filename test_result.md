@@ -125,11 +125,11 @@ user_problem_statement: |
 backend:
   - task: "Appointment System - Accept Appointment"
     implemented: true
-    working: "NA"
+    working: true
     file: "server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
@@ -154,6 +154,52 @@ backend:
           - Personne A reçoit une notification du choix de B
           
           Prêt pour test backend complet.
+      - working: true
+        agent: "testing"
+        comment: |
+          ✅ SYSTÈME DE RENDEZ-VOUS COMPLET TESTÉ AVEC SUCCÈS - 17/17 TESTS PASSÉS (100%)
+          
+          TESTS PRIORITAIRES SELON LA REVIEW REQUEST:
+          
+          🎯 NOUVEAUX ENDPOINTS (PRIORITAIRES):
+          1. ✅ POST /api/appointments/{appointment_id}/accept:
+             - Créé utilisateurs A (Marie) et B (Pierre)
+             - A crée RDV avec B (status=pending)
+             - B accepte avec POST /accept
+             - Status passe correctement à "scheduled"
+             - B ajouté à acceptedBy[]
+             - Notification créée pour A (type: appointment_accepted)
+          
+          2. ✅ POST /api/appointments/{appointment_id}/reject:
+             - A crée nouveau RDV avec B (status=pending)
+             - B refuse avec POST /reject
+             - Status passe correctement à "rejected"
+             - B ajouté à rejectedBy[]
+             - Notification créée pour A (type: appointment_rejected)
+          
+          🔍 TESTS DE VALIDATION:
+          3. ✅ Double acceptation impossible (400 error)
+          4. ✅ Authentification JWT requise (403 error)
+          5. ✅ RDV inexistant géré (404 error)
+          6. ✅ Seuls les participants peuvent accepter/refuser
+          
+          🔄 FLUX COMPLET END-TO-END:
+          7. ✅ A crée RDV → B reçoit notification → B accepte → A reçoit notification
+          8. ✅ RDV apparaît avec status="scheduled" pour A et B dans GET /api/appointments/my
+          
+          🔄 TESTS DE RÉGRESSION (ANCIENS ENDPOINTS):
+          9. ✅ POST /api/appointments - Création fonctionne
+          10. ✅ GET /api/appointments/my - Liste des RDV fonctionne (4 RDV trouvés)
+          11. ✅ PUT /api/appointments/{id} - Mise à jour statut fonctionne
+          
+          🎯 CRITÈRES DE SUCCÈS ATTEINTS:
+          ✅ Les 2 nouveaux endpoints fonctionnent correctement
+          ✅ Les notifications sont envoyées aux bonnes personnes
+          ✅ Le flux complet fonctionne de bout en bout
+          ✅ Pas de régression sur les anciens endpoints
+          ✅ Toutes les validations fonctionnent
+          
+          SYSTÈME DE RENDEZ-VOUS ACCEPTATION/REFUS PRÊT POUR PRODUCTION!
 
   - task: "Appointment System - Create Appointment"
     implemented: true
