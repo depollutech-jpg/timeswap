@@ -838,6 +838,43 @@ test_plan:
           Solution cross-platform validée - prête pour production.
 
 agent_communication:
+  - agent: "main"
+    message: |
+      ✅ SYSTÈME DE RENDEZ-VOUS - ACCEPTATION/REFUS IMPLÉMENTÉ:
+      
+      NOUVEAU FLUX COMPLET:
+      1. Personne A crée un RDV via POST /api/appointments (status=pending)
+      2. Personne B reçoit une notification
+      3. Personne B peut:
+         - Accepter: POST /api/appointments/{id}/accept → status=scheduled
+         - Refuser: POST /api/appointments/{id}/reject → status=rejected
+      4. Personne A reçoit une notification du choix de B
+      
+      NOUVEAUX ENDPOINTS:
+      - POST /api/appointments/{appointment_id}/accept
+        * Validation: RDV doit être en status "pending"
+        * Action: Passe à "scheduled", ajoute à acceptedBy[]
+        * Notification envoyée au créateur
+      
+      - POST /api/appointments/{appointment_id}/reject
+        * Validation: RDV doit être en status "pending"
+        * Action: Passe à "rejected", ajoute à rejectedBy[]
+        * Notification envoyée au créateur
+      
+      BACKEND MODIFIÉ:
+      - Fichier: /app/backend/server.py
+      - Lignes ajoutées: ~120 lignes de code (2 endpoints complets)
+      - Backend redémarré avec succès
+      
+      CORRECTIONS AU PROBLÈME INITIAL:
+      Le problème signalé par l'utilisateur était que "personne B ne recevait pas de notification 
+      et ne pouvait pas accepter/refuser". Maintenant:
+      ✅ Notification envoyée à personne B lors de la création
+      ✅ Endpoints accept/reject disponibles pour personne B
+      ✅ Notification de retour envoyée à personne A
+      
+      Prêt pour tests backend complets.
+  
   - agent: "testing"
     message: |
       ✅ APPOINTMENT SYSTEM RE-TESTING COMPLETED - DATE VALIDATION BUG FIXED!
