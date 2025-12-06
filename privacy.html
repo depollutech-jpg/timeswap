@@ -1,0 +1,463 @@
+Voici le contenu complet de `privacy.html` :
+Action: file_editor view /app/privacy.html
+Observation: /app/privacy.html:
+1|<!DOCTYPE html>
+2|<html lang="fr">
+3|<head>
+4|    <meta charset="UTF-8">
+5|    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+6|    <title>Politique de Confidentialité - TimeSwap</title>
+7|    <style>
+8|        * {
+9|            margin: 0;
+10|            padding: 0;
+11|            box-sizing: border-box;
+12|        }
+13|        
+14|        body {
+15|            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+16|            line-height: 1.6;
+17|            color: #333;
+18|            background-color: #f5f5f5;
+19|            padding: 20px;
+20|        }
+21|        
+22|        .container {
+23|            max-width: 900px;
+24|            margin: 0 auto;
+25|            background: white;
+26|            padding: 40px;
+27|            border-radius: 10px;
+28|            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+29|        }
+30|        
+31|        h1 {
+32|            color: #3EADAD;
+33|            font-size: 2.5em;
+34|            margin-bottom: 10px;
+35|            border-bottom: 3px solid #3EADAD;
+36|            padding-bottom: 15px;
+37|        }
+38|        
+39|        h2 {
+40|            color: #2c3e50;
+41|            font-size: 1.8em;
+42|            margin-top: 40px;
+43|            margin-bottom: 20px;
+44|            padding-bottom: 10px;
+45|            border-bottom: 2px solid #ecf0f1;
+46|        }
+47|        
+48|        h3 {
+49|            color: #34495e;
+50|            font-size: 1.3em;
+51|            margin-top: 25px;
+52|            margin-bottom: 15px;
+53|        }
+54|        
+55|        p {
+56|            margin-bottom: 15px;
+57|            text-align: justify;
+58|        }
+59|        
+60|        .update-date {
+61|            color: #7f8c8d;
+62|            font-style: italic;
+63|            margin-bottom: 30px;
+64|        }
+65|        
+66|        .contact-info {
+67|            background-color: #e8f4f8;
+68|            padding: 20px;
+69|            border-radius: 8px;
+70|            margin: 20px 0;
+71|            border-left: 4px solid #3EADAD;
+72|        }
+73|        
+74|        ul, ol {
+75|            margin-left: 30px;
+76|            margin-bottom: 20px;
+77|        }
+78|        
+79|        li {
+80|            margin-bottom: 10px;
+81|        }
+82|        
+83|        table {
+84|            width: 100%;
+85|            border-collapse: collapse;
+86|            margin: 20px 0;
+87|        }
+88|        
+89|        table th, table td {
+90|            border: 1px solid #ddd;
+91|            padding: 12px;
+92|            text-align: left;
+93|        }
+94|        
+95|        table th {
+96|            background-color: #3EADAD;
+97|            color: white;
+98|        }
+99|        
+100|        table tr:nth-child(even) {
+101|            background-color: #f9f9f9;
+102|        }
+103|        
+104|        .highlight {
+105|            background-color: #fff3cd;
+106|            padding: 15px;
+107|            border-left: 4px solid #ffc107;
+108|            margin: 20px 0;
+109|            border-radius: 5px;
+110|        }
+111|        
+112|        .summary {
+113|            background-color: #d4edda;
+114|            padding: 20px;
+115|            border-radius: 8px;
+116|            margin-top: 40px;
+117|            border-left: 4px solid #28a745;
+118|        }
+119|        
+120|        a {
+121|            color: #3EADAD;
+122|            text-decoration: none;
+123|        }
+124|        
+125|        a:hover {
+126|            text-decoration: underline;
+127|        }
+128|        
+129|        @media (max-width: 768px) {
+130|            .container {
+131|                padding: 20px;
+132|            }
+133|            
+134|            h1 {
+135|                font-size: 2em;
+136|            }
+137|            
+138|            h2 {
+139|                font-size: 1.5em;
+140|            }
+141|        }
+142|    </style>
+143|</head>
+144|<body>
+145|    <div class="container">
+146|        <h1>🔒 Politique de Confidentialité - TimeSwap</h1>
+147|        <p class="update-date"><strong>Dernière mise à jour :</strong> 6 décembre 2025</p>
+148|
+149|        <h2>1. Introduction</h2>
+150|        <p>Bienvenue sur TimeSwap. Nous respectons votre vie privée et nous nous engageons à protéger vos données personnelles. Cette politique de confidentialité vous informe sur la manière dont nous collectons, utilisons et protégeons vos informations lorsque vous utilisez notre application mobile TimeSwap.</p>
+151|        
+152|        <div class="contact-info">
+153|            <strong>Éditeur de l'application :</strong><br>
+154|            • Nom : TimeSwap<br>
+155|            • Site web : <a href="https://timeswap.fr">https://timeswap.fr</a><br>
+156|            • Email de contact : <a href="mailto:support@timeswap.fr">support@timeswap.fr</a>
+157|        </div>
+158|
+159|        <h2>2. Données que nous collectons</h2>
+160|        
+161|        <h3>2.1 Informations que vous nous fournissez</h3>
+162|        <p>Lorsque vous créez un compte, nous collectons :</p>
+163|        <ul>
+164|            <li><strong>Nom et prénom</strong> : Pour vous identifier sur la plateforme</li>
+165|            <li><strong>Adresse email</strong> : Pour la connexion et les communications importantes</li>
+166|            <li><strong>Mot de passe</strong> : Chiffré pour sécuriser votre compte</li>
+167|            <li><strong>Photo de profil</strong> (optionnel) : Pour personnaliser votre profil</li>
+168|            <li><strong>Numéro de téléphone</strong> (optionnel) : Pour faciliter les échanges</li>
+169|            <li><strong>Description personnelle</strong> : Pour présenter vos compétences</li>
+170|        </ul>
+171|
+172|        <h3>2.2 Informations collectées automatiquement</h3>
+173|        <p>Lors de l'utilisation de l'application :</p>
+174|        <ul>
+175|            <li><strong>Données de localisation</strong> : Pour vous proposer des services à proximité (avec votre consentement)</li>
+176|            <li><strong>Photos</strong> : Si vous choisissez d'ajouter des photos à vos annonces</li>
+177|            <li><strong>Messages de chat</strong> : Stockés de manière sécurisée pour faciliter la communication</li>
+178|            <li><strong>Historique des services</strong> : Pour afficher vos échanges passés</li>
+179|            <li><strong>Données d'utilisation</strong> : Pages visitées, fonctionnalités utilisées (via Google Analytics)</li>
+180|        </ul>
+181|
+182|        <h3>2.3 Informations sur les appareils</h3>
+183|        <ul>
+184|            <li>Type d'appareil (Android/iOS)</li>
+185|            <li>Système d'exploitation</li>
+186|            <li>Identifiant unique de l'appareil</li>
+187|            <li>Adresse IP</li>
+188|            <li>Informations de connexion</li>
+189|        </ul>
+190|
+191|        <h2>3. Comment nous utilisons vos données</h2>
+192|        
+193|        <h3>3.1 Fournir nos services</h3>
+194|        <ul>
+195|            <li>Créer et gérer votre compte utilisateur</li>
+196|            <li>Permettre la publication et la recherche de services</li>
+197|            <li>Faciliter la communication entre membres (chat)</li>
+198|            <li>Organiser des rendez-vous entre utilisateurs</li>
+199|            <li>Gérer votre solde d'heures TimeSwap</li>
+200|        </ul>
+201|
+202|        <h3>3.2 Améliorer nos services</h3>
+203|        <ul>
+204|            <li>Analyser l'utilisation de l'application (via Google Analytics)</li>
+205|            <li>Comprendre les préférences des utilisateurs</li>
+206|            <li>Développer de nouvelles fonctionnalités</li>
+207|            <li>Corriger les bugs et problèmes techniques</li>
+208|        </ul>
+209|
+210|        <h3>3.3 Communications</h3>
+211|        <ul>
+212|            <li>Envoyer des notifications sur les nouveaux messages</li>
+213|            <li>Vous informer des rendez-vous à venir</li>
+214|            <li>Envoyer des emails de réinitialisation de mot de passe (via Resend)</li>
+215|            <li>Communiquer des mises à jour importantes de l'application</li>
+216|        </ul>
+217|
+218|        <h3>3.4 Sécurité et conformité</h3>
+219|        <ul>
+220|            <li>Prévenir la fraude et les abus</li>
+221|            <li>Respecter nos obligations légales</li>
+222|            <li>Résoudre les litiges entre utilisateurs</li>
+223|        </ul>
+224|
+225|        <h2>4. Base légale du traitement (RGPD)</h2>
+226|        <p>Nous traitons vos données personnelles sur les bases légales suivantes :</p>
+227|        <ul>
+228|            <li><strong>Exécution d'un contrat</strong> : Pour fournir les services TimeSwap</li>
+229|            <li><strong>Consentement</strong> : Pour la localisation, les notifications push, l'analyse</li>
+230|            <li><strong>Intérêt légitime</strong> : Pour améliorer nos services et prévenir la fraude</li>
+231|            <li><strong>Obligation légale</strong> : Pour respecter les lois applicables</li>
+232|        </ul>
+233|
+234|        <h2>5. Partage de vos données</h2>
+235|        
+236|        <h3>5.1 Avec d'autres utilisateurs</h3>
+237|        <p>Les informations suivantes sont visibles par les autres membres :</p>
+238|        <ul>
+239|            <li>Nom et prénom</li>
+240|            <li>Photo de profil</li>
+241|            <li>Description personnelle</li>
+242|            <li>Services proposés</li>
+243|            <li>Avis et évaluations reçus</li>
+244|            <li>Localisation approximative (ville/quartier)</li>
+245|        </ul>
+246|
+247|        <div class="highlight">
+248|            <strong>Nous ne partageons jamais :</strong><br>
+249|            • Votre adresse email complète<br>
+250|            • Votre mot de passe<br>
+251|            • Votre localisation précise sans votre consentement<br>
+252|            • Vos messages privés avec d'autres utilisateurs
+253|        </div>
+254|
+255|        <h3>5.2 Avec des prestataires de services tiers</h3>
+256|        <p>Nous utilisons des services tiers de confiance :</p>
+257|        
+258|        <table>
+259|            <thead>
+260|                <tr>
+261|                    <th>Service</th>
+262|                    <th>Utilisation</th>
+263|                    <th>Données partagées</th>
+264|                    <th>Pays</th>
+265|                </tr>
+266|            </thead>
+267|            <tbody>
+268|                <tr>
+269|                    <td><strong>Google Firebase</strong></td>
+270|                    <td>Analytics, authentification</td>
+271|                    <td>Données d'utilisation, ID appareil</td>
+272|                    <td>États-Unis</td>
+273|                </tr>
+274|                <tr>
+275|                    <td><strong>Stripe</strong></td>
+276|                    <td>Paiements (achats d'heures)</td>
+277|                    <td>Informations de paiement</td>
+278|                    <td>États-Unis</td>
+279|                </tr>
+280|                <tr>
+281|                    <td><strong>Resend</strong></td>
+282|                    <td>Envoi d'emails</td>
+283|                    <td>Adresse email</td>
+284|                    <td>États-Unis</td>
+285|                </tr>
+286|                <tr>
+287|                    <td><strong>MongoDB Atlas</strong></td>
+288|                    <td>Stockage de données</td>
+289|                    <td>Toutes les données de profil</td>
+290|                    <td>États-Unis/Europe</td>
+291|                </tr>
+292|            </tbody>
+293|        </table>
+294|
+295|        <p>Ces prestataires sont conformes au RGPD et protègent vos données.</p>
+296|
+297|        <h3>5.3 Autorités légales</h3>
+298|        <p>Nous pouvons divulguer vos informations si requis par la loi ou pour :</p>
+299|        <ul>
+300|            <li>Répondre à une assignation ou ordonnance judiciaire</li>
+301|            <li>Protéger nos droits, votre sécurité ou celle d'autrui</li>
+302|            <li>Prévenir la fraude ou enquêter sur une activité illégale</li>
+303|        </ul>
+304|
+305|        <h2>6. Sécurité de vos données</h2>
+306|        <p>Nous mettons en œuvre des mesures de sécurité pour protéger vos données :</p>
+307|        <ul>
+308|            <li><strong>Chiffrement</strong> : Toutes les communications sont chiffrées (HTTPS/TLS)</li>
+309|            <li><strong>Mots de passe</strong> : Hachés avec des algorithmes sécurisés</li>
+310|            <li><strong>Accès restreint</strong> : Seuls les administrateurs autorisés ont accès aux données</li>
+311|            <li><strong>Sauvegardes</strong> : Effectuées régulièrement pour éviter la perte de données</li>
+312|            <li><strong>Surveillance</strong> : Détection des activités suspectes</li>
+313|        </ul>
+314|        <p><em>Cependant, aucune méthode de transmission sur Internet n'est 100% sécurisée.</em></p>
+315|
+316|        <h2>7. Conservation des données</h2>
+317|        <p>Nous conservons vos données personnelles :</p>
+318|        
+319|        <table>
+320|            <thead>
+321|                <tr>
+322|                    <th>Type de données</th>
+323|                    <th>Durée de conservation</th>
+324|                </tr>
+325|            </thead>
+326|            <tbody>
+327|                <tr>
+328|                    <td>Compte actif</td>
+329|                    <td>Tant que le compte est actif</td>
+330|                </tr>
+331|                <tr>
+332|                    <td>Après suppression de compte</td>
+333|                    <td>30 jours (puis suppression définitive)</td>
+334|                </tr>
+335|                <tr>
+336|                    <td>Messages de chat</td>
+337|                    <td>1 an après le dernier message</td>
+338|                </tr>
+339|                <tr>
+340|                    <td>Historique des services</td>
+341|                    <td>3 ans (pour statistiques)</td>
+342|                </tr>
+343|                <tr>
+344|                    <td>Données de facturation</td>
+345|                    <td>10 ans (obligation légale)</td>
+346|                </tr>
+347|            </tbody>
+348|        </table>
+349|
+350|        <h2>8. Vos droits (RGPD)</h2>
+351|        <p>Conformément au Règlement Général sur la Protection des Données (RGPD), vous disposez des droits suivants :</p>
+352|
+353|        <h3>8.1 Droit d'accès</h3>
+354|        <p>Vous pouvez demander une copie de toutes les données personnelles que nous détenons sur vous.</p>
+355|
+356|        <h3>8.2 Droit de rectification</h3>
+357|        <p>Vous pouvez corriger vos informations directement dans l'application ou nous demander de le faire.</p>
+358|
+359|        <h3>8.3 Droit à l'effacement ("droit à l'oubli")</h3>
+360|        <p>Vous pouvez supprimer votre compte et toutes vos données associées :</p>
+361|        <ul>
+362|            <li>Dans l'application : Profil → Paramètres → Supprimer mon compte</li>
+363|            <li>Ou par email : <a href="mailto:support@timeswap.fr">support@timeswap.fr</a></li>
+364|        </ul>
+365|
+366|        <h3>8.4 Droit à la portabilité</h3>
+367|        <p>Vous pouvez demander vos données dans un format structuré et lisible.</p>
+368|
+369|        <h3>8.5 Droit d'opposition</h3>
+370|        <p>Vous pouvez vous opposer au traitement de vos données à des fins de marketing ou d'analyse.</p>
+371|
+372|        <h3>8.6 Droit de limitation</h3>
+373|        <p>Vous pouvez demander la limitation du traitement dans certaines conditions.</p>
+374|
+375|        <h3>8.7 Exercer vos droits</h3>
+376|        <div class="contact-info">
+377|            Pour exercer vos droits, contactez-nous :<br>
+378|            • <strong>Email</strong> : <a href="mailto:support@timeswap.fr">support@timeswap.fr</a><br>
+379|            • <strong>Objet</strong> : "Demande RGPD - [Votre demande]"<br>
+380|            • <strong>Délai de réponse</strong> : 30 jours maximum
+381|        </div>
+382|
+383|        <h2>9. Données de localisation</h2>
+384|        
+385|        <h3>9.1 Comment nous utilisons votre localisation</h3>
+386|        <p>Nous utilisons votre localisation pour :</p>
+387|        <ul>
+388|            <li>Afficher les services disponibles près de chez vous</li>
+389|            <li>Proposer des recommandations personnalisées</li>
+390|            <li>Améliorer la pertinence des résultats de recherche</li>
+391|        </ul>
+392|
+393|        <h3>9.2 Contrôle de la localisation</h3>
+394|        <p>Vous pouvez à tout moment :</p>
+395|        <ul>
+396|            <li><strong>Activer/Désactiver</strong> : Paramètres appareil → TimeSwap → Localisation</li>
+397|            <li><strong>Choisir la précision</strong> : Précise ou approximative</li>
+398|            <li><strong>Révoquer le consentement</strong> : Aucune donnée de localisation ne sera plus collectée</li>
+399|        </ul>
+400|
+401|        <h2>10. Transferts internationaux de données</h2>
+402|        <p>Vos données peuvent être transférées et stockées :</p>
+403|        <ul>
+404|            <li><strong>États-Unis</strong> : Firebase, Stripe, Resend</li>
+405|            <li><strong>Europe</strong> : MongoDB Atlas (serveurs européens disponibles)</li>
+406|        </ul>
+407|        <p>Ces transferts sont protégés par :</p>
+408|        <ul>
+409|            <li>Clauses contractuelles types (CCT) approuvées par l'UE</li>
+410|            <li>Garanties appropriées conformes au RGPD</li>
+411|            <li>Privacy Shield (pour les entreprises certifiées)</li>
+412|        </ul>
+413|
+414|        <h2>11. Protection des mineurs</h2>
+415|        <p>TimeSwap est destiné aux personnes âgées de <strong>18 ans et plus</strong>.</p>
+416|        <p>Nous ne collectons pas sciemment de données personnelles d'enfants de moins de 18 ans. Si vous pensez qu'un mineur a créé un compte, contactez-nous immédiatement à <a href="mailto:support@timeswap.fr">support@timeswap.fr</a> pour que nous puissions supprimer le compte.</p>
+417|
+418|        <h2>12. Modifications de cette politique</h2>
+419|        <p>Nous pouvons mettre à jour cette politique de confidentialité occasionnellement. En cas de changement important, nous vous informerons :</p>
+420|        <ul>
+421|            <li>Par notification dans l'application</li>
+422|            <li>Par email à votre adresse enregistrée</li>
+423|        </ul>
+424|        <p><strong>Date de dernière modification</strong> : 6 décembre 2025</p>
+425|        <p>Nous vous encourageons à consulter régulièrement cette page.</p>
+426|
+427|        <h2>13. Contact et réclamations</h2>
+428|        
+429|        <h3>13.1 Nous contacter</h3>
+430|        <div class="contact-info">
+431|            Pour toute question concernant cette politique de confidentialité :<br><br>
+432|            • <strong>Email</strong> : <a href="mailto:support@timeswap.fr">support@timeswap.fr</a><br>
+433|            • <strong>Site web</strong> : <a href="https://timeswap.fr">https://timeswap.fr</a>
+434|        </div>
+435|
+436|        <h3>13.2 Autorité de contrôle</h3>
+437|        <p>Si vous estimez que vos droits ne sont pas respectés, vous pouvez déposer une réclamation auprès de la <strong>CNIL</strong> (Commission Nationale de l'Informatique et des Libertés) :</p>
+438|        <ul>
+439|            <li><strong>Site web</strong> : <a href="https://www.cnil.fr" target="_blank">www.cnil.fr</a></li>
+440|            <li><strong>Adresse</strong> : 3 Place de Fontenoy, TSA 80715, 75334 PARIS CEDEX 07</li>
+441|            <li><strong>Téléphone</strong> : 01 53 73 22 22</li>
+442|        </ul>
+443|
+444|        <div class="summary">
+445|            <h2>Résumé en bref</h2>
+446|            <p><strong>Ce que nous collectons</strong> : Nom, email, localisation, photos, messages</p>
+447|            <p><strong>Pourquoi</strong> : Fournir le service, améliorer l'expérience, sécurité</p>
+448|            <p><strong>Avec qui</strong> : Autres utilisateurs (profil public), prestataires tiers (Firebase, Stripe)</p>
+449|            <p><strong>Vos droits</strong> : Accès, rectification, suppression, portabilité, opposition</p>
+450|            <p><strong>Contact</strong> : <a href="mailto:support@timeswap.fr">support@timeswap.fr</a></p>
+451|        </div>
+452|
+453|        <p style="text-align: center; margin-top: 40px; color: #7f8c8d;">
+454|            <strong>En utilisant TimeSwap, vous acceptez cette politique de confidentialité.</strong><br><br>
+455|            Merci de faire confiance à TimeSwap pour vos échanges de services ! 🤝
+456|        </p>
+457|    </div>
+458|</body>
+459|</html>
+460|
