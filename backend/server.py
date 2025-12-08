@@ -1704,9 +1704,23 @@ async def get_blocked_users(current_user: dict = Depends(get_current_user)):
 
 # ============= ADMIN ROUTES =============
 
+# Liste des emails autorisés pour l'accès admin
+ADMIN_EMAILS = ["quentinraffalli@hotmail.com", "depollutech@gmail.com"]
+
 async def check_admin(current_user: dict = Depends(get_current_user)):
+    """
+    Vérification stricte de l'accès admin :
+    1. L'utilisateur doit avoir le rôle "admin"
+    2. L'email doit être dans la liste des admins autorisés
+    """
     if current_user.get("role") != "admin":
         raise HTTPException(403, "Admin access required")
+    
+    # Double vérification par email pour sécurité maximale
+    user_email = current_user.get("email", "").lower()
+    if user_email not in [e.lower() for e in ADMIN_EMAILS]:
+        raise HTTPException(403, "Unauthorized admin access")
+    
     return current_user
 
 @api_router.get("/admin/stats")
